@@ -13,4 +13,12 @@
 // pointer receivers and leaves the target unchanged on failure. JSON null is
 // rejected for scalar values; use pointer fields with encoding/json for nullability.
 // A new named type based on a scalar must explicitly forward its codec methods.
+//
+// Concept declares a domain value's exact scalar representation. Underlying
+// recognizes valid declarations without executing application code and returns
+// a Representation with a stable ScalarKind. CheckJSON validates actual encoded
+// scalar bytes without applying domain invariants. For the explicit marker and
+// codec-forwarding authoring pattern, see the [concept authoring guide].
+//
+// [concept authoring guide]: https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/concepts.md
 package concepts

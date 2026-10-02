@@ -5,6 +5,7 @@ package concepts
 
 import (
 	"bytes"
+	"encoding"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -21,21 +22,16 @@ import (
 //
 // Invalid representations (including zero) return an error wrapping
 // ErrInvalidConcept. Invalid data returns an ordinary error, not that sentinel.
-// r must describe a recognized declaration with a nonnegative PointerDepth.
-// The bytes are borrowed for this call only. No application methods are called.
+// r must be obtained from Underlying, with a nonnegative PointerDepth.
+// Kind must be valid and agree with Type. The bytes are borrowed for this call
+// only. CheckJSON never calls application code, and its allocations are bounded
+// by the input size: constant plus O(len(data)), not declaration complexity.
 // CheckJSON neither proves equality to ConceptValue nor applies domain/product
 // limits. Consumers must emit the same validated bytes, not call a codec again.
 // Calls are safe concurrently when callers do not mutate data during the call.
 func CheckJSON(r Representation, data []byte) error {
-	if r.Declared == nil || r.Declared.Kind() == reflect.Pointer || r.PointerDepth < 0 {
+	if !validRepresentation(r) {
 		return fmt.Errorf("CheckJSON: invalid representation: %w", ErrInvalidConcept)
-	}
-	declared, ok, err := Underlying(r.Declared)
-	if err != nil {
-		return fmt.Errorf("CheckJSON: %w", err)
-	}
-	if !ok || declared.Type != r.Type {
-		return fmt.Errorf("CheckJSON: inconsistent representation: %w", ErrInvalidConcept)
 	}
 	data = bytes.Trim(data, " \t\r\n")
 	if !utf8.Valid(data) || !json.Valid(data) {
@@ -44,6 +40,9 @@ func CheckJSON(r Representation, data []byte) error {
 	if isSharedScalar(r.Type) || r.Type.Kind() == reflect.String {
 		if data[0] != '"' {
 			return fmt.Errorf("CheckJSON: expected a string for %v", r.Type)
+		}
+		if !pairedSurrogates(data) {
+			return fmt.Errorf("CheckJSON: unpaired Unicode surrogate")
 		}
 		var text string
 		if err := json.Unmarshal(data, &text); err != nil {
@@ -77,6 +76,77 @@ func CheckJSON(r Representation, data []byte) error {
 		return fmt.Errorf("CheckJSON: number for %v: %w", r.Type, numberErr)
 	}
 	return nil
+}
+
+// validRepresentation checks the same declaration contract as Underlying, but
+// uses exact marker interfaces instead of reconstructing discovery and errors.
+// No application values or representation graphs need to be allocated.
+func validRepresentation(r Representation) bool {
+	kind, marker := scalarMetadata(r.Type)
+	if kind == KindInvalid || kind != r.Kind || r.Declared == nil || r.Declared != r.validatedDeclared || r.PointerDepth < 0 {
+		return false
+	}
+	declared := r.Declared
+	if declared.Kind() == reflect.Pointer || declared.Kind() == reflect.Interface {
+		return false
+	}
+	if isSharedScalar(declared) {
+		return declared == r.Type
+	}
+	if !declared.Implements(marker) {
+		return false
+	}
+	pointer := reflect.PointerTo(declared)
+	return declared.Implements(reflect.TypeFor[encoding.TextMarshaler]()) &&
+		declared.Implements(reflect.TypeFor[json.Marshaler]()) &&
+		!declared.Implements(reflect.TypeFor[encoding.TextUnmarshaler]()) &&
+		!declared.Implements(reflect.TypeFor[json.Unmarshaler]()) &&
+		pointer.Implements(reflect.TypeFor[encoding.TextUnmarshaler]()) &&
+		pointer.Implements(reflect.TypeFor[json.Unmarshaler]())
+}
+
+// pairedSurrogates scans an already syntax-validated JSON string. Unlike
+// encoding/json, it does not silently replace lone UTF-16 surrogates with U+FFFD.
+func pairedSurrogates(data []byte) bool {
+	for i := 1; i < len(data)-1; i++ {
+		if data[i] != '\\' {
+			continue
+		}
+		i++
+		if data[i] != 'u' {
+			continue
+		}
+		unit := jsonCodeUnit(data[i+1 : i+5])
+		i += 4
+		if unit < 0xd800 || unit > 0xdfff {
+			continue
+		}
+		if unit > 0xdbff || i+6 >= len(data)-1 || data[i+1] != '\\' || data[i+2] != 'u' {
+			return false
+		}
+		low := jsonCodeUnit(data[i+3 : i+7])
+		if low < 0xdc00 || low > 0xdfff {
+			return false
+		}
+		i += 6
+	}
+	return true
+}
+
+func jsonCodeUnit(hex []byte) uint16 {
+	var unit uint16
+	for _, digit := range hex {
+		unit <<= 4
+		switch {
+		case digit >= '0' && digit <= '9':
+			unit |= uint16(digit - '0')
+		case digit >= 'a' && digit <= 'f':
+			unit |= uint16(digit - 'a' + 10)
+		default:
+			unit |= uint16(digit - 'A' + 10)
+		}
+	}
+	return unit
 }
 
 func checkCanonical(t reflect.Type, text string) error {

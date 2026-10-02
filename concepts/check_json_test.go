@@ -8,6 +8,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/cratis/fundamentals.go/concepts"
@@ -28,7 +29,7 @@ func TestCheckJSONScalarTokens(t *testing.T) {
 		r              concepts.Representation
 		valid, invalid []string
 	}{
-		{"string", representation[string](t), []string{`""`, `"Ada"`, `"\u0041"`, `"line\nfeed"`}, []string{`42`, `true`, `"bad`, `"\x00"`, string([]byte{'"', 0xff, '"'})}},
+		{"string", representation[string](t), []string{`""`, `"Ada"`, `"\u0041"`, `"line\nfeed"`, `"\uD800\uDC00"`, `"\udbff\udfff"`, `"\\uD800"`, `"�"`}, []string{`42`, `true`, `"bad`, `"\x00"`, `"\uD800"`, `"\uDBFF"`, `"\uDC00"`, `"\uDFFF"`, `"\uD800x"`, `"\uD800\u0041"`, `"\uDC00\uD800"`, `"\uD800\uD800"`, `"\uD800\\uDC00"`, string([]byte{'"', 0xff, '"'}), string([]byte{'"', 0xed, 0xa0, 0x80, '"'})}},
 		{"bool", representation[bool](t), []string{`true`, `false`}, []string{`0`, `"true"`, `TRUE`}},
 		{"int8", representation[int8](t), []string{`-128`, `127`, `0`, `-0`}, []string{`-129`, `128`, `1.0`, `1e0`, `1e1`, `"1"`, `true`}},
 		{"int16", representation[int16](t), []string{`-32768`, `32767`}, []string{`-32769`, `32768`}},
@@ -108,8 +109,83 @@ func TestCheckJSONInvalidRepresentation(t *testing.T) {
 	}
 }
 
+func TestCheckJSONRepresentationTampering(t *testing.T) {
+	valid := representation[string](t)
+	for _, mutate := range []func(*concepts.Representation){
+		func(r *concepts.Representation) { r.Kind = concepts.KindInvalid },
+		func(r *concepts.Representation) { r.Kind = concepts.ScalarKind(255) },
+		func(r *concepts.Representation) { r.Kind = concepts.KindBool },
+		func(r *concepts.Representation) { r.Type = reflect.TypeFor[bool]() },
+		func(r *concepts.Representation) { r.Type = nil },
+		func(r *concepts.Representation) {
+			r.Type, r.Kind = reflect.TypeFor[bool](), concepts.KindBool
+		},
+		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[markerOnly]() },
+		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[embeddedConcept]() },
+		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[declarationConcept[bool]]() },
+	} {
+		r := valid
+		mutate(&r)
+		if err := concepts.CheckJSON(r, []byte(`"Ada"`)); !errors.Is(err, concepts.ErrInvalidConcept) {
+			t.Errorf("tampered representation %v: %v", r, err)
+		}
+	}
+	// Even a matching Kind/Type pair cannot certify a forged declaration.
+	for _, declared := range []reflect.Type{reflect.TypeFor[markerOnly](), reflect.TypeFor[embeddedConcept](), reflect.TypeFor[valueTextDecoder]()} {
+		r := concepts.Representation{Type: valid.Type, Kind: valid.Kind, Declared: declared}
+		if err := concepts.CheckJSON(r, []byte(`"Ada"`)); !errors.Is(err, concepts.ErrInvalidConcept) {
+			t.Errorf("forged representation %v: %v", r, err)
+		}
+	}
+}
+
+// The complex named field must never be allocated or traversed by CheckJSON.
+type complexUUIDConcept struct{ payload [8192]Book }
+
+func (c complexUUIDConcept) ConceptValue() concepts.UUID { panic(c.payload[0]) }
+func (complexUUIDConcept) MarshalText() ([]byte, error)  { panic("codec") }
+func (complexUUIDConcept) MarshalJSON() ([]byte, error)  { panic("codec") }
+func (*complexUUIDConcept) UnmarshalText([]byte) error   { panic("codec") }
+func (*complexUUIDConcept) UnmarshalJSON([]byte) error   { panic("codec") }
+
+func TestCheckJSONAllocationBound(t *testing.T) {
+	deep := reflect.TypeFor[complexUUIDConcept]()
+	for i := 0; i < 512; i++ {
+		deep = reflect.PointerTo(deep)
+	}
+	data := []byte(`"00112233-4455-6677-8899-aabbccddeeff"`)
+	var baseline float64
+	for i, input := range []reflect.Type{reflect.TypeFor[concepts.UUID](), reflect.TypeFor[declarationConcept[concepts.UUID]](), reflect.TypeFor[complexUUIDConcept](), deep} {
+		r, ok, err := concepts.Underlying(input)
+		if !ok || err != nil {
+			t.Fatalf("declaration: %v", err)
+		}
+		allocations := testing.AllocsPerRun(100, func() {
+			if err := concepts.CheckJSON(r, data); err != nil {
+				t.Fatal(err)
+			}
+		})
+		t.Logf("representation %d (pointer depth %d): %.0f allocations", i, r.PointerDepth, allocations)
+		if i == 0 {
+			baseline = allocations
+		}
+		// Leave headroom for compiler and encoding/json changes, while keeping
+		// this small input bounded independently of declaration complexity.
+		// Measured at 3 allocations per call; a ceiling of 6 leaves headroom.
+		if allocations > 6 || allocations > baseline+1 {
+			t.Errorf("allocations = %.0f; want <= 6 and <= baseline %.0f + 1", allocations, baseline)
+		}
+	}
+	// Also exercise input-linear decoding rather than a declaration-sized buffer.
+	r := representation[string](t)
+	large := []byte(`"` + strings.Repeat(`\u0041`, 1024) + `"`)
+	if err := concepts.CheckJSON(r, large); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func FuzzCheckJSON(f *testing.F) {
-	for _, data := range []string{`null`, `42`, `true`, `"00000000-0000-0000-0000-000000000000"`, `"2024-02-29"`, `"01:02:03.1234567"`, `"-10675199.02:48:05.4775808"`, `"10675199.02:48:05.4775807"`, `[]`, `"bad"`, `1e309`} {
+	for _, data := range []string{`null`, `42`, `true`, `"00000000-0000-0000-0000-000000000000"`, `"2024-02-29"`, `"01:02:03.1234567"`, `"-10675199.02:48:05.4775808"`, `"10675199.02:48:05.4775807"`, `[]`, `"bad"`, `1e309`, `"\uD800"`, `"\uDC00"`, `"\uD800\uDC00"`, `"\\uD800"`} {
 		f.Add([]byte(data))
 	}
 	types := []reflect.Type{reflect.TypeFor[concepts.UUID](), reflect.TypeFor[concepts.DateOnly](), reflect.TypeFor[concepts.TimeOnly](), reflect.TypeFor[concepts.TimeSpan]()}

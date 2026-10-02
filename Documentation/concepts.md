@@ -111,8 +111,10 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
    promotion in `Book{AuthorID; EditorID}` makes it **not a concept**. Query a
    field or element type separately when needed.
 4. An unmarked struct convertible to `DateOnly` or `TimeOnly`, but not identical,
-   is invalid (`missing-forwarding`), even if it has codecs. It must explicitly
-   declare its scalar. Other unmarked application types return zero, false, nil.
+   is invalid (`missing-forwarding`) only when its value type implements neither
+   `json.Marshaler` nor `encoding.TextMarshaler` and would encode as `{}`.
+   A type forwarding either value encoder is codec-only, not a concept, and
+   returns zero, false, nil, like other unmarked application types.
 5. A concept-bearing interface is invalid (`interface`). A concept-bearing
    struct with **any anonymous field** is invalid (`embedded-fields`), even
    with explicit overrides. Reflection cannot reliably distinguish declared
@@ -135,15 +137,27 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
    Missing or incorrectly typed codecs are invalid (`missing-codec`). For each
    decoder, implementation on the value method set is checked first and rejected
    (`value-unmarshaler`), because decoding a copy can silently lose changes.
-10. Success returns the exact scalar `Type`, pointer-stripped input `Declared`,
-    and `PointerDepth`, with true, nil. Every error returns zero, false and
+10. Success returns the exact scalar `Type`, its `ScalarKind` in `Kind`,
+    pointer-stripped input `Declared`, and `PointerDepth`, with true, nil.
+    `Kind` is set for every recognized result and agrees with `Type`. Kind values
+    are stable and never renumbered, so reflect-free tooling such as a future
+    [`go/types` counterpart (#15)](https://github.com/Cratis/Fundamentals.Go/issues/15)
+    can share these constants. Every error returns zero, false and
     `*TypeError` wrapping `ErrInvalidConcept`. Use `errors.Is` and `errors.As`;
     `TypeError.Type` retains the original input and `Underlying` its marker
     result when known. `Method` names an offending or missing method when
-    applicable. Error wording is not stable; the reason set may grow.
+    applicable. Reason string values are a stable contract and are never renamed
+    or reused. New reasons may be added; handle unknown values. `Error()` message
+    wording is not stable.
 11. Discovery inspects metadata only: no application methods, fabricated values,
     global caches, registries, or unsafe operations. Concurrent calls are safe.
     Discovery does not certify arbitrary codec output.
+12. JSON map keys use text codecs (`MarshalText`/`UnmarshalText`) rather than
+    JSON codecs in `encoding/json`. A recognized concept's text codec must
+    round-trip and produce the same canonical text as its JSON string, or the
+    canonical scalar literal for a non-string representation such as `int32`.
+    Native string/integer Go key kinds take precedence over `MarshalText` in
+    `encoding/json`; choose a named-field wrapper when custom key encoding is needed.
 
 The shared declaration corpus is the test-package types and documented
 `declarationCorpus` table in
@@ -159,7 +173,8 @@ non-nil concept value. It checks the declared scalar's wire shape:
 
 - Exactly one JSON value, allowing surrounding JSON whitespace; no `null`,
   objects, arrays, trailing values, or wrong scalar tokens.
-- Valid JSON strings and UTF-8 input; booleans must be `true` or `false`.
+- Valid JSON strings and UTF-8 input, rejecting unpaired `\uD800`–`\uDFFF`
+  surrogate escapes; booleans must be `true` or `false`.
 - Integer literal text parsed at the exact signedness and width, including
   platform-sized `int` and `uint`. No float64 round trip. Fractions and exponents
   are rejected for integers even when their mathematical value is integral.
@@ -170,9 +185,15 @@ non-nil concept value. It checks the declared scalar's wire shape:
   fractions are not canonical.
 
 A zero, inconsistent, or otherwise invalid representation returns an error
-wrapping `ErrInvalidConcept`. `Declared` must be a recognized pointer-stripped
-input, `Type` must agree with discovery, and `PointerDepth` must be nonnegative.
+wrapping `ErrInvalidConcept`. Obtain the representation from `Underlying`,
+which retains private structural-validation metadata; do not construct it by hand.
+`Declared` must remain the recognized pointer-stripped input, `Kind` must be valid
+and agree with `Type`, `Type` must agree with discovery, and `PointerDepth` must be
+nonnegative. Copies retain the validation metadata.
 Bad encoded data returns an ordinary error, not `ErrInvalidConcept`.
+
+`CheckJSON` never calls application code. Its allocations are bounded by the
+input size: constant plus O(len(data)), independent of declaration complexity.
 
 Emit the **same validated bytes**. Calling a stateful codec again could produce
 something different. This validation checks shape and range, not equality to

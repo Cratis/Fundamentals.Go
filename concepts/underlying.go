@@ -12,14 +12,22 @@ import (
 )
 
 // Representation describes a recognized concept or exact shared scalar.
+// Obtain it from Underlying; copies retain its private validation metadata.
 // Its zero value is invalid. Fields describe type structure, not nullability.
 type Representation struct {
 	// Type is the exact allowlisted scalar, never a pointer or another concept.
 	Type reflect.Type
+	// Kind is set for every recognized result and equals the kind of Type.
+	// Its values are stable and never renumbered, allowing reflect-free tooling
+	// such as a future go/types counterpart to share the same constants.
+	Kind ScalarKind
 	// Declared is the input type with pointers removed; it equals Type for shared scalars.
 	Declared reflect.Type
 	// PointerDepth counts pointer layers removed from the input.
 	PointerDepth int
+	// validatedDeclared binds metadata-only structural validation to this result.
+	// CheckJSON can verify it without walking arbitrarily large declarations.
+	validatedDeclared reflect.Type
 }
 
 // ErrInvalidConcept identifies invalid input or an invalid concept declaration.
@@ -28,7 +36,9 @@ type Representation struct {
 var ErrInvalidConcept = errors.New("invalid concept declaration")
 
 // InvalidReason identifies a declaration failure. Its zero value is reserved.
-// The set may grow; callers must handle unknown reasons.
+// Reason string values are a stable contract and are never renamed or reused.
+// New reasons may be added; callers must handle unknown values. Error message
+// wording from TypeError.Error is not stable.
 type InvalidReason string
 
 const (
@@ -50,7 +60,8 @@ const (
 	ReasonMissingCodec InvalidReason = "missing-codec"
 	// ReasonValueUnmarshaler identifies a decoder on the value method set.
 	ReasonValueUnmarshaler InvalidReason = "value-unmarshaler"
-	// ReasonMissingForwarding identifies an unmarked defined calendar scalar.
+	// ReasonMissingForwarding identifies an unmarked defined calendar scalar
+	// whose value type implements neither JSON nor text encoding.
 	ReasonMissingForwarding InvalidReason = "missing-forwarding"
 	// ReasonEmbeddedFields identifies anonymous fields in a concept-bearing struct.
 	ReasonEmbeddedFields InvalidReason = "embedded-fields"
@@ -71,7 +82,11 @@ type TypeError struct {
 
 // Error describes the declaration failure.
 func (e *TypeError) Error() string {
-	return fmt.Sprintf("%v: type %v, underlying %v, reason %s, method %s", ErrInvalidConcept, e.Type, e.Underlying, e.Reason, e.Method)
+	message := fmt.Sprintf("%v: type %v, underlying %v, reason %s", ErrInvalidConcept, e.Type, e.Underlying, e.Reason)
+	if e.Method != "" {
+		message += ", method " + e.Method
+	}
+	return message
 }
 
 // Unwrap returns ErrInvalidConcept.
@@ -85,7 +100,8 @@ func (e *TypeError) Unwrap() error { return ErrInvalidConcept }
 // Candidacy comes only from the outer value/pointer method sets. Concept-bearing
 // structs with anonymous fields, pointer-only markers, nested representations,
 // value decoders, and missing codecs are invalid. Defined DateOnly/TimeOnly
-// replacements without ConceptValue are invalid rather than silently objects.
+// replacements without ConceptValue are invalid only if their value type has
+// neither a JSON nor text encoder (and would otherwise silently encode as {}).
 // Discovery never calls methods or allocates application values. Calls are safe
 // concurrently and use no caches or registries. Codec output is not certified;
 // use CheckJSON on actual bytes and test domain codecs.
@@ -101,12 +117,14 @@ func Underlying(t reflect.Type) (Representation, bool, error) {
 		return invalid(nil, ReasonRecursiveType, "")
 	}
 	if isSharedScalar(declared) {
-		return Representation{Type: declared, Declared: declared, PointerDepth: depth}, true, nil
+		kind, _ := scalarMetadata(declared)
+		return Representation{Type: declared, Kind: kind, Declared: declared, PointerDepth: depth, validatedDeclared: declared}, true, nil
 	}
 	method, valueMarker := declared.MethodByName("ConceptValue")
 	_, pointerMarker := reflect.PointerTo(declared).MethodByName("ConceptValue")
 	if !valueMarker && !pointerMarker {
-		if declared.Kind() == reflect.Struct && (declared.ConvertibleTo(reflect.TypeFor[DateOnly]()) || declared.ConvertibleTo(reflect.TypeFor[TimeOnly]())) {
+		if declared.Kind() == reflect.Struct && (declared.ConvertibleTo(reflect.TypeFor[DateOnly]()) || declared.ConvertibleTo(reflect.TypeFor[TimeOnly]())) &&
+			!declared.Implements(reflect.TypeFor[json.Marshaler]()) && !declared.Implements(reflect.TypeFor[encoding.TextMarshaler]()) {
 			return invalid(nil, ReasonMissingForwarding, "ConceptValue")
 		}
 		return Representation{}, false, nil
@@ -128,6 +146,9 @@ func Underlying(t reflect.Type) (Representation, bool, error) {
 		return invalid(nil, ReasonInvalidMethod, "ConceptValue")
 	}
 	result := method.Type.Out(0)
+	if result.Kind() == reflect.Interface {
+		return invalid(result, ReasonUnsupportedType, "ConceptValue")
+	}
 	base, _, recursive := stripPointers(result)
 	if recursive || base == declared {
 		return invalid(result, ReasonRecursiveType, "ConceptValue")
@@ -160,7 +181,8 @@ func Underlying(t reflect.Type) (Representation, bool, error) {
 			return invalid(result, ReasonMissingCodec, codec.name)
 		}
 	}
-	return Representation{Type: result, Declared: declared, PointerDepth: depth}, true, nil
+	kind, _ := scalarMetadata(result)
+	return Representation{Type: result, Kind: kind, Declared: declared, PointerDepth: depth, validatedDeclared: declared}, true, nil
 }
 
 func stripPointers(t reflect.Type) (reflect.Type, int, bool) {
@@ -190,15 +212,6 @@ func isSharedScalar(t reflect.Type) bool {
 }
 
 func isAllowedScalar(t reflect.Type) bool {
-	if isSharedScalar(t) {
-		return true
-	}
-	switch t {
-	case reflect.TypeFor[string](), reflect.TypeFor[bool](),
-		reflect.TypeFor[int](), reflect.TypeFor[int8](), reflect.TypeFor[int16](), reflect.TypeFor[int32](), reflect.TypeFor[int64](),
-		reflect.TypeFor[uint](), reflect.TypeFor[uint8](), reflect.TypeFor[uint16](), reflect.TypeFor[uint32](), reflect.TypeFor[uint64](),
-		reflect.TypeFor[float32](), reflect.TypeFor[float64]():
-		return true
-	}
-	return false
+	kind, _ := scalarMetadata(t)
+	return kind != KindInvalid
 }
