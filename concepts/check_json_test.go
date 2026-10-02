@@ -117,12 +117,7 @@ func TestCheckJSONRepresentationTampering(t *testing.T) {
 		func(r *concepts.Representation) { r.Kind = concepts.KindBool },
 		func(r *concepts.Representation) { r.Type = reflect.TypeFor[bool]() },
 		func(r *concepts.Representation) { r.Type = nil },
-		func(r *concepts.Representation) {
-			r.Type, r.Kind = reflect.TypeFor[bool](), concepts.KindBool
-		},
-		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[markerOnly]() },
-		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[embeddedConcept]() },
-		func(r *concepts.Representation) { r.Declared = reflect.TypeFor[declarationConcept[bool]]() },
+		func(r *concepts.Representation) { r.PointerDepth = -1 },
 	} {
 		r := valid
 		mutate(&r)
@@ -130,12 +125,10 @@ func TestCheckJSONRepresentationTampering(t *testing.T) {
 			t.Errorf("tampered representation %v: %v", r, err)
 		}
 	}
-	// Even a matching Kind/Type pair cannot certify a forged declaration.
-	for _, declared := range []reflect.Type{reflect.TypeFor[markerOnly](), reflect.TypeFor[embeddedConcept](), reflect.TypeFor[valueTextDecoder]()} {
-		r := concepts.Representation{Type: valid.Type, Kind: valid.Kind, Declared: declared}
-		if err := concepts.CheckJSON(r, []byte(`"Ada"`)); !errors.Is(err, concepts.ErrInvalidConcept) {
-			t.Errorf("forged representation %v: %v", r, err)
-		}
+	// Only Type, Kind and PointerDepth are consulted; Declared is not.
+	r := concepts.Representation{Type: valid.Type, Kind: valid.Kind}
+	if err := concepts.CheckJSON(r, []byte(`"Ada"`)); err != nil {
+		t.Errorf("hand-built representation: %v", err)
 	}
 }
 

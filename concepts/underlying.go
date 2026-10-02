@@ -25,9 +25,6 @@ type Representation struct {
 	Declared reflect.Type
 	// PointerDepth counts pointer layers removed from the input.
 	PointerDepth int
-	// validatedDeclared binds metadata-only structural validation to this result.
-	// CheckJSON can verify it without walking arbitrarily large declarations.
-	validatedDeclared reflect.Type
 }
 
 // ErrInvalidConcept identifies invalid input or an invalid concept declaration.
@@ -118,7 +115,7 @@ func Underlying(t reflect.Type) (Representation, bool, error) {
 	}
 	if isSharedScalar(declared) {
 		kind, _ := scalarMetadata(declared)
-		return Representation{Type: declared, Kind: kind, Declared: declared, PointerDepth: depth, validatedDeclared: declared}, true, nil
+		return Representation{Type: declared, Kind: kind, Declared: declared, PointerDepth: depth}, true, nil
 	}
 	method, valueMarker := declared.MethodByName("ConceptValue")
 	_, pointerMarker := reflect.PointerTo(declared).MethodByName("ConceptValue")
@@ -182,7 +179,7 @@ func Underlying(t reflect.Type) (Representation, bool, error) {
 		}
 	}
 	kind, _ := scalarMetadata(result)
-	return Representation{Type: result, Kind: kind, Declared: declared, PointerDepth: depth, validatedDeclared: declared}, true, nil
+	return Representation{Type: result, Kind: kind, Declared: declared, PointerDepth: depth}, true, nil
 }
 
 func stripPointers(t reflect.Type) (reflect.Type, int, bool) {

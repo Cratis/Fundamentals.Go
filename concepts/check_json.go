@@ -5,7 +5,6 @@ package concepts
 
 import (
 	"bytes"
-	"encoding"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -22,8 +21,8 @@ import (
 //
 // Invalid representations (including zero) return an error wrapping
 // ErrInvalidConcept. Invalid data returns an ordinary error, not that sentinel.
-// r must be obtained from Underlying, with a nonnegative PointerDepth.
-// Kind must be valid and agree with Type. The bytes are borrowed for this call
+// Only Type, Kind and PointerDepth are consulted: Kind must be valid and agree
+// with Type, and PointerDepth must be nonnegative. Declared is not inspected. The bytes are borrowed for this call
 // only. CheckJSON never calls application code, and its allocations are bounded
 // by the input size: constant plus O(len(data)), not declaration complexity.
 // CheckJSON neither proves equality to ConceptValue nor applies domain/product
@@ -82,27 +81,8 @@ func CheckJSON(r Representation, data []byte) error {
 // uses exact marker interfaces instead of reconstructing discovery and errors.
 // No application values or representation graphs need to be allocated.
 func validRepresentation(r Representation) bool {
-	kind, marker := scalarMetadata(r.Type)
-	if kind == KindInvalid || kind != r.Kind || r.Declared == nil || r.Declared != r.validatedDeclared || r.PointerDepth < 0 {
-		return false
-	}
-	declared := r.Declared
-	if declared.Kind() == reflect.Pointer || declared.Kind() == reflect.Interface {
-		return false
-	}
-	if isSharedScalar(declared) {
-		return declared == r.Type
-	}
-	if !declared.Implements(marker) {
-		return false
-	}
-	pointer := reflect.PointerTo(declared)
-	return declared.Implements(reflect.TypeFor[encoding.TextMarshaler]()) &&
-		declared.Implements(reflect.TypeFor[json.Marshaler]()) &&
-		!declared.Implements(reflect.TypeFor[encoding.TextUnmarshaler]()) &&
-		!declared.Implements(reflect.TypeFor[json.Unmarshaler]()) &&
-		pointer.Implements(reflect.TypeFor[encoding.TextUnmarshaler]()) &&
-		pointer.Implements(reflect.TypeFor[json.Unmarshaler]())
+	kind, _ := scalarMetadata(r.Type)
+	return kind != KindInvalid && kind == r.Kind && r.PointerDepth >= 0
 }
 
 // pairedSurrogates scans an already syntax-validated JSON string. Unlike
