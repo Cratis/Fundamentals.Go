@@ -4,6 +4,7 @@
 package concepts_test
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -23,6 +24,21 @@ func ExampleUUID() {
 	// Output:
 	// 00112233-4455-6677-8899-aabbccddeeff
 	// 00112233445566778899aabbccddeeff
+}
+
+func ExampleUUID_Scan() {
+	var id concepts.UUID
+	if err := id.Scan("00112233-4455-6677-8899-AABBCCDDEEFF"); err != nil {
+		fmt.Println(err)
+		return
+	}
+	value, err := id.Value()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(value)
+	// Output: 00112233-4455-6677-8899-aabbccddeeff
 }
 
 func ExampleDateOnly() {
@@ -80,6 +96,16 @@ func (id *AuthorID) UnmarshalText(data []byte) error {
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
 	var value concepts.UUID
 	if err := value.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*id = AuthorID(value)
+	return nil
+}
+
+func (id AuthorID) Value() (driver.Value, error) { return concepts.UUID(id).Value() }
+func (id *AuthorID) Scan(src any) error {
+	var value concepts.UUID
+	if err := value.Scan(src); err != nil {
 		return err
 	}
 	*id = AuthorID(value)

@@ -57,6 +57,34 @@ check codecs. Run `Underlying` to validate the complete declaration, and test
 round trips for actual values. Compiling examples live in
 [`concepts/example_test.go`](../concepts/example_test.go).
 
+For concepts stored in SQL databases, optionally add these forwarding methods
+to `AuthorID` and import `database/sql/driver` in the same file:
+
+```go
+func (id AuthorID) Value() (driver.Value, error) { return concepts.UUID(id).Value() }
+func (id *AuthorID) Scan(src any) error {
+    var value concepts.UUID
+    if err := value.Scan(src); err != nil {
+        return err
+    }
+    *id = AuthorID(value)
+    return nil
+}
+```
+
+`Value` returns canonical lowercase dashed text, including for the zero UUID.
+`Scan` accepts strict dashed text as a string or byte slice; exactly 16 bytes
+are copied as RFC/network-order UUID bytes. Invalid input and SQL NULL return
+errors without changing the target. These optional methods do not affect
+`Underlying` recognition. For nullable columns, use `sql.Null[AuthorID]` (or
+`sql.Null[concepts.UUID]` for the scalar) or pointers, not a non-nullable UUID.
+
+SQL Server `uniqueidentifier` raw bytes use .NET mixed-endian order, not RFC
+order. Read them as text or convert explicitly before scanning; `Scan` never
+silently reorders bytes. The forwarding pattern is compiled and tested in
+[`concepts/uuid_sql_test.go`](../concepts/uuid_sql_test.go) using `AuthorID` from
+the examples.
+
 ## Author a calendar-backed concept
 
 Use the same pattern for dates, times, and durations. For example, in the domain

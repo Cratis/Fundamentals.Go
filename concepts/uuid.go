@@ -5,6 +5,7 @@ package concepts
 
 import (
 	"crypto/rand"
+	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -48,6 +49,38 @@ func NewUUID() (UUID, error) {
 func (id UUID) String() string {
 	text := hex.EncodeToString(id[:])
 	return text[:8] + "-" + text[8:12] + "-" + text[12:16] + "-" + text[16:20] + "-" + text[20:]
+}
+
+// Value implements driver.Valuer, returning canonical lowercase dashed text.
+// The zero UUID is returned as text, not SQL NULL.
+func (id UUID) Value() (driver.Value, error) { return id.String(), nil }
+
+// Scan implements sql.Scanner. Strings and byte slices other than 16 bytes
+// must use strict dashed UUID notation. A 16-byte slice is copied in RFC/network
+// order, never .NET Guid mixed-endian order. SQL NULL and other types are rejected;
+// use sql.Null[UUID] or a pointer for nullable columns. Errors leave id unchanged.
+func (id *UUID) Scan(src any) error {
+	var value UUID
+	var err error
+	switch src := src.(type) {
+	case string:
+		value, err = ParseUUID(src)
+	case []byte:
+		if len(src) == len(value) {
+			copy(value[:], src)
+		} else {
+			value, err = ParseUUID(string(src))
+		}
+	case nil:
+		return fmt.Errorf("cannot scan SQL NULL into UUID")
+	default:
+		return fmt.Errorf("cannot scan %T into UUID", src)
+	}
+	if err != nil {
+		return err
+	}
+	*id = value
+	return nil
 }
 
 // IsZero reports whether id is Guid.Empty.
