@@ -50,7 +50,7 @@ Defined types do not inherit methods. Without forwarding, a UUID-derived type
 encodes as an array of bytes, not a UUID string. Value encoders work even for
 unaddressable map values. Pointer decoders assign only after successful parsing,
 so malformed input leaves your value unchanged. Text codecs also support JSON
-map keys.
+map keys; see rule 12 for a Go 1.26 decoding difference.
 
 The compile-time assertion checks the marker's exact return type; it does not
 check codecs. Run `Underlying` to validate the complete declaration, and test
@@ -158,6 +158,12 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
     canonical scalar literal for a non-string representation such as `int32`.
     Native string/integer Go key kinds take precedence over `MarshalText` in
     `encoding/json`; choose a named-field wrapper when custom key encoding is needed.
+    Go 1.26 differs when **decoding** a key: if the type also implements
+    `json.Unmarshaler`, `encoding/json` calls `UnmarshalJSON` with the quoted key
+    text instead of `UnmarshalText`. Go 1.27 calls `UnmarshalText`. String-shaped
+    concepts (UUID, DateOnly, TimeOnly, TimeSpan and string-backed concepts) decode
+    on both, because their `UnmarshalJSON` accepts a JSON string. Number- and
+    bool-backed concepts used as map keys decode only on Go 1.27 or later.
 
 The shared declaration corpus is the test-package types and documented
 `declarationCorpus` table in
