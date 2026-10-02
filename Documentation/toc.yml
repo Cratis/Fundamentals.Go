@@ -2,6 +2,8 @@
   href: index.md
 - name: Concepts
   href: concepts.md
+- name: Dependency injection
+  href: dependency-injection.md
 - name: Parity
   href: parity.md
 - name: Releases
