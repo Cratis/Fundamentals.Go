@@ -9,9 +9,9 @@ The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamenta
 
 ## Status
 
-**Repository scaffold only.** The intended surface is concepts (the counterpart of `ConceptAs<T>`), a shared UUID type, and DateOnly, TimeOnly and TimeSpan wire scalars. None is implemented yet; implementation is tracked in [issue #2](https://github.com/Cratis/Fundamentals.Go/issues/2). The root package contains only documentation, with a package-documentation smoke test.
+**Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly, TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package `correlation` provides shared correlation-ID context. Start with [concept authoring and recognition](Documentation/concepts.md); the [parity map](Documentation/parity.md) records implemented contracts and remaining gaps.
 
-There is no tagged Go release yet. Releases will remain **v0.x** while the API is experimental. The [parity map](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/parity.md) records the C# source revision and the unimplemented surfaces without claiming compatibility.
+There is no tagged Go release yet. Releases will remain **v0.x** while the API is experimental.
 
 ## Installation
 

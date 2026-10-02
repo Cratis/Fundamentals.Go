@@ -13,15 +13,14 @@ dependency-light set of primitives without depending on one another.
 
 ## Current status
 
-**Scaffold only.** Concepts, UUIDs and DateOnly, TimeOnly and TimeSpan wire
-scalars are planned but not implemented. The root `fundamentals` package has a
-package comment and a documentation smoke test, not a usable value API.
-No tagged module release exists yet. Go 1.26 or later is required.
+**Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly,
+TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package
+`correlation` provides shared correlation-ID context. No tagged module release
+exists yet. Go 1.26 or later is required.
 
-Start with the [contribution guide](../CONTRIBUTING.md) to build and test the
-scaffold. Implementation is tracked in
-[issue #2](https://github.com/Cratis/Fundamentals.Go/issues/2); cross-repository
-contracts are coordinated in [issue #3](https://github.com/Cratis/Fundamentals.Go/issues/3).
+Start with [concept authoring and recognition](concepts.md) and the
+[parity map](parity.md) for supported contracts and remaining gaps. The
+[contribution guide](../CONTRIBUTING.md) covers building and testing.
 
 ## Scope and compatibility
 
