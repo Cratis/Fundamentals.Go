@@ -6,8 +6,9 @@ description: Pinned C# authority, shared scalar contracts and remaining domain-v
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-The shared scalars preserve canonical .NET wire forms. Concepts remain
-unimplemented; these scalar contracts do not establish whole-product parity.
+The shared scalars preserve canonical .NET wire forms. Typed scalar concepts
+provide explicit domain codecs and declaration discovery; these contracts do
+not establish whole-product parity.
 
 ## Authority
 
@@ -28,7 +29,8 @@ every parsing form or operation on the corresponding .NET type.
 
 | Surface | C# source or contract | Go surface | Status | Executable parity evidence | Deviations |
 | --- | --- | --- | --- | --- | --- |
-| Concepts (`ConceptAs<T>`) | `Source/DotNET/Fundamentals/Concepts/ConceptAs.cs`, `Json/ConceptAsJsonConverter.cs` and `Source/DotNET/Fundamentals.Specs/Concepts` | Not yet defined | Not implemented | None | Deferred to issue #4; no `Concept[T]` interface or `Underlying` helper |
+| Typed scalar concepts | `Source/DotNET/Fundamentals/Concepts/ConceptAs.cs`, `ConceptExtensions.cs`, `ConceptMap.cs`, `ConceptFactory.cs`; `Json/ConceptAsJsonConverter.cs`; `Source/DotNET/Fundamentals.Specs/Json/for_ConceptAsJsonConverter` including `when_converting_guid_concept_to_json.cs`, `when_converting_date_only_concept_from_json.cs`, `when_converting_time_only_concept_to_json.cs` | `concepts.Concept[T]`, explicit domain codecs, `CheckJSON` | Partial | `concepts/concept_codec_test.go`, `concepts/check_json_test.go`, `concepts/example_test.go`; all 11 `concepts/testdata/scalars.json` fixtures exercised through concepts | Named values and explicit codecs replace inheritance and the shared converter; exact scalar allowlist, integer literal policy and canonical-output validation. See concept deviations below. |
+| Concept declaration discovery | Go adaptation of `ConceptExtensions.IsConcept`, `GetConceptValueType` and `ConceptMap` under `Source/DotNET/Fundamentals/Concepts` | `concepts.Underlying`, `Representation`, `TypeError`, `ErrInvalidConcept` | Go-specific | `concepts/underlying_test.go` shared declaration corpus, exact-type and concurrent tests; `concepts/check_json_test.go` | Metadata only, no application execution or cache; nesting rejected; anonymous fields rejected only in concept candidates. No `go/types` counterpart or proxy-generation agreement claimed. |
 | Shared UUID | `System.Guid`, System.Text.Json; `Source/DotNET/Fundamentals.Specs/Json/for_ConceptAsJsonConverter/GuidConcept.cs` and `when_converting_guid_concept_{to,from}_json.cs` in the same directory | `concepts.UUID [16]byte`; `NewUUID`, `ParseUUID`, `String`, `IsZero`, text/JSON codecs | Implemented | `concepts/golden_test.go`, `concepts/scalars_test.go`, `concepts/boundaries_test.go`, `concepts/codecs_test.go`, `concepts/example_test.go`; `testdata/scalars.json` | Strict dashed D input only; no Guid.Parse N/B/P/X forms or whitespace. Bytes are RFC/network order, not Guid.ToByteArray mixed-endian order. Callers convert transport bytes explicitly outside this module. |
 | DateOnly | `Source/DotNET/Fundamentals/Json/DateOnlyJsonConverter.cs` and `Source/DotNET/Fundamentals.Specs/Json/for_DateOnlyJsonConverter` | `concepts.DateOnly`; `NewDateOnly`, `ParseDateOnly`, `Date`, `String`, text/JSON codecs | Implemented | `concepts/golden_test.go`, `concepts/scalars_test.go`, `concepts/boundaries_test.go`, `concepts/codecs_test.go`, `concepts/temporal_fuzz_test.go`, `concepts/example_test.go`; `testdata/scalars.json` | Invariant yyyy-MM-dd input only; C# also reads timestamps and culture-dependent date strings. Normalize to the canonical date before passing it to Go. |
 | TimeOnly | `Source/DotNET/Fundamentals/Json/TimeOnlyJsonConverter.cs` and `Source/DotNET/Fundamentals.Specs/Json/for_TimeOnlyJsonConverter` | `concepts.TimeOnly`; `NewTimeOnly`, `ParseTimeOnly`, `Ticks`, `String`, text/JSON codecs | Implemented | `concepts/golden_test.go`, `concepts/scalars_test.go`, `concepts/boundaries_test.go`, `concepts/codecs_test.go`, `concepts/temporal_fuzz_test.go`, `concepts/example_test.go`; `testdata/scalars.json` | HH:mm:ss with optional 1–7 fraction digits only; no culture-dependent TimeOnly.Parse forms. Canonical output always has seven fraction digits. Use 100 ns ticks, not nanoseconds. |
@@ -51,6 +53,39 @@ Zero values are Guid.Empty, 0001-01-01, midnight and zero duration. DateOnly spa
 years 0001–9999; TimeOnly spans one day at 100 ns precision. TimeSpan preserves
 both signed int64 tick extremes. UUID accepts uppercase hex and emits lowercase
 text without a BCL byte-order conversion or an external UUID dependency.
+
+## Concept deviations
+
+Go uses named values and explicit codecs rather than inheritance, implicit
+conversions, or reflection-based construction. `ConceptValue` on real values
+replaces typed value extraction; reflective untyped extraction is deferred.
+Explicit constructors and pointer decoders replace `ConceptFactory`; there is
+no universal wrapper or type-converter registration. Native Go comparison and
+conversion apply where supported, without automatic C# operator emulation.
+
+Recognition accepts only the [documented scalar set](concepts.md), preserves
+exact numeric widths, rejects nested representations and anonymous fields in
+concept-bearing structs, and reports pointers without assigning nullability.
+C# inheritance traversal is not a Go concept-valued return chain: author the
+final scalar directly. Value-receiver decoders are rejected. Defined unmarked
+DateOnly/TimeOnly replacements fail explicitly; UUID and TimeSpan-derived
+storage alone cannot establish concept identity, so callers must add the marker
+and forwarding codecs.
+
+Discovery validates declarations without executing application code. Arbitrary
+codec-output consistency requires `CheckJSON` on actual encoded bytes plus
+consumer round-trip and domain tests. Integer JSON fractions and exponents are
+rejected rather than converted through floating point; float overflow is
+rejected at the declared width. Shared scalar output must be canonical. Keep
+product-specific range and precision checks in consumers, and emit the validated
+bytes without re-encoding. Shared scalar behavior and codecs are unchanged.
+
+Decimal, enum-specific conversion, DateTime/DateTimeOffset representations,
+reflective factories, generalized value extraction and a shared concept
+serializer are not implemented. Standard Go pointer null handling replaces
+converter-specific null behavior; `CheckJSON` validates non-null scalars only.
+The reflection corpus is not evidence of consumer schema or generated-proxy
+agreement.
 
 ## Updating this map
 
