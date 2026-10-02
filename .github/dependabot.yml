@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:23'
+      timezone: Etc/UTC
+    labels: [dependencies, no-release]
+    open-pull-requests-limit: 5
+    groups:
+      go-non-major:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:41'
+      timezone: Etc/UTC
+    labels: [dependencies, no-release]
+    open-pull-requests-limit: 5
+    groups:
+      actions-non-major:
+        update-types: [minor, patch]

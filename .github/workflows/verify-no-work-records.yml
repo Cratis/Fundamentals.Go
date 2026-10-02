@@ -1,0 +1,17 @@
+name: Verify No Work Records
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: work-records-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  work-records:
+    uses: Cratis/Workflows/.github/workflows/verify-no-work-records.yml@main
