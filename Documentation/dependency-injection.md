@@ -191,11 +191,16 @@ it. Type-assert it when validating parameters or planning registrations. When
 absent, treat a key as resolvable and fail at resolution instead of rejecting
 startup. The default provider and registry implement Catalog.
 
-Call `registry.BindScopeFactory()` explicitly if a constructor needs to open
-fresh scopes. The borrowed singleton facade implements `ScopeFactory`,
+Call `registry.BindScopeFactory()` explicitly if a constructed service needs to
+open fresh scopes from its methods at operation time. The borrowed singleton facade implements `ScopeFactory`,
 `Catalog` and `ScopeOwner`. It exposes neither `Close` nor `Resolve`, so injected
 code cannot close the provider or accidentally resolve through an ambient scope.
 This registration uses the ordinary duplicate checks.
+
+Use the injected `di.ScopeFactory` only after construction, never inside a
+factory callback. Opening a scope during construction bypasses cycle and
+captive-lifetime validation and can deadlock when resolving the service's own
+in-flight construction.
 
 Before borrowing a scope, a framework adapter can require `ScopeOwner` and
 check `Owns(scope)`. Nil, typed-nil, wrapped, unknown and foreign scopes return

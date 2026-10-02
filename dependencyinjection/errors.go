@@ -26,13 +26,13 @@ var (
 	// ErrUndeclaredDependency identifies an undeclared factory edge.
 	ErrUndeclaredDependency = errors.New("undeclared service dependency")
 	// ErrClosed identifies closing/closed providers or scopes.
-	ErrClosed = errors.New("services closed")
+	ErrClosed = errors.New("dependency injection closed")
 	// ErrInvalidScope identifies zero, nil, or otherwise invalid scope handles.
 	ErrInvalidScope = errors.New("invalid service scope")
 	// ErrContextMismatch identifies guard rejection, including captured presence changes.
 	ErrContextMismatch = errors.New("service context mismatch")
 	// ErrResolverExpired identifies use after a factory returns.
-	ErrResolverExpired = errors.New("factory scope expired")
+	ErrResolverExpired = errors.New("factory resolver expired")
 	// ErrConcurrentFactoryUse identifies overlapping resolution on one factory view.
 	ErrConcurrentFactoryUse = errors.New("concurrent factory scope use")
 	// ErrNilValue identifies nil or typed-nil produced/registered values.

@@ -49,10 +49,15 @@ type Binding struct {
 
 // NewBinding validates and copies an exact-type factory descriptor.
 func NewBinding[T any](lt Lifetime, own Ownership, factory Factory[T], deps ...Key) (Binding, error) {
-	b := Binding{key: KeyFor[T](), lifetime: lt, ownership: own, dependencies: slices.Clone(deps)}
+	var adapter func(context.Context, Resolver) (any, error)
 	if factory != nil {
-		b.factory = func(ctx context.Context, r Resolver) (any, error) { return factory(ctx, r) }
+		adapter = func(ctx context.Context, r Resolver) (any, error) { return factory(ctx, r) }
 	}
+	return newBinding[T](lt, own, adapter, deps...)
+}
+
+func newBinding[T any](lt Lifetime, own Ownership, factory func(context.Context, Resolver) (any, error), deps ...Key) (Binding, error) {
+	b := Binding{key: KeyFor[T](), lifetime: lt, ownership: own, dependencies: slices.Clone(deps), factory: factory}
 	if err := b.Validate(); err != nil {
 		return Binding{}, err
 	}
@@ -96,9 +101,15 @@ func (b Binding) Validate() error {
 // A failed non-nil result is returned to let adapters honor Ownership and dispose
 // it. Construct itself never disposes values, recovers panics or applies lifetimes.
 func (b Binding) Construct(ctx context.Context, r Resolver) (any, error) {
-	if err := b.Validate(); err != nil {
-		return nil, err
+	// Nonzero bindings are immutable and were validated at construction and
+	// registration. Only the zero descriptor needs rejection on this path.
+	if b.factory == nil {
+		return nil, failure("binding", b.key, nil, ErrInvalidRegistration, nil)
 	}
+	return b.construct(ctx, r)
+}
+
+func (b Binding) construct(ctx context.Context, r Resolver) (any, error) {
 	result, err := b.factory(ctx, r)
 	if err != nil {
 		return result, failure("factory", b.key, nil, ErrFactoryFailed, err)
@@ -129,6 +140,19 @@ func bind[T any](r Registrar, lt Lifetime, own Ownership, factory Factory[T], de
 		return failure("bind", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
 	b, err := NewBinding(lt, own, factory, deps...)
+	if err != nil {
+		return err
+	}
+	return r.Register(b)
+}
+
+// bindFunction keeps dependency failures distinct from actual constructor results:
+// no T exists to transfer to the container until the user's function is invoked.
+func bindFunction[T any](r Registrar, lt Lifetime, own Ownership, factory func(context.Context, Resolver) (any, error), deps ...Key) error {
+	if value.IsNil(r) {
+		return failure("bind", KeyFor[T](), nil, ErrInvalidRegistration, nil)
+	}
+	b, err := newBinding[T](lt, own, factory, deps...)
 	if err != nil {
 		return err
 	}

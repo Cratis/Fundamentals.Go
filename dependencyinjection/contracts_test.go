@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -203,10 +204,30 @@ func TestAllTypedConstructorHelpers(t *testing.T) {
 			}
 		} else {
 			errs = []error{
-				di.BindFunc1(r, di.Transient, func(_ context.Context, a int) (greeting, error) { return "one", nil }),
-				di.BindFunc2(r, di.Scoped, func(_ context.Context, a int, b string) (greeting, error) { return "two", nil }),
-				di.BindFunc3(r, di.Singleton, func(_ context.Context, a int, b string, c bool) (greeting, error) { return "three", nil }),
-				di.BindFunc4(r, di.Transient, func(_ context.Context, a int, b string, c bool, d float64) (greeting, error) { return "four", nil }),
+				di.BindFunc1(r, di.Transient, func(_ context.Context, a int) (greeting, error) {
+					if a != 1 {
+						t.Error(a)
+					}
+					return "one", nil
+				}),
+				di.BindFunc2(r, di.Scoped, func(_ context.Context, a int, b string) (greeting, error) {
+					if a != 1 || b != "two" {
+						t.Error(a, b)
+					}
+					return "two", nil
+				}),
+				di.BindFunc3(r, di.Singleton, func(_ context.Context, a int, b string, c bool) (greeting, error) {
+					if a != 1 || b != "two" || !c {
+						t.Error(a, b, c)
+					}
+					return "three", nil
+				}),
+				di.BindFunc4(r, di.Transient, func(_ context.Context, a int, b string, c bool, d float64) (greeting, error) {
+					if a != 1 || b != "two" || !c || d != 4 {
+						t.Error(a, b, c, d)
+					}
+					return "four", nil
+				}),
 			}
 		}
 		for _, err := range errs {
@@ -219,14 +240,23 @@ func TestAllTypedConstructorHelpers(t *testing.T) {
 			if borrowed {
 				want = di.Borrowed
 			}
-			if b.Ownership() != want || len(b.Dependencies()) != i+1 {
-				t.Fatal(b)
+			keys := []di.Key{di.KeyFor[int](), di.KeyFor[string](), di.KeyFor[bool](), di.KeyFor[float64]()}
+			if b.Ownership() != want || !slices.Equal(b.Dependencies(), keys[:i+1]) {
+				t.Fatal(b.Ownership(), b.Dependencies())
 			}
 			if _, err := b.Construct(ctx, resolver); err != nil {
 				t.Fatal(err)
 			}
-			if _, err := b.Construct(ctx, manualResolver{}); !errors.Is(err, di.ErrMissing) {
-				t.Fatal(err)
+			for _, missing := range keys[:i+1] {
+				failing := manualResolver{}
+				for key, value := range resolver {
+					if key != missing {
+						failing[key] = value
+					}
+				}
+				if value, err := b.Construct(ctx, failing); value != nil || !errors.Is(err, di.ErrMissing) {
+					t.Fatal(value, err)
+				}
 			}
 		}
 	}

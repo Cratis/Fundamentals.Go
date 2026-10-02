@@ -14,6 +14,11 @@
 // Catalog is optional on registrars and scope factories: type-assert it for
 // startup checks, otherwise treat keys as resolvable and fail at resolution.
 //
+// The default container's injected ScopeFactory is for opening scopes after
+// construction, from methods at operation time, never inside a factory callback.
+// Opening a scope in a factory bypasses cycle and captive-lifetime validation and
+// can deadlock when resolving its own in-flight construction.
+//
 // # Errors
 //
 // Use errors.Is and errors.As, not Error text, which is diagnostic only. Error

@@ -16,7 +16,6 @@ import (
 // Resolved services must independently support any concurrent application use.
 type scope struct {
 	state *scopeState
-	view  *factoryView
 }
 type scopeState struct {
 	provider *provider
@@ -81,7 +80,7 @@ func (s *scope) CheckContext(ctx context.Context) error {
 // It unregisters the scope, never commits command effects, and is safe to repeat.
 // Factory views cannot close their parent scope. Context deadlines are cooperative.
 func (s *scope) Close(ctx context.Context) error {
-	if s == nil || s.state == nil || s.view != nil || ctx == nil {
+	if s == nil || s.state == nil || ctx == nil {
 		return failure("close scope", di.Key{}, nil, di.ErrInvalidScope, nil)
 	}
 	return s.state.close(ctx, false)

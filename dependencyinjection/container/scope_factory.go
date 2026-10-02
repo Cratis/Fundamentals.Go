@@ -11,6 +11,10 @@ import (
 // BindScopeFactory explicitly reserves a borrowed singleton ScopeFactory binding.
 // Its facade also implements Catalog and ScopeOwner, but never Close or Resolver.
 // Registration is optional and participates in ordinary duplicate checks.
+// Use the injected facade to open scopes after construction, from methods at
+// operation time, never inside a factory callback. Opening a scope in a factory
+// bypasses cycle and captive-lifetime validation and can deadlock when resolving
+// its own in-flight construction.
 func (r *Registry) BindScopeFactory() error {
 	key := di.KeyFor[di.ScopeFactory]()
 	if r == nil {

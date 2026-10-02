@@ -35,11 +35,11 @@ type owner struct {
 }
 
 func newOwner() *owner { return &owner{entries: map[di.Key]*entry{}, done: make(chan struct{})} }
-func (o *owner) admit() error {
+func (o *owner) admit(operation string) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	if o.closing {
-		return failure("resolve", di.Key{}, nil, di.ErrClosed, nil)
+		return failure(operation, di.Key{}, nil, di.ErrClosed, nil)
 	}
 	if o.active == 0 {
 		o.drained = make(chan struct{})

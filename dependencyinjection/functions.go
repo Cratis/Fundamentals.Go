@@ -5,89 +5,85 @@ package dependencyinjection
 
 import "context"
 
-// BindFunc1 registers a owned constructor and derives its direct edges.
+// BindFunc1 registers an owned constructor and derives its direct edges.
 // Repeated parameter types share one declared edge; parameters resolve in order.
 func BindFunc1[T, A1 any](r Registrar, lt Lifetime, fn func(context.Context, A1) (T, error)) error {
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return Bind(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Owned, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1)
 	}, uniqueKeys(KeyFor[A1]())...)
 }
 
-// BindFunc2 registers a owned constructor and derives its direct edges.
+// BindFunc2 registers an owned constructor and derives its direct edges.
 // Repeated parameter types share one declared edge; parameters resolve in order.
 func BindFunc2[T, A1, A2 any](r Registrar, lt Lifetime, fn func(context.Context, A1, A2) (T, error)) error {
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return Bind(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Owned, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2]())...)
 }
 
-// BindFunc3 registers a owned constructor and derives its direct edges.
+// BindFunc3 registers an owned constructor and derives its direct edges.
 // Repeated parameter types share one declared edge; parameters resolve in order.
 func BindFunc3[T, A1, A2, A3 any](r Registrar, lt Lifetime, fn func(context.Context, A1, A2, A3) (T, error)) error {
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return Bind(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Owned, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a3, err := Resolve[A3](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2, a3)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2](), KeyFor[A3]())...)
 }
 
-// BindFunc4 registers a owned constructor and derives its direct edges.
+// BindFunc4 registers an owned constructor and derives its direct edges.
 // Repeated parameter types share one declared edge; parameters resolve in order.
 func BindFunc4[T, A1, A2, A3, A4 any](r Registrar, lt Lifetime, fn func(context.Context, A1, A2, A3, A4) (T, error)) error {
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return Bind(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Owned, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a3, err := Resolve[A3](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a4, err := Resolve[A4](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2, a3, a4)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2](), KeyFor[A3](), KeyFor[A4]())...)
@@ -99,11 +95,10 @@ func BindBorrowedFunc1[T, A1 any](r Registrar, lt Lifetime, fn func(context.Cont
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return BindBorrowed(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Borrowed, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1)
 	}, uniqueKeys(KeyFor[A1]())...)
@@ -115,15 +110,14 @@ func BindBorrowedFunc2[T, A1, A2 any](r Registrar, lt Lifetime, fn func(context.
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return BindBorrowed(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Borrowed, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2]())...)
@@ -135,19 +129,18 @@ func BindBorrowedFunc3[T, A1, A2, A3 any](r Registrar, lt Lifetime, fn func(cont
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return BindBorrowed(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Borrowed, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a3, err := Resolve[A3](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2, a3)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2](), KeyFor[A3]())...)
@@ -159,23 +152,22 @@ func BindBorrowedFunc4[T, A1, A2, A3, A4 any](r Registrar, lt Lifetime, fn func(
 	if fn == nil {
 		return failure("bind function", KeyFor[T](), nil, ErrInvalidRegistration, nil)
 	}
-	return BindBorrowed(r, lt, func(ctx context.Context, resolver Resolver) (T, error) {
-		var zero T
+	return bindFunction[T](r, lt, Borrowed, func(ctx context.Context, resolver Resolver) (any, error) {
 		a1, err := Resolve[A1](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a2, err := Resolve[A2](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a3, err := Resolve[A3](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		a4, err := Resolve[A4](ctx, resolver)
 		if err != nil {
-			return zero, err
+			return nil, err
 		}
 		return fn(ctx, a1, a2, a3, a4)
 	}, uniqueKeys(KeyFor[A1](), KeyFor[A2](), KeyFor[A3](), KeyFor[A4]())...)

@@ -38,18 +38,18 @@ func (p *provider) Contains(key di.Key) bool {
 // Closed scopes retain their ownership identity; they cannot resolve further values.
 func (p *provider) Owns(handle di.Scope) bool {
 	scope, _ := handle.(*scope)
-	return p != nil && p.root != nil && scope != nil && scope.state != nil && scope.state.provider == p && scope.view == nil
+	return p != nil && p.root != nil && scope != nil && scope.state != nil && scope.state.provider == p
 }
 
 // NewScope captures configured guards, never the context itself.
 func (p *provider) NewScope(ctx context.Context) (di.Scope, error) {
 	if p == nil || p.root == nil || ctx == nil {
-		return nil, failure("new scope", di.Key{}, nil, di.ErrInvalidScope, nil)
+		return nil, failure("new-scope", di.Key{}, nil, di.ErrInvalidScope, nil)
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if err := p.root.admit(); err != nil {
+	if err := p.root.admit("new-scope"); err != nil {
 		return nil, err
 	}
 	defer p.root.release()
@@ -64,7 +64,7 @@ func (p *provider) NewScope(ctx context.Context) (di.Scope, error) {
 	p.root.mu.Lock()
 	defer p.root.mu.Unlock()
 	if p.root.closing {
-		return nil, failure("new scope", di.Key{}, nil, di.ErrClosed, nil)
+		return nil, failure("new-scope", di.Key{}, nil, di.ErrClosed, nil)
 	}
 	p.scopes = append(p.scopes, state)
 	return &scope{state: state}, nil

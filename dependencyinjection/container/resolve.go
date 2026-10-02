@@ -16,11 +16,11 @@ func (scope *scope) Resolve(ctx context.Context, key di.Key) (any, error) {
 	if scope == nil || scope.state == nil || ctx == nil {
 		return nil, failure("resolve", key, nil, di.ErrInvalidScope, nil)
 	}
-	if err := scope.state.provider.root.admit(); err != nil {
+	if err := scope.state.provider.root.admit("resolve"); err != nil {
 		return nil, err
 	}
 	defer scope.state.provider.root.release()
-	if err := scope.state.owner.admit(); err != nil {
+	if err := scope.state.owner.admit("resolve"); err != nil {
 		return nil, err
 	}
 	defer scope.state.owner.release()
@@ -133,7 +133,13 @@ func invokeFactory(ctx context.Context, scope di.Resolver, key di.Key, b binding
 	}()
 	value, err = b.factory(ctx, scope)
 	if err != nil {
-		err = failure("factory", key, path, nil, err)
+		var diagnostic *di.Error
+		if errors.As(err, &diagnostic) && diagnostic.Operation == "factory" && diagnostic.Key == key {
+			diagnostic.Path = slices.Clone(path)
+			err = diagnostic
+		} else {
+			err = failure("factory", key, path, di.ErrFactoryFailed, err)
+		}
 	}
 	return value, err
 }

@@ -27,9 +27,15 @@ type binding struct {
 // Successful Build freezes it; failed validation leaves it editable.
 // Registry is not safe for concurrent mutation and must not be copied after use.
 type Registry struct {
+	noCopy   noCopy
 	bindings map[di.Key]binding
 	frozen   bool
 }
+
+type noCopy struct{}
+
+func (*noCopy) Lock()   {}
+func (*noCopy) Unlock() {}
 
 // Register validates and copies a descriptor. Duplicate keys fail; no replacement.
 func (r *Registry) Register(b di.Binding) error {
