@@ -4,5 +4,5 @@
 // Package fundamentals is the root of the Go counterpart of Cratis Fundamentals.
 //
 // Shared UUIDs and temporal wire scalars are provided by the concepts package.
-// Generic domain-value concepts are not implemented yet.
+// Typed scalar concepts are provided by the concepts package; see Documentation/parity.md for gaps.
 package fundamentals
