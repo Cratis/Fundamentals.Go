@@ -258,6 +258,32 @@ Pre-canceled contexts, scope creation and waiting may return bare
 cleanup errors remain inspectable even when wrapped or joined. Close does not
 require matching operation metadata: you can supply a dedicated cleanup context.
 
+## Conformance levels
+
+If you write a provider adapter, run the reusable suites from
+`github.com/cratis/fundamentals.go/dependencyinjection/ditest` in your tests.
+This package imports `testing`: import it only from `_test.go` files, never
+production packages. Translate every `ditest.Config` field into a fresh provider
+and return build failures as errors, rather than calling `t.Fatal` in the builder.
+
+- **Level 1 — `RunProvider`:** exact keys, result validation, lifetimes and caching,
+  owned and borrowed disposal, cleanup order, close semantics, scope ownership,
+  Catalog and the explicit scope-factory facade. No capability is skipped.
+- **Level 2 — `RunDeclaredGraph`:** additionally checks missing edges, cycles and
+  captive lifetimes at build, declared-edge enforcement, expiring and non-overlapping
+  factory views, singleton context isolation and guards supplied in Config.
+  Run both suites to claim both levels. The default container runs both.
+- **Resolver-only — `RunResolver`:** exact lookup, `ErrMissing`, typed-helper
+  interoperability and cancellation. Passing it certifies nothing about lifetimes,
+  disposal, guards, dependency graphs or ownership. Fixtures are externally owned;
+  register any adapter teardown with `t.Cleanup`.
+
+The [adapter conformance example](../dependencyinjection/ditest/suites_test.go)
+shows how to translate configuration and run both provider suites. Opaque typed
+bindings prevent incompatible factory results without unsafe code; successful
+provider lookups check result types, while resolver fixtures explicitly exercise
+nil, typed-nil and wrong-type results through `di.Resolve`.
+
 ## Know the limits
 
 This is not full Microsoft.Extensions.DependencyInjection compatibility.
@@ -271,5 +297,5 @@ child resolution. Plain and custom resolvers need not implement that graph polic
 
 Keep constructors explicit when composition is simple. Neither the contracts
 nor the container chooses an Arc operation or Chronicle delivery lifetime, and
-neither imports those frameworks. Portable adapter conformance tooling is a
-separate work item; it is not included in this package.
+neither imports those frameworks. Conformance tests qualify the shared contracts,
+not an adapter's application-specific policies or ecosystem integration.
