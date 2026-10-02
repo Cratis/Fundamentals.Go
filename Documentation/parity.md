@@ -13,9 +13,10 @@ not establish whole-product parity.
 ## Status summary
 
 Implemented: UUID, DateOnly, TimeOnly, TimeSpan, correlation context. Partial:
-typed concepts, conversion. Go-specific: concept declaration discovery.
-Everything else, including dependency injection, is Not implemented; see the
-tracking issues per area. See [Updating this map](#updating-this-map) for the
+typed concepts, conversion, dependency injection (exact typed bindings,
+lifetimes, scopes and an optional container; conventions are not implemented).
+Go-specific: concept declaration discovery, dependency-injection conformance
+levels. Everything else is Not implemented; see the tracking issues per area. See [Updating this map](#updating-this-map) for the
 status vocabulary.
 
 ## Authority
@@ -52,6 +53,37 @@ Evidence paths are repository-relative; each
 `testdata/scalars.json` entry refers to `concepts/testdata/scalars.json`.
 JavaScript scalar types in `Source/JavaScript` provide consumer references, not
 authority to change C# behavior.
+
+## Dependency injection surfaces
+
+Authority: `Source/DotNET/Fundamentals/DependencyInjection` (principally
+`ServiceCollectionExtensions.cs`) and `Types/InstancesOf.cs`,
+`Types/ImplementationsOf.cs` at the pinned revision, plus Microsoft dependency
+injection semantics as Cratis uses them. The Go code moved from Arc.Go
+`services` at `304e97466bca594b51a3d7bbc723f4c477a6a99c`. Evidence:
+`dependencyinjection/*_test.go`, `dependencyinjection/container/*_test.go`, and
+both conformance levels in `dependencyinjection/ditest`, which the default
+container passes (`container/conformance_test.go`). Guide:
+[Dependency injection](dependency-injection.md).
+
+| C# surface | Go surface | Status | Notes and deviations |
+| --- | --- | --- | --- |
+| Service descriptors, provider, scopes and the three lifetimes | `Binding`, `Lifetime`, `Provider`, `Scope`, `ScopeFactory`, `container.Registry` | Partial | Exact typed bindings and explicit scopes. No root resolution, open generics, `IEnumerable<T>` synthesis or last-registration-wins. |
+| Disposal, `IAsyncDisposable` preferred over `IDisposable`, supplied singleton instances | Owned bindings; `Close(context.Context) error` preferred over `io.Closer`; `BindValue` | Implemented | Reverse-order disposal, repeated `Close` returns the retained result, `ErrClosed` after close, supplied values are never disposed. |
+| `IServiceProviderIsService` | Optional `Catalog` capability on `ScopeFactory` and `Registrar` | Partial | Exact keys only. Without the capability, consumers attempt resolution, as C# `DefaultServiceProvider` does. |
+| `IServiceScopeFactory` | `container.Registry.BindScopeFactory` facade | Implemented | The facade implements `ScopeFactory`, `Catalog` and `ScopeOwner`, not `Close` or resolution. Open scopes from methods, never inside a factory callback. |
+| Injectable `IServiceProvider` | None | Not implemented | No injectable current provider or resolver, by design. |
+| `ValidateScopes` / `ValidateOnBuild` | `Build` validation | Go-specific | Always on: missing edges, cycles and transitive captive lifetimes fail `Build`. |
+| `IFoo` → `Foo`, `[Singleton]`/`[Scoped]` with transient fallback, `[IgnoreConvention]`, self-bindings, generated convention metadata | Manual bindings and `BindBorrowed` forwarding | Not implemented | Convention generation is [#14][issue-14]. No `TransientAttribute` or `ISelfBindable` exists at the pinned revision. |
+| Existing registrations win; convention registration is idempotent | Duplicate registration fails | Not implemented | Deliberate: duplicates never silently win. Generated registrations will use an explicit override plan ([#14][issue-14]). |
+| `IInstancesOf<T>`, `IImplementationsOf<T>`, keyed services, diagnostics registration | None | Not implemented | `Key` identifies a type, not a named service. A future collection API must select a scope and report errors explicitly. |
+| Assembly scanning, `ActivatorUtilities`, artifact-method invocation | Explicit registration; consumer-owned activation | Out of scope | Explicit or generated registration replaces scanning. Chronicle.Go may use validated registration-time reflection for its artifacts. |
+| Separate interface and self descriptors | `BindBorrowed` interface forwarding over an owned concrete binding | Go-specific | Intentional difference accepted on [#9][di-decision]: forwarding shares the concrete instance and closes it once; C# may create separate instances. |
+| Provider and resolver access rules | Frozen registry, expiring restricted factory resolvers, provider drains child scopes | Go-specific | Factories receive a resolver limited to declared edges that expires when the callback returns. |
+| Request isolation | `container.WithContextGuard`; singleton factories see contexts with all values hidden | Go-specific | Guards run on every scoped resolution, including through factory resolvers. |
+| Failed-value disposal | Independent cooperative 30-second cleanup budget | Go-specific | Not configurable yet. |
+| Client-lifetime artifacts | `Singleton` binding resolved from a short-lived startup scope | Go-specific | The provider owns the instance until `Provider.Close`; the application controls shutdown order. |
+| Context cancellation | `Resolve` checks `ctx.Err()` first | Go-specific | A canceled context returns the bare context error before closed or expired-resolver errors. |
 
 ## Shared scalar guarantees
 
@@ -223,7 +255,7 @@ boundary or [#5][issue-5]'s deferrals, not duplicate issues.
 | Types discovery: `Types/Types.cs`, `ContractToImplementorsMap.cs`, `ProjectReferencedAssemblies.cs`, `PackageReferencedAssemblies.cs`, `CompositeAssemblyProvider.cs`, `GeneratedTypeDiscoveryRegistry.cs`, `TypesServiceCollectionExtensions.cs`, `TypeDiscoveryDiagnostics.cs` | Types A29/C10; application features, extension providers and schema universe | Not implemented | Go-idiom replacement: explicit catalogs/contributions; shared registration/generation planned [#11][issue-11]/[#14][issue-14] under [#9][issue-9] | No assembly loading, global `Types.Instance` or CLR diagnostics port. Arc/Chronicle own feature registration and completeness checks; composition must not silently omit required contributors. |
 | Types activation: `Types/InstancesOf.cs`, `ImplementationsOf.cs`, `KnownInstancesOf.cs` and corresponding interfaces | Types A29/C10; discovered instances in both; no direct `IImplementationsOf` client use established | Not implemented | Go-idiom replacement: explicit factory/instance lists; DI work [#11][issue-11]–[#14][issue-14]; no promise of container-wide enumeration | Factories resolve using the active operation scope; discovery is not activation. Exact instance lists stay caller-owned; do not cache request-scoped extensions globally. |
 | Reflection: `Reflection/TypeExtensions.cs`, `DictionaryExtensions.cs`, `PropertyExtensions.cs`, `ParameterExtensions.cs`, `MethodExtensions.cs`, `ExpressionExtensions.cs`, `TypeConstructorExtensions.cs`, `TypeInfo.cs`, `MethodCalls.cs` | A9/C7; classification, schema/nullability, expression paths and invocation metadata | Not implemented | Out of scope; concept declaration inspection is the Go-specific row in Surfaces | Use `reflect`, explicit tags, typed factories and generated field identifiers without conflating scalar, collection and stream kinds. Product field plans, presence and handler/schema agreement remain local. |
-| DependencyInjection contracts/lifetimes: `DependencyInjection/SingletonAttribute.cs`, `ScopedAttribute.cs`, `IgnoreConventionAttribute.cs`, `ConventionServiceBinding.cs`, `ConventionSelfBinding.cs`; Microsoft DI as used by Fundamentals | A41/C16; both products' providers and operation-scoped activation | Not implemented | Planned [#11][issue-11] contracts, [#12][issue-12] default container, [#13][issue-13] conformance; ownership accepted on [#9][di-decision] | Fundamentals will own exact-type resolver/scope contracts and optional container extracted from Arc. Plain constructors remain first-class. Arc principal/tenant/staging and Chronicle delivery/client-lifetime policy remain product-owned. |
+| DependencyInjection contracts/lifetimes: `DependencyInjection/SingletonAttribute.cs`, `ScopedAttribute.cs`, `IgnoreConventionAttribute.cs`, `ConventionServiceBinding.cs`, `ConventionSelfBinding.cs`; Microsoft DI as used by Fundamentals | A41/C16; both products' providers and operation-scoped activation | Partial | Ported: contracts [#11][issue-11], default container moved from Arc.Go [#12][issue-12], conformance suites [#13][issue-13]; design accepted on [#9][di-decision]; see [Dependency injection surfaces](#dependency-injection-surfaces) | Fundamentals owns `dependencyinjection`, `dependencyinjection/container` and `dependencyinjection/ditest`. Plain constructors remain first-class; no product imports the container. Arc principal/tenant/staging and Chronicle delivery activation remain product-owned. Attribute-driven lifetimes are not implemented ([#14][issue-14]). |
 | DependencyInjection conventions: `DependencyInjection/ServiceCollectionExtensions.cs`, `ICanProvideConventionsForDependencyInjection.cs`; `Source/DotNET/Fundamentals.TypeDiscovery.Generator/TypeDiscoveryCollector.cs`, `GeneratedSourceBuilder.cs` | DI A41/C16; Arc calls convention registration; Chronicle also explicitly registers/activates artifacts | Not implemented | Planned typed constructor bindings [#14][issue-14], tooling prerequisite [#16][issue-16]; runtime ownership [#11][issue-11]–[#13][issue-13] | Explicit/generated package contributions replace assembly scanning. Record duplicate/override and ownership differences before claiming parity; operation adapters stay in Arc.Go/Chronicle.Go. Generator plans are not implementations. |
 | Execution: `Execution/CorrelationId.cs`, `CorrelationIdAccessor.cs`, `ICorrelationIdAccessor.cs`, `ICorrelationIdModifier.cs` | A29/C35, Connections 4; HTTP/pipeline and RPC/event propagation | Implemented | Ported explicit-context contract [#8][issue-8], replacing ambient storage; tests above | Shared UUID-backed context key only. `AddCorrelationIdSupport` has no counterpart; `WithID`/`FromContext` need no registration (Go-idiom replacement). Ingress parsing/generation, headers, principal, tenancy, causation, store/namespace and detached-operation policy stay local. No Fundamentals `ExecutionContext` class exists to port. |
 | Monads: `Monads/Result.cs`, `Result{TError}.cs`, `Result{TResult,TError}.cs`, `Catch.cs`, `Catch{TResult}.cs`, `Catch{TResult,TError}.cs`, `Option.cs` | A4/C15; Result in both, Catch in Chronicle activation/reactors; no direct client Option use established | Not implemented | Out of scope as a shared union framework; Go-idiom replacement recorded by [#10][issue-10] | Use `(T, error)`, `errors.Is/As`, `(T, bool)` and product-specific outcomes. Preserve domain rejection versus infrastructure failure and explicit presence; do not flatten Arc command outcomes or confuse Option with three-state JSON Optional. |

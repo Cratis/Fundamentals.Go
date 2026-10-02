@@ -5,5 +5,7 @@
 //
 // Package concepts provides the shared UUID and temporal wire scalars and the
 // typed concept contract; package correlation shares correlation IDs through
-// context.Context. Documentation/parity.md records the remaining gaps.
+// context.Context; package dependencyinjection provides an optional
+// dependency-injection contract and default container.
+// Documentation/parity.md records the remaining gaps.
 package fundamentals

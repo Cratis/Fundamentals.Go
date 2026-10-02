@@ -15,10 +15,13 @@ dependency-light set of primitives without depending on one another.
 
 **Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly,
 TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package
-`correlation` provides shared correlation-ID context. No tagged module release
+`correlation` provides shared correlation-ID context. Package
+`dependencyinjection` provides an optional dependency-injection contract, with a
+default container and conformance suites. No tagged module release
 exists yet. Go 1.26 or later is required.
 
-Start with [concept authoring and recognition](concepts.md) and the
+Start with [concept authoring and recognition](concepts.md),
+[dependency injection](dependency-injection.md) and the
 [parity map](parity.md) for supported contracts and remaining gaps. The
 [contribution guide](../CONTRIBUTING.md) covers building and testing.
 

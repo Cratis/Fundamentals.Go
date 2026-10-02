@@ -9,7 +9,7 @@ The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamenta
 
 ## Status
 
-**Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly, TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package `correlation` provides shared correlation-ID context. Start with [concept authoring and recognition](Documentation/concepts.md); the [parity map](Documentation/parity.md) records implemented contracts and remaining gaps.
+**Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly, TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package `correlation` provides shared correlation-ID context. Package `dependencyinjection` provides an optional dependency-injection contract, with a default container and conformance suites; plain constructors need none of it. Start with [concept authoring and recognition](Documentation/concepts.md) and [dependency injection](Documentation/dependency-injection.md); the [parity map](Documentation/parity.md) records implemented contracts and remaining gaps.
 
 There is no tagged Go release yet. Releases will remain **v0.x** while the API is experimental.
 
