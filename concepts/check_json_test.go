@@ -91,13 +91,11 @@ func TestCheckJSONScalarTokens(t *testing.T) {
 func TestCheckJSONInvalidRepresentation(t *testing.T) {
 	valid := representation[string](t)
 	for _, r := range []concepts.Representation{
-		{}, {Type: reflect.TypeFor[string]()}, {Declared: valid.Declared},
-		{Type: reflect.TypeFor[bool](), Declared: valid.Declared},
-		{Type: valid.Type, Declared: valid.Declared, PointerDepth: -1},
-		{Type: valid.Type, Declared: reflect.PointerTo(valid.Declared)},
-		{Type: reflect.TypeFor[string](), Declared: reflect.TypeFor[string]()},
-		{Type: reflect.TypeFor[string](), Declared: reflect.TypeFor[markerOnly]()},
-		{Type: reflect.TypeFor[int64](), Declared: reflect.TypeFor[cyclicPointer]()},
+		{}, {Type: reflect.TypeFor[string]()}, {Kind: concepts.KindString},
+		{Type: reflect.TypeFor[bool](), Kind: concepts.KindString},
+		{Type: valid.Type, Kind: valid.Kind, PointerDepth: -1},
+		{Type: reflect.TypeFor[uintptr](), Kind: concepts.KindUint},
+		{Type: reflect.TypeFor[cyclicPointer](), Kind: concepts.KindInt64},
 	} {
 		if err := concepts.CheckJSON(r, []byte(`"Ada"`)); !errors.Is(err, concepts.ErrInvalidConcept) {
 			t.Errorf("%v: want ErrInvalidConcept, got %v", r, err)

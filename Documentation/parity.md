@@ -142,7 +142,9 @@ Source inspection establishes a contract, not executable Go parity.
 
 The dependency baseline comes from [inventory issue #10][issue-10]. The accepted
 [DI ownership decision][di-decision] on [#9][issue-9] supersedes the earlier
-suggestion to leave Arc's container in Arc.Go. DI is **Not implemented** in Fundamentals.Go.
+suggestion to leave Arc's container in Arc.Go. DI is **Partial** in Fundamentals.Go:
+contracts, the default container and conformance suites are implemented;
+conventions are not ([#14][issue-14]).
 
 | Consumer baseline | Revision | Inspected scope |
 | --- | --- | --- |
@@ -335,7 +337,8 @@ accidental CLR behavior into a new Go guarantee.
   defaults unmarked types to transient; no `TransientAttribute` exists. Its
   interface/self singleton bindings are separate descriptors and need not share
   an instance. Go stance: explicit lifetimes/owned-versus-borrowed bindings and
-  close-once conformance ([#11][issue-11]–[#13][issue-13]); do not claim the pending design is implemented.
+  close-once forwarding are implemented and covered by `dependencyinjection/ditest`
+  ([#11][issue-11]–[#13][issue-13]); convention registration is not ([#14][issue-14]).
 - **Enumeration is activation:** `Types/InstancesOf.cs` captures discovered
   concrete types and a provider, then calls `GetService(concreteType)` on every
   enumeration. It neither enumerates interface registrations nor falls back to

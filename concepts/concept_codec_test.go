@@ -113,11 +113,11 @@ func checkConceptWire[T comparable](t *testing.T, value T, wire, text string) {
 			if err != nil || string(data) != tc.want {
 				t.Fatalf("JSON = %s, %v; want %s", data, err, tc.want)
 			}
-			// Go 1.26 decodes keys through UnmarshalJSON with the quoted key, which
+			// The v1 encoding/json decodes keys through UnmarshalJSON with the quoted key, which
 			// only string-shaped JSON codecs accept (Documentation/concepts.md rule 12).
 			if tc.name == "map key" && !mapKeyDecodeUsesText && wire[0] != '"' {
 				if err := json.Unmarshal(data, tc.target); err == nil {
-					t.Fatal("Go 1.26 unexpectedly decoded a non-string map key; update rule 12")
+					t.Fatal("v1 encoding/json unexpectedly decoded a non-string map key; update rule 12")
 				}
 				return
 			}

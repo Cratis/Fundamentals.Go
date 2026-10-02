@@ -13,12 +13,12 @@ dependency-light set of primitives without depending on one another.
 
 ## Current status
 
-**Available on develop, unreleased.** Package `concepts` provides UUID, DateOnly,
+**Experimental (v0.x).** Package `concepts` provides UUID, DateOnly,
 TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package
 `correlation` provides shared correlation-ID context. Package
 `dependencyinjection` provides an optional dependency-injection contract, with a
-default container and conformance suites. No tagged module release
-exists yet. Go 1.26 or later is required.
+default container and conformance suites. Releases remain v0.x while the API
+is experimental. Go 1.26 or later is required.
 
 Start with [concept authoring and recognition](concepts.md),
 [dependency injection](dependency-injection.md) and the
@@ -35,8 +35,7 @@ but wire compatibility needs executable evidence.
 
 ## Publication
 
-The initial implementation will be released as v0.1.0 before either consuming Go
-framework releases. After a tagged release exists, use the lowercase module path
-`github.com/cratis/fundamentals.go`. See [release policy](releases.md) for tags,
+Releases are published before the consuming Go frameworks release against them.
+Use the lowercase module path `github.com/cratis/fundamentals.go`. See [release policy](releases.md) for tags,
 proxy indexing and recovery, and [project context](project-context.md) for the
 independent-session workflow. Central documentation-site integration is separate.

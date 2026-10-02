@@ -20,5 +20,5 @@
 // scalar bytes without applying domain invariants. For the explicit marker and
 // codec-forwarding authoring pattern, see the [concept authoring guide].
 //
-// [concept authoring guide]: https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/concepts.md
+// [concept authoring guide]: https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/concepts.md
 package concepts

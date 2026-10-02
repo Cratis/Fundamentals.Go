@@ -12,7 +12,8 @@ import (
 )
 
 // Representation describes a recognized concept or exact shared scalar.
-// Obtain it from Underlying; copies retain its private validation metadata.
+// Underlying produces it; it is a plain comparable value that callers and
+// tooling may also construct.
 // Its zero value is invalid. Fields describe type structure, not nullability.
 type Representation struct {
 	// Type is the exact allowlisted scalar, never a pointer or another concept.

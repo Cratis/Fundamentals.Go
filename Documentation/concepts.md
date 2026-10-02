@@ -184,14 +184,17 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
     JSON codecs in `encoding/json`. A recognized concept's text codec must
     round-trip and produce the same canonical text as its JSON string, or the
     canonical scalar literal for a non-string representation such as `int32`.
-    Native string/integer Go key kinds take precedence over `MarshalText` in
-    `encoding/json`; choose a named-field wrapper when custom key encoding is needed.
-    Go 1.26 differs when **decoding** a key: if the type also implements
-    `json.Unmarshaler`, `encoding/json` calls `UnmarshalJSON` with the quoted key
-    text instead of `UnmarshalText`. Go 1.27 calls `UnmarshalText`. String-shaped
-    concepts (UUID, DateOnly, TimeOnly, TimeSpan and string-backed concepts) decode
-    on both, because their `UnmarshalJSON` accepts a JSON string. Number- and
-    bool-backed concepts used as map keys decode only on Go 1.27 or later.
+    `encoding/json` uses a string-kinded key type directly, ignoring
+    `MarshalText`; it checks `MarshalText` before integer kinds. Choose a
+    named-field wrapper when a string-kinded type needs custom key encoding.
+    Decoding a key differs between `encoding/json` implementations. The v1
+    implementation (the Go 1.26 default, or Go 1.27 with `GOEXPERIMENT=nojsonv2`)
+    calls `UnmarshalJSON` with the quoted key text when the type implements
+    `json.Unmarshaler`. The jsonv2-backed implementation (the Go 1.27 default)
+    calls `UnmarshalText`. String-shaped concepts (UUID, DateOnly, TimeOnly,
+    TimeSpan and string-backed concepts) decode under both, because their
+    `UnmarshalJSON` accepts a JSON string. Number- and bool-backed concepts used
+    as map keys decode only with the jsonv2-backed implementation.
 
 The shared declaration corpus is the test-package types and documented
 `declarationCorpus` table in
@@ -219,11 +222,10 @@ non-nil concept value. It checks the declared scalar's wire shape:
   fractions are not canonical.
 
 A zero, inconsistent, or otherwise invalid representation returns an error
-wrapping `ErrInvalidConcept`. Obtain the representation from `Underlying`,
-which retains private structural-validation metadata; do not construct it by hand.
-`Declared` must remain the recognized pointer-stripped input, `Kind` must be valid
-and agree with `Type`, `Type` must agree with discovery, and `PointerDepth` must be
-nonnegative. Copies retain the validation metadata.
+wrapping `ErrInvalidConcept`. `CheckJSON` checks only `Type`, `Kind` and
+`PointerDepth`: `Kind` must be valid and agree with `Type`, and `PointerDepth`
+must be nonnegative. `Declared` is informational and is not inspected, so a
+hand-built representation is accepted.
 Bad encoded data returns an ordinary error, not `ErrInvalidConcept`.
 
 `CheckJSON` never calls application code. Its allocations are bounded by the
