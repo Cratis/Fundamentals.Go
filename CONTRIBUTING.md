@@ -48,7 +48,7 @@ govulncheck ./...
 
 No source files should appear in `gofmt -l` output. After `go mod tidy`, also check `git status --short -- go.mod go.sum` for untracked manifests. Commit `go.sum` when dependencies require it. Do not commit nested modules, local `replace` directives, or personal `go.work` files: released modules must build without sibling checkouts.
 
-Pull requests run the Linux matrix; scheduled and manual builds also check macOS and Windows. Workflow lint invokes ShellCheck when available. There are no service-dependent integration tests in this scaffold. CodeQL runs separately in GitHub Actions and compiles tests as well as packages so the scaffold is analyzed.
+Pull requests run the Linux matrix; scheduled and manual builds also check macOS and Windows. Workflow lint invokes ShellCheck when available. There are no service-dependent integration tests in this scaffold. CodeQL runs separately in GitHub Actions with autobuild and test-source extraction enabled so the scaffold is analyzed.
 
 ## Conventions
 
