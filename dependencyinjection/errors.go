@@ -29,7 +29,7 @@ var (
 	ErrClosed = errors.New("services closed")
 	// ErrInvalidScope identifies zero, nil, or otherwise invalid scope handles.
 	ErrInvalidScope = errors.New("invalid service scope")
-	// ErrContextMismatch identifies principal/tenant replacement, including presence changes.
+	// ErrContextMismatch identifies guard rejection, including captured presence changes.
 	ErrContextMismatch = errors.New("service context mismatch")
 	// ErrResolverExpired identifies use after a factory returns.
 	ErrResolverExpired = errors.New("factory scope expired")
@@ -37,11 +37,13 @@ var (
 	ErrConcurrentFactoryUse = errors.New("concurrent factory scope use")
 	// ErrNilValue identifies nil or typed-nil produced/registered values.
 	ErrNilValue = errors.New("nil service value")
-	// ErrCallbackPanicked identifies factory or cleanup panics.
+	// ErrCallbackPanicked identifies factory, cleanup or context-guard panics.
 	ErrCallbackPanicked = errors.New("service callback panicked")
 )
 
-// Error is an inspectable service failure. Text never includes service values or claims.
+// Error is an inspectable service failure. Text is diagnostic-only, not a stable
+// format, and never includes service values, causes or panic payloads. Constructors
+// copy Path; adapters constructing Error themselves must also copy retained paths.
 type Error struct {
 	// Operation is the failing operation.
 	Operation string

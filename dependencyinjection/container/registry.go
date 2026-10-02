@@ -16,10 +16,11 @@ import (
 var ErrFrozen = errors.New("service registry frozen")
 
 type binding struct {
-	lifetime     di.Lifetime
-	factory      func(context.Context, di.Resolver) (any, error)
-	dependencies []di.Key
-	borrowed     bool
+	lifetime       di.Lifetime
+	factory        func(context.Context, di.Resolver) (any, error)
+	dependencies   []di.Key
+	borrowed       bool
+	infrastructure bool
 }
 
 // Registry is a single-owner mutable builder. Zero is ready to use.
@@ -95,6 +96,13 @@ func (r *Registry) Build(options ...Option) (di.Provider, error) {
 		bindings[key] = b
 	}
 	p := newProvider(bindings)
+	for key, b := range bindings {
+		if b.infrastructure {
+			facade := &scopeFactory{provider: p}
+			b.factory = func(context.Context, di.Resolver) (any, error) { return facade, nil }
+			bindings[key] = b
+		}
+	}
 	p.guards = slices.Clone(config.guards)
 	r.frozen = true
 	return p, nil

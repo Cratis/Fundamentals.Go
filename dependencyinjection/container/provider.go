@@ -41,7 +41,7 @@ func (p *provider) Owns(handle di.Scope) bool {
 	return p != nil && p.root != nil && scope != nil && scope.state != nil && scope.state.provider == p && scope.view == nil
 }
 
-// NewScope captures principal/tenant and their presence, never the context itself.
+// NewScope captures configured guards, never the context itself.
 func (p *provider) NewScope(ctx context.Context) (di.Scope, error) {
 	if p == nil || p.root == nil || ctx == nil {
 		return nil, failure("new scope", di.Key{}, nil, di.ErrInvalidScope, nil)
@@ -55,6 +55,9 @@ func (p *provider) NewScope(ctx context.Context) (di.Scope, error) {
 	defer p.root.release()
 	checks, err := captureChecks(ctx, p.guards)
 	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	state := &scopeState{provider: p, owner: newOwner(), checks: checks}
