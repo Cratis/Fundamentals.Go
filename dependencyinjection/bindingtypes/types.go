@@ -9,6 +9,7 @@ import (
 	"slices"
 
 	di "github.com/cratis/fundamentals.go/dependencyinjection"
+	"github.com/cratis/fundamentals.go/internal/typeinspection"
 )
 
 func identity(t types.Type) string {
@@ -380,12 +381,11 @@ func disposableValue(t types.Type) bool {
 	case *types.Pointer, *types.Interface, *types.Map, *types.Chan, *types.Slice, *types.Signature:
 		return false
 	}
-	method, _, _ := types.LookupFieldOrMethod(t, false, nil, "Close")
-	fn, ok := method.(*types.Func)
-	if !ok {
+	method := typeinspection.RuntimeMethodSet(t).Lookup(nil, "Close")
+	if method == nil {
 		return false
 	}
-	sig := fn.Type().(*types.Signature)
+	sig := method.Type().(*types.Signature)
 	return !sig.Variadic() && sig.Results().Len() == 1 && types.Identical(sig.Results().At(0).Type(), types.Universe.Lookup("error").Type()) &&
 		(sig.Params().Len() == 0 || (sig.Params().Len() == 1 && isContext(sig.Params().At(0).Type())))
 }

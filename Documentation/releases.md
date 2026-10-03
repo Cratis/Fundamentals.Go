@@ -6,24 +6,26 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-The first implemented release is v0.1.0. Experimental releases remain v0.x
-until an approved stable launch; a minor version may contain breaking changes,
-with migration notes.
+Fundamentals.Go v0.1.0 was released at commit `e50913e`. The current additive
+package release targets v0.2.0 with `minor` intent. Experimental releases remain
+v0.x until an approved stable launch; a minor version may contain breaking
+changes, with migration notes.
 
 ## Development and release intent
 
 Feature work uses `develop`, focused conventional commits and verified pushes.
-Collect the initial implementation in one `develop` → `main` release PR labeled
-`minor`. Fundamentals.Go v0.1.0 must be tagged before Arc.Go or Chronicle.Go
-releases. Consumers may pin pushed develop commits through Go pseudo-versions
-until then; communicate pins and the release in
+Collect release-bound changes in a `develop` → `main` release PR with the
+appropriate intent label. Consumers use published tags for released APIs and may
+pin pushed develop commits through Go pseudo-versions for unreleased APIs;
+communicate pins and releases in
 [coordination issue #3](https://github.com/Cratis/Fundamentals.Go/issues/3).
+The initial v0.1.0 bootstrap sequencing is complete, not a rule for every release.
 
 Every PR has exactly one of `major`, `minor`, `patch` or `no-release`. While
-v0.x, use minor for breaking experimental API changes and patch for compatible
-fixes. Describe breaking changes explicitly. Dependabot PRs use `no-release`;
-a dependency change requiring publication needs a deliberate release-bound
-maintainer change.
+v0.x, use minor for additive public APIs or breaking experimental API changes
+and patch for compatible fixes. Describe breaking changes explicitly. Dependabot
+PRs use `no-release`; a dependency change requiring publication needs a deliberate
+release-bound maintainer change.
 
 The merged PR body becomes the GitHub Release notes verbatim. Follow the
 [contribution guide](../CONTRIBUTING.md) and PR template; keep verification and
@@ -73,9 +75,8 @@ Each `nested` entry has an explicit `dir` and boolean `publish` policy.
 1. Create `tools/go.mod` or `integrations/<name>/go.mod` with module path
    `github.com/cratis/fundamentals.go/<directory>`. Use lowercase relative
    directories; modules cannot contain other modules.
-2. Require a **published stable root version**, such as `v0.1.0` once that version
-   is released. Pseudo-versions, workspaces and `replace` directives are not a
-   substitute. If the tool needs new root APIs, release the root first.
+2. Require a **published stable root version**, such as the released `v0.1.0`.
+   Pseudo-versions, workspaces and `replace` directives are not a substitute. If the tool needs new root APIs, release the root first.
 3. Add the exact directory to `nested` in the same change. For example, the
    following illustrative configuration includes two publishable modules and
    the unpublished recipes:

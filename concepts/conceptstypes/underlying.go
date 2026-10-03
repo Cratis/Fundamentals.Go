@@ -8,6 +8,7 @@ import (
 	"go/types"
 
 	"github.com/cratis/fundamentals.go/concepts"
+	"github.com/cratis/fundamentals.go/internal/typeinspection"
 )
 
 // Representation describes a recognized concept or exact shared scalar.
@@ -70,8 +71,8 @@ func Underlying(t types.Type) (Representation, bool, error) {
 	if kind := sharedKind(declared); kind != concepts.KindInvalid {
 		return Representation{Type: declared, Kind: kind, Declared: declared, PointerDepth: depth}, true, nil
 	}
-	valueMethods := runtimeMethodSet(declared)
-	pointerMethods := runtimeMethodSet(types.NewPointer(declared))
+	valueMethods := typeinspection.RuntimeMethodSet(declared)
+	pointerMethods := typeinspection.RuntimeMethodSet(types.NewPointer(declared))
 	marker := valueMethods.Lookup(nil, "ConceptValue")
 	if marker == nil && pointerMethods.Lookup(nil, "ConceptValue") == nil {
 		if isCalendarStruct(declared) && !hasCodec(valueMethods, "MarshalJSON", false) && !hasCodec(valueMethods, "MarshalText", false) {
@@ -151,8 +152,8 @@ func stripPointers(t types.Type) (types.Type, int, bool) {
 }
 
 func hasConceptMethod(t types.Type) bool {
-	return runtimeMethodSet(t).Lookup(nil, "ConceptValue") != nil ||
-		runtimeMethodSet(types.NewPointer(t)).Lookup(nil, "ConceptValue") != nil
+	return typeinspection.RuntimeMethodSet(t).Lookup(nil, "ConceptValue") != nil ||
+		typeinspection.RuntimeMethodSet(types.NewPointer(t)).Lookup(nil, "ConceptValue") != nil
 }
 
 func sharedKind(t types.Type) concepts.ScalarKind {
