@@ -125,7 +125,9 @@ CI uses Go 1.26.x and 1.27.x, golangci-lint v2.14.0, actionlint v1.7.12 and
 govulncheck v1.8.0. PR builds run Linux; scheduled/manual builds also run macOS
 and Windows. CodeQL, release intent, release notes and work-record checks run
 on GitHub. [CONTRIBUTING](../CONTRIBUTING.md) and `.github/workflows/` define the
-full gates; managed AI stop hooks alone do not check Go.
+full gates. The repository-owned quality-gate override makes managed AI stop
+hooks check root and recipes build, vet, and tests by default; it does not replace
+the full CI matrix, race, lint, module hygiene or vulnerability checks.
 
 ## AI guidance and ownership
 

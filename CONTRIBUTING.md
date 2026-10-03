@@ -78,19 +78,19 @@ Pull requests run the Linux matrix; scheduled and manual builds also check macOS
 
 Managed Cratis AI rules and harness adapters are installed through `cratis ai install` and updated through `cratis ai update`. Shared improvements belong in [Cratis AI](https://github.com/Cratis/AI); local Go rules and skills stay outside the managed manifest. Read [project context](Documentation/project-context.md) for ownership and the documented hook patch exceptions.
 
-The automatic project override in `.cratis/ai/quality-gates.project.json` limits
-frontend gates to a root Node application with `package.json`, `yarn.lock`, and
-the requested scripts; none exists here. It excludes the opt-in contract probes
-and never discovers managed harness packages. The managed runner can patch
-existing gate IDs but cannot append native Go gates. Select the repository-owned
-Go configuration explicitly when running the hook (or export this variable in
-your harness environment):
+The automatic project override in `.cratis/ai/quality-gates.project.json` enables
+native Go phases through the default managed stop hook and quality-gate tool;
+no `CRATIS_HOOKS_GATES` opt-in is needed. It reuses six existing managed IDs for
+root and recipes build, vet, and test commands. IDs are merge keys, not language
+execution semantics; descriptions and commands show the actual Go phases.
+The remaining `frontend-lint` gate requires a root Node application with
+`package.json`, `yarn.lock`, and `lint:ci`; none exists here. Opt-in contract
+probes and managed harness packages never count as this repository's application.
 
 ```sh
-export CRATIS_HOOKS_GATES="$PWD/.cratis/quality-gates.go.json"
 CRATIS_HOOKS_GATE_DRYRUN=1 bash .cratis/ai/hooks/scripts/cratis-quality-gate.sh </dev/null
 bash .cratis/ai/hooks/scripts/cratis-quality-gate.sh </dev/null
-python3 -B -m unittest discover -s scripts -p 'test_quality_gates.py' -v
+python3 -B -m unittest discover -s .github/scripts -p 'test_quality_gates.py' -v
 ```
 
 Native gates run `go build ./...`, `go vet ./...`, and
@@ -105,7 +105,18 @@ trees are no-ops, not evidence that checks ran. This hook is not the full CI gat
 listed above and does not run .NET or JavaScript contract probes. Set
 `QUALITY_GATES_REAL_GO=1` for the routing regression suite to additionally run
 native checks on an isolated copy of the current source, without changing your
-working tree.
+working tree. CI discovers the fake-Go routing tests with the existing
+`.github/scripts/test_*.py` self-tests; hosted Go jobs still run the real matrix.
+
+The routing test helper owns a fresh POSIX process group and terminates, escalates,
+and reaps it on timeout or interruption before deleting fixtures. Its hanging-child
+regression uses readiness and termination events and verifies an unrelated process
+survives. Native Windows Python (including under Git Bash) lacks POSIX process
+groups, so only those process-group regressions are explicitly skipped; routing
+coverage still runs, with the built-in `taskkill /PID /T /F` for tree cleanup on
+failure. Neither cleanup mechanism covers descendants that deliberately detach
+from its group or process tree. This helper is test-local and does not replace
+managed hook or Pi runner cancellation.
 
 Plans, scratch files, and work records belong only in the ignored `.ai-work/` directory and are never committed. Durable follow-ups belong in GitHub issues.
 
