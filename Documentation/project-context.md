@@ -16,11 +16,11 @@ C# layout, application vertical slices and .NET test tooling do not apply.
 - Minimum Go version: 1.26. Keep one root module and canonical lowercase imports.
 - Purpose: the Go counterpart of C# Cratis Fundamentals, providing shared
   domain-value primitives for Arc.Go and Chronicle.Go.
-- Planned surface: concepts (the `ConceptAs<T>` counterpart), a shared UUID
-  type, and DateOnly, TimeOnly and TimeSpan wire scalars.
-- Current state: repository scaffold only. `doc.go` documents the package;
-  `doc_test.go` checks package documentation and canonical importability.
-  These checks prove no scalar, concept or wire behavior.
+- Packages: `concepts` (UUID, DateOnly, TimeOnly, TimeSpan, the `Concept[T]`
+  contract, `Underlying` and `CheckJSON`), `correlation` (shared correlation-ID
+  context), and the optional `dependencyinjection` contract with its default
+  `container` and its `ditest` conformance suites. The [parity map](parity.md)
+  records what is implemented and what remains.
 - Stay small and dependency-light. Use the standard library unless an external
   dependency is justified by capability, maintenance, license and compatibility.
   There are currently no external module dependencies.

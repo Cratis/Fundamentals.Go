@@ -6,9 +6,9 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-This repository has no tagged Go release yet. Repository setup uses
-`no-release`; the first implemented release will be v0.1.0. Experimental
-releases remain v0.x until an approved stable launch.
+The first implemented release is v0.1.0. Experimental releases remain v0.x
+until an approved stable launch; a minor version may contain breaking changes,
+with migration notes.
 
 ## Development and release intent
 

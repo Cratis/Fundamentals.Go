@@ -28,7 +28,7 @@ jobs:
     env:
       GOTOOLCHAIN: local
       GOWORK: 'off'
-      # The scaffold has no production functions; include its smoke test.
+      # Also analyze test sources (conformance suites and examples).
       CODEQL_EXTRACTOR_GO_OPTION_EXTRACT_TESTS: 'true'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

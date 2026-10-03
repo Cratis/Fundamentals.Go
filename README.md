@@ -5,17 +5,17 @@
 [![Release](https://github.com/Cratis/Fundamentals.Go/actions/workflows/publish.yml/badge.svg)](https://github.com/Cratis/Fundamentals.Go/actions/workflows/publish.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Cratis/Fundamentals.Go/blob/main/LICENSE)
 
-The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamentals): shared domain-value primitives for Arc.Go and Chronicle.Go. Instead of each framework defining incompatible values and codecs, Fundamentals.Go will provide one small, dependency-light foundation. It must never import either framework.
+The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamentals): shared domain-value primitives for Arc.Go and Chronicle.Go. Instead of each framework defining incompatible values and codecs, Fundamentals.Go provides one small, standard-library-only foundation. It must never import either framework.
 
 ## Status
 
-**Repository scaffold only.** The intended surface is concepts (the counterpart of `ConceptAs<T>`), a shared UUID type, and DateOnly, TimeOnly and TimeSpan wire scalars. None is implemented yet; implementation is tracked in [issue #2](https://github.com/Cratis/Fundamentals.Go/issues/2). The root package contains only documentation, with a package-documentation smoke test.
+**Experimental (v0.x).** Package `concepts` provides UUID, DateOnly, TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package `correlation` provides shared correlation-ID context. Package `dependencyinjection` provides an optional dependency-injection contract, with a default container and conformance suites; plain constructors need none of it. Start with [concept authoring and recognition](Documentation/concepts.md) and [dependency injection](Documentation/dependency-injection.md); the [parity map](Documentation/parity.md) records implemented contracts and remaining gaps.
 
-There is no tagged Go release yet. Releases will remain **v0.x** while the API is experimental. The [parity map](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/parity.md) records the C# source revision and the unimplemented surfaces without claiming compatibility.
+Releases remain **v0.x** while the API is experimental; a minor version may contain breaking changes, with migration notes.
 
 ## Installation
 
-Requires Go **1.26 or later**. After the first release, you will be able to run:
+Requires Go **1.26 or later**:
 
 ```sh
 go get github.com/cratis/fundamentals.go@latest
