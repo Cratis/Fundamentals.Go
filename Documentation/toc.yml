@@ -8,6 +8,8 @@
   href: naming.md
 - name: Ecosystem recipes
   href: recipes.md
+- name: Enum JSON compatibility
+  href: enum-compatibility.md
 - name: Parity
   href: parity.md
 - name: Releases

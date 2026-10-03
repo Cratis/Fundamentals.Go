@@ -1,0 +1,3263 @@
+{
+  "source": {
+    "repository": "Cratis/Fundamentals",
+    "commit": "d2accc4a79b6bcf2708213c97093ab5ba6c06381",
+    "package": "source extraction, not a published package"
+  },
+  "runtime": {
+    "framework": ".NET 10.0.12",
+    "environmentVersion": "10.0.12",
+    "architecture": "Arm64",
+    "os": "macOS 26.6.2",
+    "jsonAssembly": "System.Text.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51",
+    "jsonInformationalVersion": "10.0.12\u002B95017c711e6afc1085133d440e42b4bd78155701",
+    "culture": ""
+  },
+  "enumDefinitions": [
+    {
+      "name": "Plain",
+      "backing": "Int32",
+      "flags": false,
+      "members": [
+        {
+          "name": "Zero",
+          "numeric": "0"
+        },
+        {
+          "name": "One",
+          "numeric": "1"
+        },
+        {
+          "name": "Two",
+          "numeric": "2"
+        },
+        {
+          "name": "Max",
+          "numeric": "2147483647"
+        },
+        {
+          "name": "Min",
+          "numeric": "-2147483648"
+        }
+      ]
+    },
+    {
+      "name": "NoZero",
+      "backing": "Int32",
+      "flags": false,
+      "members": [
+        {
+          "name": "One",
+          "numeric": "1"
+        }
+      ]
+    },
+    {
+      "name": "Bits",
+      "backing": "Int32",
+      "flags": true,
+      "members": [
+        {
+          "name": "None",
+          "numeric": "0"
+        },
+        {
+          "name": "A",
+          "numeric": "1"
+        },
+        {
+          "name": "B",
+          "numeric": "2"
+        },
+        {
+          "name": "AB",
+          "numeric": "3"
+        },
+        {
+          "name": "C",
+          "numeric": "4"
+        }
+      ]
+    },
+    {
+      "name": "ByteEnum",
+      "backing": "Byte",
+      "flags": false,
+      "members": [
+        {
+          "name": "Zero",
+          "numeric": "0"
+        },
+        {
+          "name": "One",
+          "numeric": "1"
+        },
+        {
+          "name": "Max",
+          "numeric": "255"
+        }
+      ]
+    },
+    {
+      "name": "UIntEnum",
+      "backing": "UInt32",
+      "flags": false,
+      "members": [
+        {
+          "name": "Zero",
+          "numeric": "0"
+        },
+        {
+          "name": "One",
+          "numeric": "1"
+        },
+        {
+          "name": "High",
+          "numeric": "2147483648"
+        },
+        {
+          "name": "Max",
+          "numeric": "4294967295"
+        }
+      ]
+    },
+    {
+      "name": "LongEnum",
+      "backing": "Int64",
+      "flags": false,
+      "members": [
+        {
+          "name": "Zero",
+          "numeric": "0"
+        },
+        {
+          "name": "One",
+          "numeric": "1"
+        },
+        {
+          "name": "High",
+          "numeric": "2147483648"
+        },
+        {
+          "name": "Max",
+          "numeric": "9223372036854775807"
+        },
+        {
+          "name": "Low",
+          "numeric": "-2147483649"
+        },
+        {
+          "name": "Negative",
+          "numeric": "-1"
+        }
+      ]
+    }
+  ],
+  "count": 236,
+  "cases": [
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "1",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "1",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "9",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00229\u0022 to Enum \u0022Plain\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "9",
+      "accepted": true,
+      "numeric": "9",
+      "display": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022-1\u0022 to Enum \u0022Plain\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "-1",
+      "accepted": true,
+      "numeric": "-1",
+      "display": "-1",
+      "output": {
+        "accepted": true,
+        "json": "-1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "2147483647",
+      "accepted": true,
+      "numeric": "2147483647",
+      "display": "Max",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "2147483647",
+      "accepted": true,
+      "numeric": "2147483647",
+      "display": "Max",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "-2147483648",
+      "accepted": true,
+      "numeric": "-2147483648",
+      "display": "Min",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "-2147483648",
+      "accepted": true,
+      "numeric": "-2147483648",
+      "display": "Min",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "-2147483649",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 11.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "-2147483649",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 11.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022one\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022one\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027one\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022ONE\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022ONE\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027ONE\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022 One \u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022 One \u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022Missing\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022Missing\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022Missing\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027Missing\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u00229\u0022",
+      "accepted": true,
+      "numeric": "9",
+      "display": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u00229\u0022",
+      "accepted": true,
+      "numeric": "9",
+      "display": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022\u002B1\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022\u002B1\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u002201\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u002201\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022 9 \u0022",
+      "accepted": true,
+      "numeric": "9",
+      "display": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022 9 \u0022",
+      "accepted": true,
+      "numeric": "9",
+      "display": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u00222147483648\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00222147483648\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u00222147483648\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022-2147483648\u0022",
+      "accepted": true,
+      "numeric": "-2147483648",
+      "display": "Min",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022-2147483648\u0022",
+      "accepted": true,
+      "numeric": "-2147483648",
+      "display": "Min",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022One, Two\u0022",
+      "accepted": true,
+      "numeric": "3",
+      "display": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022One, Two\u0022",
+      "accepted": true,
+      "numeric": "3",
+      "display": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022one, two\u0022",
+      "accepted": true,
+      "numeric": "3",
+      "display": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022one, two\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027one, two\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022One,One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022One,One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u00221, 2\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00221, 2\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u00221, 2\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u00271, 2\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022One,\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022One,\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022One,\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027One,\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Must specify valid information for parsing in the string. (Parameter \u0027value\u0027)",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022 \u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022 \u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022 \u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Must specify valid information for parsing in the string. (Parameter \u0027value\u0027)",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "null",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token Null when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "null",
+      "accepted": true,
+      "numeric": null,
+      "display": null,
+      "output": {
+        "accepted": true,
+        "json": "null"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "true",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token True when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "true",
+      "accepted": false,
+      "error": {
+        "type": "System.InvalidCastException",
+        "message": "Object must implement IConvertible.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "false",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token False when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "false",
+      "accepted": false,
+      "error": {
+        "type": "System.InvalidCastException",
+        "message": "Object must implement IConvertible.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "[]",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token StartArray when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "[]",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 1.",
+        "innerType": "System.InvalidOperationException",
+        "innerMessage": "Cannot get the value of a token type \u0027StartArray\u0027 as a string."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "{}",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token StartObject when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "{}",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 1.",
+        "innerType": "System.InvalidOperationException",
+        "innerMessage": "Cannot get the value of a token type \u0027StartObject\u0027 as a string."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "1.0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "1.0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "1e0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "1e0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "1E\u002B0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 4.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "1E\u002B0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 4.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "0.5",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to Plain. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "0.5",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to PlainConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 3.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u00221.0\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00221.0\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u00221.0\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u00271.0\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u00221e0\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00221e0\u0022 to Enum \u0022Plain\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u00221e0\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u00271e0\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "-0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "-0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Plain",
+      "input": "\u0022-0\u0022",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Plain",
+      "input": "\u0022-0\u0022",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "1",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "1",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "9",
+      "output": {
+        "accepted": true,
+        "json": "9"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "-1",
+      "output": {
+        "accepted": true,
+        "json": "-1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "-1",
+      "output": {
+        "accepted": true,
+        "json": "-1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "-2147483648",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "-2147483648",
+      "output": {
+        "accepted": true,
+        "json": "-2147483648"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Plain",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "NoZero",
+      "input": "0",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00220\u0022 to Enum \u0022NoZero\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "NoZero",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "NoZero",
+      "input": "\u00220\u0022",
+      "accepted": true,
+      "numeric": "0",
+      "display": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "NoZero",
+      "input": "\u00220\u0022",
+      "accepted": true,
+      "numeric": "0",
+      "display": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "NoZero",
+      "input": "null",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token Null when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "NoZero",
+      "input": "null",
+      "accepted": true,
+      "numeric": null,
+      "display": null,
+      "output": {
+        "accepted": true,
+        "json": "null"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "NoZero",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "NoZero",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "None",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "None",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "3",
+      "accepted": true,
+      "numeric": "3",
+      "display": "AB",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "3",
+      "accepted": true,
+      "numeric": "3",
+      "display": "AB",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "5",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00225\u0022 to Enum \u0022Bits\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "5",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "7",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00227\u0022 to Enum \u0022Bits\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "7",
+      "accepted": true,
+      "numeric": "7",
+      "display": "AB, C",
+      "output": {
+        "accepted": true,
+        "json": "7"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "8",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00228\u0022 to Enum \u0022Bits\u0022. Value is not defined.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "8",
+      "accepted": true,
+      "numeric": "8",
+      "display": "8",
+      "output": {
+        "accepted": true,
+        "json": "8"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u0022A, B\u0022",
+      "accepted": true,
+      "numeric": "3",
+      "display": "AB",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u0022A, B\u0022",
+      "accepted": true,
+      "numeric": "3",
+      "display": "AB",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u0022A, C\u0022",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u0022A, C\u0022",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u0022a, c\u0022",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u0022a, c\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027a, c\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u00225\u0022",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u00225\u0022",
+      "accepted": true,
+      "numeric": "5",
+      "display": "A, C",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u00228\u0022",
+      "accepted": true,
+      "numeric": "8",
+      "display": "8",
+      "output": {
+        "accepted": true,
+        "json": "8"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u00228\u0022",
+      "accepted": true,
+      "numeric": "8",
+      "display": "8",
+      "output": {
+        "accepted": true,
+        "json": "8"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "Bits",
+      "input": "\u0022A, Missing\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022A, Missing\u0022 to Enum \u0022Bits\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "Bits",
+      "input": "\u0022A, Missing\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027A, Missing\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Bits",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Bits",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Bits",
+      "numeric": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Bits",
+      "numeric": "3",
+      "output": {
+        "accepted": true,
+        "json": "3"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Bits",
+      "numeric": "5",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Bits",
+      "numeric": "5",
+      "output": {
+        "accepted": true,
+        "json": "5"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Bits",
+      "numeric": "7",
+      "output": {
+        "accepted": true,
+        "json": "7"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Bits",
+      "numeric": "7",
+      "output": {
+        "accepted": true,
+        "json": "7"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "Bits",
+      "numeric": "8",
+      "output": {
+        "accepted": true,
+        "json": "8"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Bits",
+      "numeric": "8",
+      "output": {
+        "accepted": true,
+        "json": "8"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "0",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Byte\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Byte\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "1",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "255",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Byte\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "255",
+      "accepted": true,
+      "numeric": "255",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "256",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Byte\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "256",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an unsigned byte.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Byte\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an unsigned byte.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "\u0022One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "\u0022One\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "\u0022one\u0022",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "\u0022one\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Requested value \u0027one\u0027 was not found.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "\u0022255\u0022",
+      "accepted": true,
+      "numeric": "255",
+      "display": "Max",
+      "output": {
+        "accepted": true,
+        "json": "255"
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "\u0022255\u0022",
+      "accepted": true,
+      "numeric": "255",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "\u0022256\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022256\u0022 to Enum \u0022ByteEnum\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "\u0022256\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an unsigned byte.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "input": "\u0022-1\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022-1\u0022 to Enum \u0022ByteEnum\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "input": "\u0022-1\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an unsigned byte.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "ByteEnum",
+      "numeric": "255",
+      "output": {
+        "accepted": true,
+        "json": "255"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "ByteEnum",
+      "numeric": "255",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027ByteEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "0",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.UInt32\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.UInt32\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "1",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "2147483647",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.UInt32\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "2147483647",
+      "accepted": true,
+      "numeric": "2147483647",
+      "display": "2147483647",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to UIntEnum. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to UIntConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "4294967295",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to UIntEnum. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "4294967295",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to UIntConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.UInt32\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for a UInt32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "\u0022High\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "\u0022High\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "\u00224294967295\u0022",
+      "accepted": true,
+      "numeric": "4294967295",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "\u00224294967295\u0022",
+      "accepted": true,
+      "numeric": "4294967295",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "input": "\u0022-1\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u0022-1\u0022 to Enum \u0022UIntEnum\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "input": "\u0022-1\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for a UInt32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "numeric": "2147483648",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "numeric": "2147483648",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "UIntEnum",
+      "numeric": "4294967295",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "UIntEnum",
+      "numeric": "4294967295",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027UIntEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "0",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Int64\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "0",
+      "accepted": true,
+      "numeric": "0",
+      "display": "Zero",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Int64\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "1",
+      "accepted": true,
+      "numeric": "1",
+      "display": "One",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "-1",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Int64\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "-1",
+      "accepted": true,
+      "numeric": "-1",
+      "display": "Negative",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "2147483647",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentException",
+        "message": "Enum underlying type and the object must be same type or object must be a String. Type passed in was \u0027System.Int32\u0027; the enum underlying type was \u0027System.Int64\u0027.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "2147483647",
+      "accepted": true,
+      "numeric": "2147483647",
+      "display": "2147483647",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to LongEnum. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to LongConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 10.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "-2147483649",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to LongEnum. Path: $ | LineNumber: 0 | BytePositionInLine: 11.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "-2147483649",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "The JSON value could not be converted to LongConcept. Path: $ | LineNumber: 0 | BytePositionInLine: 11.",
+        "innerType": "System.FormatException",
+        "innerMessage": "Either the JSON value is not in a supported format, or is out of bounds for an Int32."
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "\u0022High\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "\u0022High\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "\u00222147483648\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "\u00222147483648\u0022",
+      "accepted": true,
+      "numeric": "2147483648",
+      "display": "High",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "\u0022-2147483649\u0022",
+      "accepted": true,
+      "numeric": "-2147483649",
+      "display": "Low",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "\u0022-2147483649\u0022",
+      "accepted": true,
+      "numeric": "-2147483649",
+      "display": "Low",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "\u00229223372036854775807\u0022",
+      "accepted": true,
+      "numeric": "9223372036854775807",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "\u00229223372036854775807\u0022",
+      "accepted": true,
+      "numeric": "9223372036854775807",
+      "display": "Max",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "input": "\u00229223372036854775808\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unable to convert \u00229223372036854775808\u0022 to Enum \u0022LongEnum\u0022.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "input": "\u00229223372036854775808\u0022",
+      "accepted": false,
+      "error": {
+        "type": "System.OverflowException",
+        "message": "Value was either too large or too small for an Int64.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": true,
+        "json": "0"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "0",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": true,
+        "json": "1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "1",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "-1",
+      "output": {
+        "accepted": true,
+        "json": "-1"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "-1",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": true,
+        "json": "2147483647"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "2147483647",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "2147483648",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "2147483648",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "-2147483649",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "-2147483649",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "bare",
+      "enumType": "LongEnum",
+      "numeric": "9223372036854775807",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.OverflowException",
+          "message": "Value was either too large or too small for an Int32.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "LongEnum",
+      "numeric": "9223372036854775807",
+      "output": {
+        "accepted": false,
+        "error": {
+          "type": "System.InvalidCastException",
+          "message": "Unable to cast object of type \u0027LongEnum\u0027 to type \u0027System.Int32\u0027.",
+          "innerType": null,
+          "innerMessage": null
+        }
+      }
+    },
+    {
+      "operation": "read",
+      "mode": "nullable-bare",
+      "enumType": "Plain",
+      "input": "null",
+      "accepted": true,
+      "numeric": null,
+      "output": {
+        "accepted": true,
+        "json": "null"
+      }
+    },
+    {
+      "operation": "write",
+      "mode": "concept",
+      "enumType": "Plain",
+      "numeric": null,
+      "output": {
+        "accepted": true,
+        "json": "null"
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "null",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token Null when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "null",
+      "accepted": false,
+      "error": {
+        "type": "System.ArgumentNullException",
+        "message": "Value cannot be null. (Parameter \u0027value\u0027)",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "1.0",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "1.0",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "1e0",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "1e0",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "2147483648",
+      "accepted": false,
+      "error": {
+        "type": "System.FormatException",
+        "message": "Either the JSON value is not in a supported format, or is out of bounds for an Int32.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "{}",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token StartObject when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "{}",
+      "accepted": false,
+      "error": {
+        "type": "System.InvalidOperationException",
+        "message": "Cannot get the value of a token type \u0027StartObject\u0027 as a string.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "bare",
+      "input": "true",
+      "accepted": false,
+      "error": {
+        "type": "System.Text.Json.JsonException",
+        "message": "Unexpected token True when parsing an Enum.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    },
+    {
+      "operation": "direct-read",
+      "mode": "concept",
+      "input": "true",
+      "accepted": false,
+      "error": {
+        "type": "System.InvalidCastException",
+        "message": "Object must implement IConvertible.",
+        "innerType": null,
+        "innerMessage": null
+      }
+    }
+  ]
+}
