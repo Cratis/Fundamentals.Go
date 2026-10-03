@@ -34,7 +34,9 @@ func Inspect(ctx context.Context, dir, pattern string) ([]Concept, error) {
 	loaded, err := packages.Load(&packages.Config{
 		Context: ctx, Dir: dir,
 		Mode: packages.NeedName | packages.NeedTypes | packages.NeedImports | packages.NeedDeps,
-		Env:  append(os.Environ(), "GOWORK=off", "GOPROXY=off", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOFLAGS=-mod=readonly"),
+		// GONOPROXY must override both an inherited value and its GOPRIVATE default:
+		// bypassing GOPROXY=off would otherwise allow direct dependency fetching.
+		Env: append(os.Environ(), "GOWORK=off", "GOPROXY=off", "GONOPROXY=none", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOFLAGS=-mod=readonly"),
 	}, pattern)
 	if err != nil {
 		return nil, err
