@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"sync/atomic"
@@ -29,6 +31,52 @@ func TestLoadedExportedTypes(t *testing.T) {
 	want := []packagesloading.Concept{{Name: "ID", Kind: concepts.KindUUID}, {Name: "Name", Kind: concepts.KindString}}
 	if !slices.Equal(got, want) {
 		t.Fatalf("concepts = %v, want %v", got, want)
+	}
+}
+
+func TestExternalPackageDriversNeverExecute(t *testing.T) {
+	dir := t.TempDir()
+	name := "gopackagesdriver"
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	driver := filepath.Join(dir, name)
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	defer cancel()
+	build := exec.CommandContext(ctx, "go", "build", "-o", driver, "./testdata/driver")
+	build.Env = append(os.Environ(), "GOWORK=off", "GOPROXY=off", "GONOPROXY=none", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOENV=off", "GOFLAGS=-mod=readonly")
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build driver probe: %v\n%s", err, output)
+	}
+
+	cases := []struct {
+		name   string
+		driver string
+	}{
+		{name: "explicit environment", driver: driver},
+		{name: "PATH discovery"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			marker := filepath.Join(t.TempDir(), "invoked")
+			t.Setenv("PACKAGESLOADING_DRIVER_MARKER", marker)
+			t.Setenv("GOPACKAGESDRIVER", tc.driver)
+			t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+			t.Setenv("GOENV", "off")
+			ctx, cancel := context.WithTimeout(t.Context(), 15*time.Second)
+			defer cancel()
+			got, err := packagesloading.Inspect(ctx, ".", "./testdata/model")
+			if _, markerErr := os.Stat(marker); !errors.Is(markerErr, os.ErrNotExist) {
+				t.Errorf("external driver must not execute; marker stat = %v", markerErr)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := []packagesloading.Concept{{Name: "ID", Kind: concepts.KindUUID}, {Name: "Name", Kind: concepts.KindString}}
+			if !slices.Equal(got, want) {
+				t.Fatalf("concepts = %v, want %v", got, want)
+			}
+		})
 	}
 }
 
@@ -79,7 +127,6 @@ func TestUncachedPrivateDependencyFailsWithoutFetching(t *testing.T) {
 			t.Setenv("GOPROXY", server.URL)
 			t.Setenv("GOSUMDB", "sum.golang.org")
 			t.Setenv("GOENV", "off")
-			t.Setenv("GOPACKAGESDRIVER", "off")
 			t.Setenv("GOMODCACHE", t.TempDir())
 
 			dir := t.TempDir()

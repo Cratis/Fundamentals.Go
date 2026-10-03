@@ -36,7 +36,8 @@ func Inspect(ctx context.Context, dir, pattern string) ([]Concept, error) {
 		Mode: packages.NeedName | packages.NeedTypes | packages.NeedImports | packages.NeedDeps,
 		// GONOPROXY must override both an inherited value and its GOPRIVATE default:
 		// bypassing GOPROXY=off would otherwise allow direct dependency fetching.
-		Env: append(os.Environ(), "GOWORK=off", "GOPROXY=off", "GONOPROXY=none", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOFLAGS=-mod=readonly"),
+		// External drivers (inherited or found on PATH) need not honor these limits.
+		Env: append(os.Environ(), "GOWORK=off", "GOPROXY=off", "GONOPROXY=none", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOFLAGS=-mod=readonly", "GOPACKAGESDRIVER=off"),
 	}, pattern)
 	if err != nil {
 		return nil, err
