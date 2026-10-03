@@ -28,13 +28,13 @@ func TestEnumContractFixture(t *testing.T) {
 			Package    string `json:"package"`
 		} `json:"source"`
 		Runtime struct {
-			Framework                string `json:"framework"`
-			EnvironmentVersion       string `json:"environmentVersion"`
-			Architecture             string `json:"architecture"`
-			OS                       string `json:"os"`
-			JSONAssembly             string `json:"jsonAssembly"`
-			JSONInformationalVersion string `json:"jsonInformationalVersion"`
-			Culture                  string `json:"culture"`
+			Framework                string  `json:"framework"`
+			EnvironmentVersion       string  `json:"environmentVersion"`
+			Architecture             string  `json:"architecture"`
+			OS                       string  `json:"os"`
+			JSONAssembly             string  `json:"jsonAssembly"`
+			JSONInformationalVersion string  `json:"jsonInformationalVersion"`
+			Culture                  *string `json:"culture"`
 		} `json:"runtime"`
 		EnumDefinitions json.RawMessage `json:"enumDefinitions"`
 		Count           int             `json:"count"`
@@ -53,7 +53,7 @@ func TestEnumContractFixture(t *testing.T) {
 	runtime := fixture.Runtime
 	if runtime.Framework != ".NET 10.0.12" || runtime.EnvironmentVersion != "10.0.12" ||
 		runtime.JSONInformationalVersion != "10.0.12+95017c711e6afc1085133d440e42b4bd78155701" ||
-		runtime.Culture != "" || runtime.Architecture == "" || runtime.OS == "" || runtime.JSONAssembly == "" {
+		!isEnumFixtureInvariantCulture(runtime.Culture) || runtime.Architecture == "" || runtime.OS == "" || runtime.JSONAssembly == "" {
 		t.Fatal("invalid runtime identity")
 	}
 	assertEnumCaptureDigest(t, fixture.EnumDefinitions, "4ef6cccc344ad9d4ed903aa8ae9a4ef9edc0e0b1bbc317c44955141793972538")
@@ -121,6 +121,49 @@ func TestEnumContractFixture(t *testing.T) {
 	if counts["read"] != 167 || counts["write"] != 57 || counts["direct-read"] != 12 {
 		t.Fatalf("operation counts = %v; want 167 reads, 57 writes, 12 direct diagnostics", counts)
 	}
+}
+
+func TestEnumContractFixtureCulture(t *testing.T) {
+	cases := []struct {
+		name            string
+		input           string
+		wantInvariant   bool
+		wantDecodeError bool
+	}{
+		{name: "missing", input: `{}`},
+		{name: "null", input: `{"culture":null}`},
+		{name: "nonempty", input: `{"culture":"en-US"}`},
+		{name: "explicit empty", input: `{"culture":""}`, wantInvariant: true},
+		{name: "boolean", input: `{"culture":true}`, wantDecodeError: true},
+		{name: "integer", input: `{"culture":1}`, wantDecodeError: true},
+		{name: "float", input: `{"culture":1.0}`, wantDecodeError: true},
+		{name: "array", input: `{"culture":[]}`, wantDecodeError: true},
+		{name: "object", input: `{"culture":{}}`, wantDecodeError: true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var runtime struct {
+				Culture *string `json:"culture"`
+			}
+			err := json.Unmarshal([]byte(tc.input), &runtime)
+			if tc.wantDecodeError {
+				if err == nil {
+					t.Fatal("wrong JSON type decoded without error")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got := isEnumFixtureInvariantCulture(runtime.Culture); got != tc.wantInvariant {
+				t.Fatalf("invariant culture = %t, want %t", got, tc.wantInvariant)
+			}
+		})
+	}
+}
+
+func isEnumFixtureInvariantCulture(culture *string) bool {
+	return culture != nil && *culture == ""
 }
 
 func assertEnumCaptureDigest(t *testing.T, data json.RawMessage, want string) {

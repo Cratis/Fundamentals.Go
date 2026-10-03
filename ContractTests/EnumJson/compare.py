@@ -7,6 +7,21 @@ import pathlib
 import sys
 
 
+def json_equal(actual, expected):
+    """Compare decoded JSON recursively, preserving boolean and integer/float types."""
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(actual, dict):
+        return actual.keys() == expected.keys() and all(
+            json_equal(actual[key], expected[key]) for key in actual
+        )
+    if isinstance(actual, list):
+        return len(actual) == len(expected) and all(
+            json_equal(a, e) for a, e in zip(actual, expected)
+        )
+    return actual == expected
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("capture", type=pathlib.Path)
@@ -14,15 +29,15 @@ def main():
     args = parser.parse_args()
     actual = json.loads(args.capture.read_text(encoding="utf-8"))
     expected = json.loads(args.golden.read_text(encoding="utf-8"))
-    if actual == expected:
+    if json_equal(actual, expected):
         print("Capture matches committed fixture: 236 observations (224 serializer-level, 12 direct diagnostics).")
         return 0
-    if actual.get("runtime") != expected.get("runtime"):
+    if not json_equal(actual.get("runtime"), expected.get("runtime")):
         print("Runtime/platform identity drift; retain this as a separate output, not a replacement golden.", file=sys.stderr)
         print("Expected:", expected.get("runtime"), file=sys.stderr)
         print("Actual:", actual.get("runtime"), file=sys.stderr)
     for key in ["source", "enumDefinitions", "count", "cases"]:
-        if actual.get(key) != expected.get(key):
+        if not json_equal(actual.get(key), expected.get(key)):
             print("Fixture drift in " + key, file=sys.stderr)
     return 1
 
