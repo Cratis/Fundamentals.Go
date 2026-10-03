@@ -18,8 +18,16 @@ policies), dependency injection (exact typed bindings,
 lifetimes, scopes, an optional container and convention planning).
 Generation and rendering remain product-owned; no full generator parity is claimed.
 Go-specific: concept declaration discovery, dependency-injection conformance
-levels, rune-based string casing. Everything else is Not implemented; see the tracking issues per area. See [Updating this map](#updating-this-map) for the
-status vocabulary.
+levels, rune-based string casing. Status is per surface: the ledgers below also
+record implemented DI disposal and scope-factory behavior, deliberate exclusions
+and the remaining Not implemented areas. See [Updating this map](#updating-this-map)
+for the status vocabulary.
+
+Runtime APIs described here are released in **v0.2.0**. The enum captures are
+**develop-only evidence**, not released enum support. Start with the
+[scalar reference](scalars.md), [correlation guide](correlation.md) or
+[constructor-planning workflow](constructor-bindings.md) for usage; retain this
+map as the source and compatibility ledger.
 
 ## Authority
 

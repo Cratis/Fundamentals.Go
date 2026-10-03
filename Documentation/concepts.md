@@ -11,6 +11,10 @@ interchangeable Go values. Define a nominal type, declare its scalar with
 `ConceptValue`, and forward its codecs. You retain domain identity in Go while
 serializers and schema builders can discover the exact scalar representation.
 
+For a complete first program, start with the [JSON round-trip tutorial](getting-started.md).
+For scalar signatures, ranges, zero values and SQL support, use the
+[scalar reference](scalars.md). This page covers the released v0.2.0 concept contract.
+
 ## Author a UUID-backed concept
 
 This declaration uses only `github.com/cratis/fundamentals.go/concepts`. You can
@@ -215,6 +219,25 @@ including generic aliases, are resolved with `types.Unalias`. Shared scalars
 are identified by their canonical concepts package path and type name. Errors
 wrap `concepts.ErrInvalidConcept`; `errors.As` exposes
 `*conceptstypes.TypeError` with the shared `concepts.InvalidReason` values.
+
+| Runtime API | Compile-time counterpart |
+| --- | --- |
+| `concepts.Underlying(t reflect.Type) (Representation, bool, error)` | `conceptstypes.Underlying(t types.Type) (Representation, bool, error)` |
+| `Representation.Type` / `Declared` are `reflect.Type` | Both fields are `types.Type`; preserve declared identity separately from the scalar |
+| `Representation.Kind` / `PointerDepth` | Same `concepts.ScalarKind` / `int` meaning |
+| `*concepts.TypeError` | `*conceptstypes.TypeError`, with `Type` / `Underlying` as `types.Type`, plus shared `Reason` and `Method` |
+| `concepts.CheckJSON` on runtime representations | No compile-time JSON checker; analysis never runs a codec |
+
+Pass actual types from one coherent type-checking/importer universe. Do not infer
+an ID's representation from an array shape or compare types by their printed
+names. A nil type is an error; an ordinary unmarked type returns zero, false,
+nil. A malformed concept returns zero, false and an inspectable error. Preserve
+the distinction in a generator: unsupported domain declarations must not silently
+fall back to ordinary objects. Pointer depth is not a nullability policy.
+
+The [package-loading recipe](recipes.md#load-types-for-a-generator) shows an
+optional `go/packages` integration. Neither recognizer generates proxies or
+owns the consumer's schema, property naming, validation or wire policies.
 
 Although `go/types` can distinguish promoted methods, this recognizer deliberately
 keeps reflect's conservative rule: any anonymous field invalidates a

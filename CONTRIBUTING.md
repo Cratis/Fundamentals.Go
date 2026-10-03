@@ -14,13 +14,13 @@ The [Cratis contribution guide](https://github.com/Cratis/.github/blob/main/cont
 
 ## Layout and setup
 
-The repository has one root module, `github.com/cratis/fundamentals.go`, with package `fundamentals`. Product documentation lives in `Documentation/`. Add capability packages only as implementation needs them; use lowercase package directories, co-located `_test.go` files, and compiling `Example` tests for public usage. The root package-documentation test is not a feature example.
+The repository has two approved modules: the standard-library-only root `github.com/cratis/fundamentals.go` (released at **v0.2.0**) and the explicitly unpublished `recipes/` module. The root package `fundamentals` supplies package documentation; capability packages supply the APIs. Product documentation lives in `Documentation/`. Use lowercase package directories, co-located `_test.go` files and output-checked `Example` tests for public workflows. The [getting-started tutorial](Documentation/getting-started.md) and its neighboring how-to examples are checked against compiled example source by `TestDocumentationSnippets`.
 
 Install Go 1.26 or later, golangci-lint v2.14.0, actionlint v1.7.12, ShellCheck, and markdownlint-cli2. CI tests Go 1.26 and 1.27, including the latest patches; golangci-lint must be built with a Go version at least as new as the code it analyzes.
 
 ## Verify your change
 
-Run from the repository root, with each supported Go toolchain where applicable:
+Run each Go phase in **both the root and `recipes/`**, with each supported Go toolchain where applicable. Root `./...` patterns exclude the nested module. Run workflow and Markdown checks once from the repository root. Execute these as separate phases, not a single long shell chain:
 
 ```sh
 export GOWORK=off
@@ -39,7 +39,15 @@ actionlint -color
 markdownlint-cli2 '*.md' 'Documentation/**/*.md' '.github/ISSUE_TEMPLATE/*.md' '.github/pull_request_template.md' '!AGENTS.md' '!CLAUDE.md'
 ```
 
-Race detection requires a supported platform and a C compiler. Run govulncheck with Go 1.27:
+Also run the module-policy checks once from the root:
+
+```sh
+python3 -B -m unittest discover -s .github/scripts -p 'test_*.py' -v
+python3 .github/scripts/go_modules.py matrix
+python3 .github/scripts/go_modules.py dependencies
+```
+
+Race detection requires a supported platform and a C compiler. Run govulncheck with Go 1.27 in each module:
 
 ```sh
 go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
@@ -62,7 +70,7 @@ Pull requests run the Linux matrix; scheduled and manual builds also check macOS
 - Use focused conventional commits and merge commits; do not squash, rebase, or force-push shared history.
 - Apply exactly one release-intent label: `major`, `minor`, `patch`, or `no-release`. Setup-only changes and Dependabot use `no-release`.
 - Keep the PR body user-facing: optional `## Summary`, then only applicable `## Added`, `Changed`, `Fixed`, `Removed`, `Security`, or `Deprecated` sections, with concise bullets. End a delivered issue's bullet with `(#123)`; use `(part of #123)` if it stays open. Delete placeholders and unused sections, use absolute links, and put test/review notes in a PR comment.
-- The PR body is published verbatim as release notes. The first minor release becomes v0.1.0. During v0.x, use minor for breaking experimental API changes and describe the break explicitly; use patch for compatible fixes.
+- The PR body is published verbatim as release notes. The released baseline is v0.2.0; bootstrap release sequencing is complete. During v0.x, use minor for breaking experimental API changes and describe the break explicitly; use patch for compatible fixes. Documentation and example-only changes use `no-release`. Develop-only enum captures are contract evidence, not an enum codec release.
 - A major release requires human approval. `GO_RELEASE_MAJOR_CEILING` defaults to 0, blocking an accidental v1 launch. Set it to 1 only for an approved v1 release; v2+ requires `/vN` module/import paths and a revised workflow.
 - Wait for Publish to finish before merging the next release-bound PR. Tags are immutable; never delete or move a released version. See [release policy](Documentation/releases.md).
 

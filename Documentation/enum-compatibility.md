@@ -7,8 +7,9 @@ description: Captured bare-enum and enum-concept acceptance at the pinned C# aut
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
 Use this reference to distinguish enum read acceptance, numeric writes and schema
-admission. **Go enum codecs are Not implemented.** Contract fixture evidence is
-available; it does not add an enum package, registry, serializer or an enum
+admission. **Go enum codecs are Not implemented.** These captures are
+**develop-only evidence**, not part of the released v0.2.0 baseline. They do not
+add an enum package, registry, serializer or an enum
 representation to `concepts.Underlying`.
 
 ## Authority and scope

@@ -13,20 +13,27 @@ C# layout, application vertical slices and .NET test tooling do not apply.
 ## Purpose and boundaries
 
 - Module: `github.com/cratis/fundamentals.go`; root package: `fundamentals`.
-- Minimum Go version: 1.26. Keep one root module and canonical lowercase imports.
+- Minimum Go version: 1.26. Use canonical lowercase imports. There are two
+  approved modules: the released root and the unpublished `recipes/` module,
+  allow-listed in `.github/go-modules.json`.
 - Purpose: the Go counterpart of C# Cratis Fundamentals, providing shared
   domain-value primitives for Arc.Go and Chronicle.Go.
-- Packages: `concepts` (UUID, DateOnly, TimeOnly, TimeSpan, the `Concept[T]`
-  contract, `Underlying` and `CheckJSON`), `correlation` (shared correlation-ID
-  context), and the optional `dependencyinjection` contract with its default
-  `container` and its `ditest` conformance suites. The [parity map](parity.md)
-  records what is implemented and what remains.
+- Released packages: `concepts` (UUID, DateOnly, TimeOnly, TimeSpan,
+  `Concept[T]`, `Underlying`, `CheckJSON`), `concepts/conceptstypes` (compile-time
+  recognition), `correlation` (correlation-ID context), `naming` (explicit casing
+  policies), and optional `dependencyinjection` with `container`, `bindingtypes`
+  planning and test-only `ditest`. The [documentation index](index.md) routes
+  readers through these APIs; the [parity map](parity.md) records remaining gaps.
 - Stay small and dependency-light. Use the standard library unless an external
   dependency is justified by capability, maintenance, license and compatibility.
-  There are currently no external module dependencies.
+  The root has no external module dependencies. The unpublished recipes have
+  pinned ecosystem dependencies; see the
+  [accepted integration decision](../decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md).
 - **Never import Arc.Go or Chronicle.Go.** They consume Fundamentals.Go, not the
   reverse. No HTTP hosting, event-store client, application framework or service
-  dependencies belong here. Never require sibling `replace` directives.
+  dependencies belong here. Never require sibling `replace` directives in the
+  root or publishable modules. Only the unpublished recipes may use their
+  allow-listed local-root replacement.
 
 ## Authority and parity
 
@@ -60,13 +67,14 @@ proof that an API exists. Agree on the contract before consumers adopt it.
 - Push verified, coherent work to `develop` freely under the maintainer's
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
-- Fundamentals.Go **v0.1.0 is released at commit `e50913e`**. Consumers use
+- Fundamentals.Go **v0.2.0 is released at commit `532d2181c610f67730133f61e768a943379da571`**. Consumers use
   published tags for released APIs and may pin **pushed** develop commits using
   Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
   use local replacements as evidence that a consumer can resolve the module.
 - Collect release-bound changes in a release PR from `develop` to `main` with
-  the appropriate intent label. The current additive package release targets
-  **v0.2.0 with `minor` intent**; initial v0.1.0 bootstrap sequencing is complete.
+  the appropriate intent label. The v0.2.0 release is complete; do not describe
+  released packages as future work. Enum contract captures on `develop` are
+  evidence only, not released enum codecs or new runtime APIs.
 - Confirm public proxy retrieval after publication, then tell the consumer
   sessions the version and commit. The configured release workflow, not a manual
   competing tag, produces the release after the authorized merge.
@@ -74,7 +82,7 @@ proof that an API exists. Agree on the contract before consumers adopt it.
   the maintainer's release instructions and [release policy](releases.md).
 - Exactly one PR intent: `major`, `minor`, `patch` or `no-release`. A stable v1
   launch requires explicit human approval and `GO_RELEASE_MAJOR_CEILING=1`.
-  No `/v2` or nested module without a migration and release-workflow design.
+  No `/v2` or additional nested module without a migration and release-workflow design.
 
 ## Layout and local gates
 
@@ -83,8 +91,10 @@ Keep public packages grouped by capability, implementation helpers under
 Use standard `testing`, external consumer tests, golden wire fixtures and
 compiling examples for real APIs. Product docs belong in `Documentation/`.
 
-Run each phase separately from the root, with `GOWORK=off` and
-`GOTOOLCHAIN=local`, at the supported minimum and CI toolchains when available:
+Run Go phases separately in **both the root and `recipes/`**, with `GOWORK=off`
+and `GOTOOLCHAIN=local`, at the supported minimum and CI toolchains when available.
+Root `./...` commands do not traverse nested modules. Run workflow and Markdown
+checks once from the root. The commands below list the gates, not one shell phase:
 
 ```sh
 go mod download
@@ -106,6 +116,10 @@ govulncheck ./...
 `gofmt` must print no files, tidy must leave no diff or new `go.sum`, and every
 command must exit successfully. Use bounded runs and report missing tools rather
 than treating them as passes. There are no service integration tests yet.
+
+CI also runs `.github/scripts/test_*.py`, the module allow-list/matrix and
+released-root dependency checks. Recipes are explicitly unpublished and exempt
+from the released-root requirement; publishable integrations are not.
 
 CI uses Go 1.26.x and 1.27.x, golangci-lint v2.14.0, actionlint v1.7.12 and
 govulncheck v1.8.0. PR builds run Linux; scheduled/manual builds also run macOS

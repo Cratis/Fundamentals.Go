@@ -121,6 +121,9 @@ without sharing a generator. `dependencyinjection/bindingtypes` analyzes already
 type-checked packages and returns a registration plan. It never loads packages,
 executes constructors, touches files or emits code. Arc and Chronicle own their
 renderers and artifact discovery; Fundamentals supplies only the planner.
+For a complete type-check → directive → plan example, configuration fields and
+diagnostic recovery, follow [Plan constructor bindings](constructor-bindings.md).
+The rules below remain the composition and ownership contract.
 
 Put lifetime directives on type doc comments, not constructors. This excerpt
 from the [render fixture](../dependencyinjection/internal/bindingcorpus/render/render.go)
