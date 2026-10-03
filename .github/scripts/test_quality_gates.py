@@ -14,6 +14,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,12 +23,17 @@ ROOT_GATES = {"backend-build-debug", "backend-build-release", "backend-specs"}
 RECIPE_GATES = {"frontend-compile", "frontend-compile-specs", "frontend-specs"}
 
 
+class OwnedInterruption(BaseException):
+    """Keep communicate's KeyboardInterrupt handler from reaping our group anchor."""
+
+
 def stop_owned(process, grace=3):
     """Stop only this test's session/tree and reap its leader before fixture cleanup.
 
-    POSIX descendants must stay in the launched process group. Native Windows
-    lacks killpg: use its built-in taskkill tree operation, not a global Go kill.
-    Neither mechanism is a sandbox for deliberately detached descendants.
+    POSIX descendants stay in the launched session/group, except cooperative
+    supervisors (such as pi-phase) which must stop and join their own groups
+    within grace. Native Windows uses taskkill's tree operation, not a global
+    Go kill. Deliberately detached arbitrary callbacks are not supported.
     """
     # Never signal a PID/group after Popen has reaped its leader: it can be reused.
     if process.returncode is not None:
@@ -62,15 +68,12 @@ def stop_owned(process, grace=3):
 
     send(signal.SIGTERM)
     try:
-        # Keep the leader unreaped to pin ownership of its group through KILL.
-        # WNOWAIT observes termination without releasing that PID. On Unix Python
-        # without waitid, allow the same bounded grace without reaping early.
+        # Do not poll/wait: the unreaped session leader pins its PID/PGID even
+        # after exiting. Allow the FULL bounded grace independently of leader
+        # status: Bash can exit immediately while pi-phase still needs time to
+        # TERM/KILL and reap its separately grouped producer (normally < 2s).
         deadline = time.monotonic() + grace
         while time.monotonic() < deadline:
-            if hasattr(os, "waitid") and hasattr(os, "WNOWAIT"):
-                status = os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT | os.WNOHANG)
-                if status is not None:
-                    break
             time.sleep(min(0.01, max(0, deadline - time.monotonic())))
     finally:
         # Includes descendants whose redirected output would hide them from
@@ -92,20 +95,29 @@ def run_owned(command, *, timeout=120, started=None, grace=3, **kwargs):
     previous_int = signal.getsignal(signal.SIGINT)
 
     def interrupted(signum, frame):
-        raise InterruptedError("test subprocess interrupted by SIGTERM")
+        # CPython catches KeyboardInterrupt inside communicate and briefly waits
+        # for the leader. If it has exited, that wait reaps our session/PGID
+        # anchor while pipe-holding children live. Defer KeyboardInterrupt until
+        # AFTER cleanup instead; no PID/group is signalled after being reaped.
+        raise OwnedInterruption(signum)
 
     signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGINT, interrupted)
     try:
         if started:
             started(process)
         stdout, stderr = process.communicate(input="", timeout=timeout)
         return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
-    except BaseException:
+    except BaseException as error:
         # A second Ctrl-C must not interrupt the bounded cleanup before fixtures
         # are removed. Restore both handlers after the owned leader is reaped.
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         stop_owned(process, grace)
+        if isinstance(error, OwnedInterruption):
+            if error.args[0] == signal.SIGINT:
+                raise KeyboardInterrupt() from None
+            raise InterruptedError("test subprocess interrupted by SIGTERM") from None
         raise
     finally:
         signal.signal(signal.SIGTERM, previous)
@@ -151,7 +163,7 @@ class QualityGateRoutingTests(unittest.TestCase):
     def put(self, relative, content):
         path = self.repo / relative
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content)
+        path.write_text(content, newline="\n")
         return path
 
     def fake_tool(self, name, content):
@@ -209,7 +221,7 @@ class QualityGateRoutingTests(unittest.TestCase):
                 if original is None:
                     path.unlink()
                 else:
-                    path.write_text(original)
+                    path.write_text(original, newline="\n")
 
     def test_probe_does_not_discover_managed_frontend(self):
         self.put("ContractTests/ComplexKeyJson/js/probe.ts", "export {};\n")
@@ -272,16 +284,91 @@ class QualityGateRoutingTests(unittest.TestCase):
         self.calls.unlink()
         success = self.run_gate(dry=False)
         self.assertEqual(success.returncode, 0, success.stderr)
+
+        def shell_pwd(directory):
+            # Compare Bash's physical paths to Bash's $PWD, not native Python's
+            # drive-letter spelling or macOS's /var symlink spelling.
+            return subprocess.run(["bash", "-c", "pwd -P"], cwd=directory,
+                                  check=True, capture_output=True, text=True).stdout.strip()
+
+        root_pwd = shell_pwd(self.repo)
+        recipes_pwd = shell_pwd(self.repo / "recipes")
         expected = [
-            f"{self.repo}|off|local|{args}"
+            f"{root_pwd}|off|local|{args}"
             for args in ("build ./...", "test -count=1 -timeout=2m ./...", "vet ./...")
         ] + [
-            f"{self.repo}/recipes|off|local|{args}"
+            f"{recipes_pwd}|off|local|{args}"
             for args in ("build ./...", "vet ./...", "test -count=1 -timeout=2m ./...")
         ]
-        # macOS canonicalizes /var to /private/var when the runner changes directory.
-        actual = [line.replace("/private/var/", "/var/") for line in self.calls.read_text().splitlines()]
-        self.assertEqual(actual, [line.replace("/private/var/", "/var/") for line in expected])
+        self.assertEqual(self.calls.read_text().splitlines(), expected)
+
+    @unittest.skipUnless(os.name == "posix" and shutil.which("pi-phase"), "requires POSIX and configured pi-phase supervisor")
+    def test_configured_supervisor_joins_separately_grouped_go_child_before_deletion(self):
+        event = self.repo / ".ai-work/child.pid"
+        stopped = self.repo / ".ai-work/stopped"
+        child = self.put(".ai-work/hanging-go.py", '''import os, signal, sys, time
+from pathlib import Path
+root = Path(os.environ["CLAUDE_PROJECT_DIR"]) / ".ai-work"
+def stop(signum, frame):
+    time.sleep(0.3)
+    (root / "stopped").write_text("terminated")
+    sys.exit(0)
+signal.signal(signal.SIGTERM, stop)
+(root / "child.pid").write_text(str(os.getpid()))
+while not (root / "release").exists():
+    time.sleep(0.01)
+stop(None, None)
+''')
+        self.fake_tool("go", f'#!/bin/sh\nexec "{sys.executable}" "{child}"\n')
+        self.put("concepts/changed.go", "package concepts\n")
+        witness = subprocess.Popen([sys.executable, "-u", "-c",
+                                    'import sys; print("ready", flush=True); print(sys.stdin.readline().strip(), flush=True)'],
+                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, start_new_session=True)
+        checks = OwnedProcessTests()
+        owned = []
+        child_pid = None
+        try:
+            checks.ready(witness)
+
+            def started(process):
+                # The managed hook reads its input before dispatching a phase.
+                process.stdin.close()
+                process.stdin = None
+                owned.append(process)
+                deadline = time.monotonic() + 10
+                while not event.exists():
+                    self.assertLess(time.monotonic(), deadline, "configured wrapper did not start Go")
+                    time.sleep(0.01)
+                pid = int(event.read_text())
+                self.assertNotEqual(os.getpgid(pid), process.pid)
+                self.assertNotEqual(os.getpgid(pid), os.getpgid(witness.pid))
+
+            with self.assertRaises(subprocess.TimeoutExpired):
+                run_owned(["bash", str(HOOK)], cwd=self.repo, env=self.env,
+                          started=started, timeout=0.05)
+            child_pid = int(event.read_text())
+            print(f"configured pi-phase cleanup: child live={checks.live(child_pid)}; "
+                  f"termination event={stopped.exists()}; leader reaped={owned[0].returncode is not None}",
+                  flush=True)
+            self.assertEqual(stopped.read_text(), "terminated")
+            self.assertFalse(checks.live(child_pid), "separately grouped Go child survived")
+            checks.assert_gone(owned[0].pid)
+            stdout, stderr = witness.communicate(input="unrelated survives\n", timeout=3)
+            self.assertEqual(witness.returncode, 0, stderr)
+            self.assertEqual(stdout, "unrelated survives\n")
+        finally:
+            if event.exists():
+                child_pid = int(event.read_text())
+            if child_pid and checks.live(child_pid):
+                # A failed old helper may already have reaped the session
+                # anchor. Release via the fixture, never signal a reusable PID.
+                (self.repo / ".ai-work/release").touch()
+                deadline = time.monotonic() + 3
+                while checks.live(child_pid) and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                self.assertFalse(checks.live(child_pid), "reproducer failed to stop")
+            stop_owned(witness)
 
     @unittest.skipUnless(os.environ.get("QUALITY_GATES_REAL_GO") == "1", "opt-in actual root and recipes checks")
     def test_actual_native_go_checks_in_an_isolated_source_copy(self):
@@ -342,7 +429,7 @@ def stop(signum, frame):
 signal.signal(signal.SIGTERM, stop)
 print("ready", flush=True)
 signal.pause()
-''')
+''', newline="\n")
                 parent = Path(directory) / "parent.py"
                 parent.write_text('''import json, os, signal, subprocess, sys
 from pathlib import Path
@@ -357,7 +444,7 @@ signal.signal(signal.SIGTERM, stop)
 event.write_text(json.dumps({"parent": os.getpid(), "child": child.pid, "joined": False}))
 print("ready", flush=True)
 signal.pause()
-''')
+''', newline="\n")
                 witness = subprocess.Popen(
                     [sys.executable, "-u", "-c", 'import sys; print("ready", flush=True); print(sys.stdin.readline().strip(), flush=True)'],
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -397,6 +484,105 @@ signal.pause()
                 finally:
                     stop_owned(witness)
             self.assertFalse(Path(directory).exists())
+
+    @unittest.skipUnless(hasattr(os, "waitid") and hasattr(os, "WNOWAIT"), "requires non-reaping exit observation")
+    def test_real_sigint_during_communicate_cleans_exited_leaders_child(self):
+        previous_int = signal.getsignal(signal.SIGINT)
+        previous_term = signal.getsignal(signal.SIGTERM)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            event = root / "child.pid"
+            communicating = root / "communicating"
+            stopped = root / "stopped"
+            child = root / "child.py"
+            child.write_text('''import os, signal, sys, time
+from pathlib import Path
+root = Path(sys.argv[1])
+def stop(signum, frame):
+    (root / "stopped").write_text("terminated")
+    sys.exit(0)
+signal.signal(signal.SIGTERM, stop)
+(root / "child.pid").write_text(str(os.getpid()))
+print("ready", flush=True)
+while not (root / "communicating").exists():
+    time.sleep(0.01)
+time.sleep(0.05)
+os.kill(int(sys.argv[2]), signal.SIGINT)
+while not (root / "release").exists():
+    time.sleep(0.01)
+stop(None, None)
+''', newline="\n")
+            leader = root / "leader.py"
+            leader.write_text('''import subprocess, sys
+subprocess.Popen([sys.executable, sys.argv[1], sys.argv[2], sys.argv[3]])
+''', newline="\n")
+            owned = []
+
+            def started(process):
+                self.ready(process)
+                owned.append(process)
+                deadline = time.monotonic() + 5
+                while os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is None:
+                    self.assertLess(time.monotonic(), deadline, "leader did not exit")
+                    time.sleep(0.01)
+                self.assertEqual(os.getpgid(int(event.read_text())), process.pid)
+
+            communicate = subprocess.Popen.communicate
+            drain = subprocess.Popen._communicate
+            interrupted_returncode = []
+
+            def during_drain(process, *args, **kwargs):
+                # The child can signal ONLY after communicate has entered its
+                # actual pipe-draining path, inside CPython's Ctrl-C handler.
+                communicating.touch()
+                return drain(process, *args, **kwargs)
+
+            def during_communication(process, *args, **kwargs):
+                try:
+                    return communicate(process, *args, **kwargs)
+                except BaseException:
+                    interrupted_returncode.append(process.returncode)
+                    print(f"real SIGINT during communicate: leader returncode={process.returncode}; "
+                          f"child live={self.live(int(event.read_text()))}", flush=True)
+                    raise
+
+            child_pid = None
+            try:
+                with (mock.patch.object(subprocess.Popen, "communicate", during_communication),
+                      mock.patch.object(subprocess.Popen, "_communicate", during_drain)):
+                    with self.assertRaises(KeyboardInterrupt):
+                        run_owned([sys.executable, str(leader), str(child), directory, str(os.getpid())],
+                                  started=started, timeout=5, grace=0.2)
+                child_pid = int(event.read_text())
+                self.assertEqual(interrupted_returncode, [None], "communication reaped the group anchor")
+                self.assertEqual(stopped.read_text(), "terminated")
+                self.assertFalse(self.live(child_pid), "child survived cleanup")
+                self.assert_gone(owned[0].pid)
+                self.assertEqual(signal.getsignal(signal.SIGINT), previous_int)
+                self.assertEqual(signal.getsignal(signal.SIGTERM), previous_term)
+            finally:
+                # Regression failure must not leak its reproducer or delete its
+                # fixture while a child can still use it. Release through a file
+                # instead of signalling a PID after the old helper reaped it.
+                if event.exists():
+                    child_pid = int(event.read_text())
+                if child_pid and self.live(child_pid):
+                    (root / "release").touch()
+                    deadline = time.monotonic() + 3
+                    while self.live(child_pid) and time.monotonic() < deadline:
+                        time.sleep(0.01)
+                    self.assertFalse(self.live(child_pid), "reproducer failed to stop")
+                for process in owned:
+                    for stream in (process.stdin, process.stdout, process.stderr):
+                        if stream is not None:
+                            stream.close()
+        self.assertFalse(root.exists())
+
+    def live(self, pid):
+        snapshot = subprocess.run(["ps", "-p", str(pid), "-o", "stat="],
+                                  capture_output=True, text=True, timeout=2)
+        self.assertIn(snapshot.returncode, (0, 1), snapshot.stderr)
+        return bool(snapshot.stdout.strip()) and not snapshot.stdout.strip().startswith("Z")
 
     def test_uncooperative_leader_is_killed_and_reaped_after_bounded_grace(self):
         owned = []
