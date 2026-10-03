@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "d2accc4a79b6bcf2708213c97093ab5ba6c06381",
+  "runtime": ".NET 10.0.12",
+  "systemTextJson": "10.0.12\u002B95017c711e6afc1085133d440e42b4bd78155701",
+  "profile": "CamelCase/default encoder/compact; ComplexKey, EnumerableConceptAs, ConceptAs factories; not Globals",
+  "globalStubAccesses": 0,
+  "count": 16,
+  "factoryAdmission": [
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.String,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Guid,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Int32,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Decimal,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Uri,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.DateTime,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[TextKey,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[TextKey,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[Composite,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Hashtable",
+      "admitted": false
+    }
+  ],
+  "observations": [
+    {
+      "id": "js/string/write/0",
+      "kind": "string",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "string/write/0",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022plain\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/stringConcept/write/0",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "stringConcept/write/0",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "plain"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022plain\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/string/write/1",
+      "kind": "string",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "string/write/1",
+      "input": "{\u0022map\u0022:{\u0022a\\\u0022b\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\u0022b",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022a\\u0022b\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/stringConcept/write/1",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "stringConcept/write/1",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022a\\\\\\\u0022b\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\u0022b"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022a\\\\u0022b\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/string/write/2",
+      "kind": "string",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "string/write/2",
+      "input": "{\u0022map\u0022:{\u0022a\\\\b\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\\b",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022a\\\\b\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/stringConcept/write/2",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "stringConcept/write/2",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022a\\\\\\\\b\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\\b"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022a\\\\\\\\b\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/string/write/3",
+      "kind": "string",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "string/write/3",
+      "input": "{\u0022map\u0022:{\u0022\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u00E9\\u96EA\\uD83D\\uDE00\\u003C\\u003E\\u0026\\u0027\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/stringConcept/write/3",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "stringConcept/write/3",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\\\\\\\u0022\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\\\u0027\\\\u0022\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/string/write/4",
+      "kind": "string",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "string/write/4",
+      "input": "{\u0022map\u0022:{\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/stringConcept/write/4",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "stringConcept/write/4",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": ""
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/guid/write",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "guid/write",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map[\u0027\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022\u0027] | LineNumber: 0 | BytePositionInLine: 51."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "js/guidConcept/write",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "guidConcept/write",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/guidConcept/write-zero",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "guidConcept/write-zero",
+      "input": "{\u0022map\u0022:{\u0022\\\u002200000000-0000-0000-0000-000000000000\\\u0022\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "00000000-0000-0000-0000-000000000000"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u002200000000-0000-0000-0000-000000000000\\u0022\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/composite/write",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "composite/write",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/composite/write-escaped",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "composite/write-escaped",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022a\\\\\\\u0022\\\\\\\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\\\u0022}\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "a\u0022\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022a\\\\u0022\\\\\\\\\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\u0022}\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "js/compositeObjectValue/write",
+      "kind": "compositeObjectValue",
+      "operation": "read",
+      "origin": "actual-js-write",
+      "sourceCapture": "javascript.json",
+      "sourceCaseId": "compositeObjectValue/write",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:{\u0022number\u0022:42,\u0022label\u0022:\u0022answer\u0022}}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": {
+                "Number": 42,
+                "Label": "answer"
+              }
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:{\u0022number\u0022:42,\u0022label\u0022:\u0022answer\u0022}}}"
+      },
+      "returnedObject": true
+    }
+  ]
+}

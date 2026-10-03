@@ -1,0 +1,4028 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "d2accc4a79b6bcf2708213c97093ab5ba6c06381",
+  "runtime": ".NET 10.0.12",
+  "systemTextJson": "10.0.12\u002B95017c711e6afc1085133d440e42b4bd78155701",
+  "profile": "CamelCase/default encoder/compact; ComplexKey, EnumerableConceptAs, ConceptAs factories; not Globals",
+  "globalStubAccesses": 0,
+  "count": 151,
+  "factoryAdmission": [
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.String,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Guid,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Int32,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Decimal,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.Uri,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[System.DateTime,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[TextKey,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[TextKey,System.Int32]",
+      "admitted": false
+    },
+    {
+      "type": "System.Collections.Generic.Dictionary\u00602[Composite,System.Int32]",
+      "admitted": true
+    },
+    {
+      "type": "System.Collections.Hashtable",
+      "admitted": false
+    }
+  ],
+  "observations": [
+    {
+      "id": "string/missing",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/missing",
+      "input": "{}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/null-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/null-map",
+      "input": "{\u0022map\u0022:null}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:null}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/empty-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/empty-map",
+      "input": "{\u0022map\u0022:{}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/array-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/array-map",
+      "input": "{\u0022map\u0022:[]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/populated-array-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/populated-array-map",
+      "input": "{\u0022map\u0022:[1]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/number-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/number-map",
+      "input": "{\u0022map\u0022:7}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/zero-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/zero-map",
+      "input": "{\u0022map\u0022:0}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/false-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/false-map",
+      "input": "{\u0022map\u0022:false}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/string-map",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/string-map",
+      "input": "{\u0022map\u0022:\u0022ab\u0022}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.String,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/malformed-outer",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/malformed-outer",
+      "input": "{\u0022map\u0022:{",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/null-envelope",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/null-envelope",
+      "input": "null",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "envelope": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/ordinary",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/ordinary",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022plain\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/zero-value",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/zero-value",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022plain\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/null-value",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/null-value",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $.map.plain | LineNumber: 0 | BytePositionInLine: 20."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/invalid-value",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/invalid-value",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:\u0022not-number\u0022}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $.map.plain | LineNumber: 0 | BytePositionInLine: 28."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/duplicate-json-property",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/duplicate-json-property",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:1,\u0022plain\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022plain\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/good-then-malformed-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/good-then-malformed-key",
+      "input": "{\u0022map\u0022:{\u0022plain\u0022:1,\u0022not-json\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 2,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 1
+            },
+            {
+              "key": "not-json",
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022plain\u0022:1,\u0022not-json\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/null-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/null-key",
+      "input": "{\u0022map\u0022:{\u0022null\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "null",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022null\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/empty-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/empty-key",
+      "input": "{\u0022map\u0022:{\u0022\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/numeric-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/numeric-key",
+      "input": "{\u0022map\u0022:{\u00220\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "0",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u00220\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/object-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/object-key",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "{}",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{}\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/array-key",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/array-key",
+      "input": "{\u0022map\u0022:{\u0022[]\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "[]",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022[]\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/missing",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/missing",
+      "input": "{}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/null-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/null-map",
+      "input": "{\u0022map\u0022:null}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:null}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/empty-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/empty-map",
+      "input": "{\u0022map\u0022:{}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/array-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/array-map",
+      "input": "{\u0022map\u0022:[]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 9."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/populated-array-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/populated-array-map",
+      "input": "{\u0022map\u0022:[1]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 10."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/number-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/number-map",
+      "input": "{\u0022map\u0022:7}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/zero-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/zero-map",
+      "input": "{\u0022map\u0022:0}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/false-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/false-map",
+      "input": "{\u0022map\u0022:false}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/string-map",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/string-map",
+      "input": "{\u0022map\u0022:\u0022ab\u0022}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[TextKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/malformed-outer",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/malformed-outer",
+      "input": "{\u0022map\u0022:{",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/null-envelope",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/null-envelope",
+      "input": "null",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "envelope": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/ordinary",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/ordinary",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "plain"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022plain\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/zero-value",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/zero-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "plain"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022plain\\u0022\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/null-value",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/null-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 4."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/invalid-value",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/invalid-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:\u0022not-number\u0022}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/duplicate-json-property",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/duplicate-json-property",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:1,\u0022\\\u0022plain\\\u0022\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "plain"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022plain\\u0022\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/good-then-malformed-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/good-then-malformed-key",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022plain\\\u0022\u0022:1,\u0022not-json\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "\u0027not-json\u0027 is an invalid JSON literal. Expected the literal \u0027null\u0027. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/null-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/null-key",
+      "input": "{\u0022map\u0022:{\u0022null\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.ArgumentNullException",
+        "innerException": null,
+        "message": "Value cannot be null. (Parameter \u0027key\u0027)"
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/empty-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/empty-key",
+      "input": "{\u0022map\u0022:{\u0022\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true. Path: $ | LineNumber: 0 | BytePositionInLine: 0."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/numeric-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/numeric-key",
+      "input": "{\u0022map\u0022:{\u00220\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "Cratis.Json.UnsupportedConceptValueType",
+        "innerException": null,
+        "message": "\u0027System.String\u0027 is not a supported underlying concept value type for a JSON number token."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/object-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/object-key",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to TextKey. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "stringConcept/array-key",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/array-key",
+      "input": "{\u0022map\u0022:{\u0022[]\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to TextKey. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/missing",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/missing",
+      "input": "{}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/null-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/null-map",
+      "input": "{\u0022map\u0022:null}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:null}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/empty-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/empty-map",
+      "input": "{\u0022map\u0022:{}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/array-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/array-map",
+      "input": "{\u0022map\u0022:[]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/populated-array-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/populated-array-map",
+      "input": "{\u0022map\u0022:[1]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/number-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/number-map",
+      "input": "{\u0022map\u0022:7}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/zero-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/zero-map",
+      "input": "{\u0022map\u0022:0}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/false-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/false-map",
+      "input": "{\u0022map\u0022:false}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/string-map",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/string-map",
+      "input": "{\u0022map\u0022:\u0022ab\u0022}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[System.Guid,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/malformed-outer",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/malformed-outer",
+      "input": "{\u0022map\u0022:{",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/null-envelope",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/null-envelope",
+      "input": "null",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "envelope": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/ordinary",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/ordinary",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Guid",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/zero-value",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/zero-value",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Guid",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/null-value",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/null-value",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $.map.e094c582-9d91-4df0-b795-8d39fce089da | LineNumber: 0 | BytePositionInLine: 51."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/invalid-value",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/invalid-value",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:\u0022not-number\u0022}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $.map.e094c582-9d91-4df0-b795-8d39fce089da | LineNumber: 0 | BytePositionInLine: 59."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/duplicate-json-property",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/duplicate-json-property",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:1,\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Guid",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guid/good-then-malformed-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/good-then-malformed-key",
+      "input": "{\u0022map\u0022:{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:1,\u0022not-json\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map.not-json | LineNumber: 0 | BytePositionInLine: 60."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/null-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/null-key",
+      "input": "{\u0022map\u0022:{\u0022null\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map.null | LineNumber: 0 | BytePositionInLine: 15."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/empty-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/empty-key",
+      "input": "{\u0022map\u0022:{\u0022\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map. | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/numeric-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/numeric-key",
+      "input": "{\u0022map\u0022:{\u00220\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map.0 | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/object-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/object-key",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map.{} | LineNumber: 0 | BytePositionInLine: 13."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guid/array-key",
+      "kind": "guid",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guid/array-key",
+      "input": "{\u0022map\u0022:{\u0022[]\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to System.Guid. Path: $.map[\u0027[]\u0027] | LineNumber: 0 | BytePositionInLine: 13."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/missing",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/missing",
+      "input": "{}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/null-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/null-map",
+      "input": "{\u0022map\u0022:null}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:null}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/empty-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/empty-map",
+      "input": "{\u0022map\u0022:{}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/array-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/array-map",
+      "input": "{\u0022map\u0022:[]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 9."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/populated-array-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/populated-array-map",
+      "input": "{\u0022map\u0022:[1]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 10."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/number-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/number-map",
+      "input": "{\u0022map\u0022:7}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/zero-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/zero-map",
+      "input": "{\u0022map\u0022:0}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/false-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/false-map",
+      "input": "{\u0022map\u0022:false}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/string-map",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/string-map",
+      "input": "{\u0022map\u0022:\u0022ab\u0022}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[IdKey,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/malformed-outer",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/malformed-outer",
+      "input": "{\u0022map\u0022:{",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/null-envelope",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/null-envelope",
+      "input": "null",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "envelope": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/ordinary",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/ordinary",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/zero-value",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/zero-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/null-value",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/null-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 4."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/invalid-value",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/invalid-value",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:\u0022not-number\u0022}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/duplicate-json-property",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/duplicate-json-property",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:1,\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/good-then-malformed-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/good-then-malformed-key",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022\u0022:1,\u0022not-json\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "\u0027not-json\u0027 is an invalid JSON literal. Expected the literal \u0027null\u0027. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/null-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/null-key",
+      "input": "{\u0022map\u0022:{\u0022null\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.ArgumentNullException",
+        "innerException": null,
+        "message": "Value cannot be null. (Parameter \u0027key\u0027)"
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/empty-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/empty-key",
+      "input": "{\u0022map\u0022:{\u0022\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true. Path: $ | LineNumber: 0 | BytePositionInLine: 0."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/numeric-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/numeric-key",
+      "input": "{\u0022map\u0022:{\u00220\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to IdKey. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/object-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/object-key",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to IdKey. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "guidConcept/array-key",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/array-key",
+      "input": "{\u0022map\u0022:{\u0022[]\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to IdKey. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/missing",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/missing",
+      "input": "{}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/null-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/null-map",
+      "input": "{\u0022map\u0022:null}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:null}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/empty-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/empty-map",
+      "input": "{\u0022map\u0022:{}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 0,
+          "entries": []
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/array-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/array-map",
+      "input": "{\u0022map\u0022:[]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 9."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/populated-array-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/populated-array-map",
+      "input": "{\u0022map\u0022:[1]}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 10."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/number-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/number-map",
+      "input": "{\u0022map\u0022:7}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/zero-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/zero-map",
+      "input": "{\u0022map\u0022:0}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/false-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/false-map",
+      "input": "{\u0022map\u0022:false}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/string-map",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/string-map",
+      "input": "{\u0022map\u0022:\u0022ab\u0022}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Collections.Generic.IDictionary\u00602[Composite,System.Int32]. Path: $.map | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/malformed-outer",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/malformed-outer",
+      "input": "{\u0022map\u0022:{",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.map | LineNumber: 0 | BytePositionInLine: 8."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/null-envelope",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/null-envelope",
+      "input": "null",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "envelope": "null"
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/ordinary",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/ordinary",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:42}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:42}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/zero-value",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/zero-value",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/null-value",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/null-value",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 4."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/invalid-value",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/invalid-value",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:\u0022not-number\u0022}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to System.Int32. Path: $ | LineNumber: 0 | BytePositionInLine: 12."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/duplicate-json-property",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/duplicate-json-property",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:1,\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/good-then-malformed-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/good-then-malformed-key",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:1,\u0022not-json\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "\u0027not-json\u0027 is an invalid JSON literal. Expected the literal \u0027null\u0027. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/null-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/null-key",
+      "input": "{\u0022map\u0022:{\u0022null\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.ArgumentNullException",
+        "innerException": null,
+        "message": "Value cannot be null. (Parameter \u0027key\u0027)"
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/empty-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/empty-key",
+      "input": "{\u0022map\u0022:{\u0022\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.Text.Json.JsonReaderException",
+        "message": "The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true. Path: $ | LineNumber: 0 | BytePositionInLine: 0."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/numeric-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/numeric-key",
+      "input": "{\u0022map\u0022:{\u00220\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to Composite. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/object-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/object-key",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "name": null
+              },
+              "value": 3
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u002200000000-0000-0000-0000-000000000000\\u0022,\\u0022name\\u0022:null}\u0022:3}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/array-key",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/array-key",
+      "input": "{\u0022map\u0022:{\u0022[]\u0022:3}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": null,
+        "message": "The JSON value could not be converted to Composite. Path: $ | LineNumber: 0 | BytePositionInLine: 1."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "string/quotes",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/quotes",
+      "input": "{\u0022map\u0022:{\u0022a\\\u0022b\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\u0022b",
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022a\\u0022b\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/backslash",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/backslash",
+      "input": "{\u0022map\u0022:{\u0022a\\\\b\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\\b",
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022a\\\\b\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/unicode-html",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/unicode-html",
+      "input": "{\u0022map\u0022:{\u0022\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\\\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022",
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u00E9\\u96EA\\uD83D\\uDE00\\u003C\\u003E\\u0026\\u0027\\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/empty-string",
+      "kind": "string",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "string/empty-string",
+      "input": "{\u0022map\u0022:{\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "",
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/quotes",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/quotes",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022a\\\\\\\u0022b\\\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\u0022b"
+              },
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022a\\\\u0022b\\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/backslash",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/backslash",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022a\\\\\\\\b\\\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\\b"
+              },
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022a\\\\\\\\b\\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/unicode-html",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/unicode-html",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\\\\\\\u0022\\\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022"
+              },
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\\\u0027\\\\u0022\\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/empty-string",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/empty-string",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022\\\u0022\u0022:5}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": ""
+              },
+              "value": 5
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022\\u0022\u0022:5}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "stringConcept/duplicate-decoded-escape",
+      "kind": "stringConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "stringConcept/duplicate-decoded-escape",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022a\\\u0022\u0022:1,\u0022\\\u0022\\\\u0061\\\u0022\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u0022a\\u0022\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/empty-guid",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/empty-guid",
+      "input": "{\u0022map\u0022:{\u0022\\\u002200000000-0000-0000-0000-000000000000\\\u0022\u0022:0}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "00000000-0000-0000-0000-000000000000"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022\\u002200000000-0000-0000-0000-000000000000\\u0022\u0022:0}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "guidConcept/invalid-guid",
+      "kind": "guidConcept",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "guidConcept/invalid-guid",
+      "input": "{\u0022map\u0022:{\u0022\\\u0022not-a-guid\\\u0022\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.FormatException",
+        "innerException": null,
+        "message": "Unrecognized Guid format."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/reordered-duplicate",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/reordered-duplicate",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:1,\u0022{\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022,\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022}\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/whitespace-duplicate",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/whitespace-duplicate",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:1,\u0022{ \\\u0022id\\\u0022 : \\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022, \\\u0022name\\\u0022 : \\\u0022tenant-a\\\u0022 }\u0022:2}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 2
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:2}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/missing-members",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/missing-members",
+      "input": "{\u0022map\u0022:{\u0022{}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "name": null
+              },
+              "value": 1
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u002200000000-0000-0000-0000-000000000000\\u0022,\\u0022name\\u0022:null}\u0022:1}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/zero-members",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/zero-members",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u002200000000-0000-0000-0000-000000000000\\\u0022,\\\u0022name\\\u0022:\\\u0022\\\u0022}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "name": ""
+              },
+              "value": 1
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u002200000000-0000-0000-0000-000000000000\\u0022,\\u0022name\\u0022:\\u0022\\u0022}\u0022:1}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/null-members",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/null-members",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:null,\\\u0022name\\\u0022:null}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.InvalidOperationException",
+        "message": "The JSON value could not be converted to Composite. Path: $.id | LineNumber: 0 | BytePositionInLine: 10."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/invalid-guid-member",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/invalid-guid-member",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022bad\\\u0022,\\\u0022name\\\u0022:\\\u0022a\\\u0022}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "rejected",
+        "exception": "System.Text.Json.JsonException",
+        "innerException": "System.FormatException",
+        "message": "The JSON value could not be converted to Composite. Path: $.id | LineNumber: 0 | BytePositionInLine: 11."
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "not-attempted",
+        "reason": "no-returned-object"
+      },
+      "returnedObject": false
+    },
+    {
+      "id": "composite/wrong-case-members",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/wrong-case-members",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022Id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022Name\\\u0022:\\\u0022a\\\u0022}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "00000000-0000-0000-0000-000000000000",
+                "name": null
+              },
+              "value": 1
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u002200000000-0000-0000-0000-000000000000\\u0022,\\u0022name\\u0022:null}\u0022:1}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "composite/quotes-unicode-html",
+      "kind": "composite",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "composite/quotes-unicode-html",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022a\\\\\\\u0022\\\\\\\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\\\u0022}\u0022:1}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "a\u0022\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026"
+              },
+              "value": 1
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022a\\\\u0022\\\\\\\\\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\u0022}\u0022:1}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "compositeObjectValue/typed-value",
+      "kind": "compositeObjectValue",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "compositeObjectValue/typed-value",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:{\u0022number\u0022:42,\u0022label\u0022:\u0022answer\u0022}}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": {
+                "Number": 42,
+                "Label": "answer"
+              }
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:{\u0022number\u0022:42,\u0022label\u0022:\u0022answer\u0022}}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "compositeObjectValue/missing-value-members",
+      "kind": "compositeObjectValue",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "compositeObjectValue/missing-value-members",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:{}}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": {
+                "Number": 0,
+                "Label": null
+              }
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:{\u0022number\u0022:0,\u0022label\u0022:null}}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "compositeObjectValue/null-value",
+      "kind": "compositeObjectValue",
+      "operation": "read",
+      "origin": "authored-stimulus",
+      "sourceCapture": "inputs.json",
+      "sourceCaseId": "compositeObjectValue/null-value",
+      "input": "{\u0022map\u0022:{\u0022{\\\u0022id\\\u0022:\\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\\u0022,\\\u0022name\\\u0022:\\\u0022tenant-a\\\u0022}\u0022:null}}",
+      "read": {
+        "stage": "read",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": null
+            }
+          ]
+        }
+      },
+      "rewrite": {
+        "stage": "rewrite",
+        "status": "accepted",
+        "value": "{\u0022map\u0022:{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:null}}"
+      },
+      "returnedObject": true
+    },
+    {
+      "id": "string/write/132",
+      "kind": "string",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": "plain",
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "plain",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022plain\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "stringConcept/write/132",
+      "kind": "stringConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "TextKey",
+        "value": "plain"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "plain"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022plain\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "string/write/134",
+      "kind": "string",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": "a\u0022b",
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\u0022b",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022a\\u0022b\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "stringConcept/write/134",
+      "kind": "stringConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "TextKey",
+        "value": "a\u0022b"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\u0022b"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022a\\\\u0022b\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "string/write/136",
+      "kind": "string",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": "a\\b",
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "a\\b",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022a\\\\b\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "stringConcept/write/136",
+      "kind": "stringConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "TextKey",
+        "value": "a\\b"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "a\\b"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022a\\\\\\\\b\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "string/write/138",
+      "kind": "string",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022",
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u00E9\\u96EA\\uD83D\\uDE00\\u003C\\u003E\\u0026\\u0027\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "stringConcept/write/138",
+      "kind": "stringConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "TextKey",
+        "value": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": "\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026\u0027\u0022"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\\\u0027\\\\u0022\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "string/write/140",
+      "kind": "string",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": "",
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": "",
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "stringConcept/write/140",
+      "kind": "stringConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "TextKey",
+        "value": ""
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "TextKey",
+                "value": ""
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "guid/write",
+      "kind": "guid",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Guid",
+        "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Guid",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022e094c582-9d91-4df0-b795-8d39fce089da\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "guidConcept/write",
+      "kind": "guidConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "IdKey",
+        "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "e094c582-9d91-4df0-b795-8d39fce089da"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "guidConcept/write-zero",
+      "kind": "guidConcept",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "IdKey",
+        "value": "00000000-0000-0000-0000-000000000000"
+      },
+      "inputValue": 0,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "IdKey",
+                "value": "00000000-0000-0000-0000-000000000000"
+              },
+              "value": 0
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022\\u002200000000-0000-0000-0000-000000000000\\u0022\u0022:0}"
+      },
+      "indented": false
+    },
+    {
+      "id": "composite/write",
+      "kind": "composite",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": "tenant-a"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "composite/write-escaped",
+      "kind": "composite",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": "a\u0022\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "a\u0022\\\u00E9\u96EA\uD83D\uDE00\u003C\u003E\u0026"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022a\\\\u0022\\\\\\\\\\\\u00E9\\\\u96EA\\\\uD83D\\\\uDE00\\\\u003C\\\\u003E\\\\u0026\\u0022}\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "composite/write-indented",
+      "kind": "composite",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": "tenant-a"
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\n  \u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022: 42\n}"
+      },
+      "indented": true
+    },
+    {
+      "id": "composite/write-null-member",
+      "kind": "composite",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": null
+      },
+      "inputValue": 42,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": null
+              },
+              "value": 42
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:null}\u0022:42}"
+      },
+      "indented": false
+    },
+    {
+      "id": "compositeObjectValue/write",
+      "kind": "compositeObjectValue",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": "tenant-a"
+      },
+      "inputValue": {
+        "Number": 42,
+        "Label": "answer"
+      },
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": {
+                "Number": 42,
+                "Label": "answer"
+              }
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:{\u0022number\u0022:42,\u0022label\u0022:\u0022answer\u0022}}"
+      },
+      "indented": false
+    },
+    {
+      "id": "compositeObjectValue/write-null",
+      "kind": "compositeObjectValue",
+      "operation": "write",
+      "sourceCapture": null,
+      "sourceCaseId": null,
+      "inputKey": {
+        "type": "Composite",
+        "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+        "name": "tenant-a"
+      },
+      "inputValue": null,
+      "construction": {
+        "stage": "construction",
+        "status": "accepted",
+        "value": {
+          "state": "map",
+          "count": 1,
+          "entries": [
+            {
+              "key": {
+                "type": "Composite",
+                "id": "e094c582-9d91-4df0-b795-8d39fce089da",
+                "name": "tenant-a"
+              },
+              "value": null
+            }
+          ]
+        }
+      },
+      "write": {
+        "stage": "write",
+        "status": "accepted",
+        "value": "{\u0022{\\u0022id\\u0022:\\u0022e094c582-9d91-4df0-b795-8d39fce089da\\u0022,\\u0022name\\u0022:\\u0022tenant-a\\u0022}\u0022:null}"
+      },
+      "indented": false
+    }
+  ]
+}

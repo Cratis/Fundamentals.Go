@@ -18,6 +18,8 @@
   href: recipes.md
 - name: Enum JSON compatibility
   href: enum-compatibility.md
+- name: Dictionary-key JSON compatibility
+  href: dictionary-key-compatibility.md
 - name: Parity
   href: parity.md
 - name: Releases

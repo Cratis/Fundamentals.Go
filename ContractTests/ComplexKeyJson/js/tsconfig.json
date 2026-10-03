@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": ["ESNext", "ES2022", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "outDir": "output",
+    "rootDir": ".",
+    "types": []
+  },
+  "include": ["source/**/*.ts", "probe.ts"]
+}

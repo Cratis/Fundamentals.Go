@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Cratis/Fundamentals.Go/testdata/complex-key-contract/schema.json",
+  "title": "Historical complex-key capture",
+  "description": "Envelope schema only, not key admission or consumer validation. manifest.json locks exact IDs, counts, declarations and captured bytes.",
+  "type": "object",
+  "required": ["schemaVersion", "sourceRevision", "profile", "count", "observations"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "sourceRevision": {"const": "d2accc4a79b6bcf2708213c97093ab5ba6c06381"},
+    "profile": {"type": "string", "minLength": 1},
+    "count": {"type": "integer", "minimum": 1},
+    "observations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/observation"}},
+    "runtime": {"type": "string"},
+    "systemTextJson": {"type": "string"},
+    "globalStubAccesses": {"type": "integer", "const": 0},
+    "factoryAdmission": {"type": "array", "minItems": 11, "maxItems": 11, "items": {"type": "object", "required": ["type", "admitted"], "properties": {"type": {"type": "string"}, "admitted": {"type": "boolean"}}, "additionalProperties": false}},
+    "node": {"type": "string"},
+    "typescript": {"type": "string", "minLength": 1},
+    "metadata": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "object", "required": ["kind", "field", "type", "genericArguments"], "properties": {"kind": {"$ref": "#/$defs/kind"}, "field": {"const": "map"}, "type": {"const": "ValueMap"}, "genericArguments": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}}}, "additionalProperties": false}}
+  },
+  "additionalProperties": false,
+  "oneOf": [
+    {"required": ["runtime", "systemTextJson", "globalStubAccesses", "factoryAdmission"], "not": {"required": ["node"]}},
+    {"required": ["node", "typescript", "metadata"], "not": {"required": ["runtime"]}}
+  ],
+  "$defs": {
+    "kind": {"enum": ["string", "stringConcept", "guid", "guidConcept", "composite", "compositeObjectValue"]},
+    "stimuli": {"type": "array", "minItems": 132, "maxItems": 132, "items": {"type": "object", "required": ["id", "kind", "input"], "properties": {"id": {"type": "string"}, "kind": {"$ref": "#/$defs/kind"}, "input": {"type": "string"}}, "additionalProperties": false}},
+    "outcome": {
+      "type": "object",
+      "required": ["stage", "status"],
+      "properties": {
+        "stage": {"enum": ["read", "write", "rewrite", "construction", "lookup"]},
+        "status": {"enum": ["accepted", "rejected", "not-attempted"]},
+        "value": {},
+        "exception": {"type": "string", "minLength": 1},
+        "innerException": {"type": ["string", "null"]},
+        "message": {"type": "string", "description": "Diagnostic literal only, excluded from replay contract comparison"},
+        "reason": {"type": "string", "minLength": 1},
+        "queryMode": {"enum": ["fixed-key", "original-key"]},
+        "lookupKey": {}
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {"properties": {"status": {"const": "accepted"}}, "required": ["value"], "not": {"anyOf": [{"required": ["exception"]}, {"required": ["reason"]}, {"required": ["message"]}, {"required": ["innerException"]}]}},
+        {"properties": {"status": {"const": "rejected"}}, "required": ["exception", "innerException", "message"], "not": {"anyOf": [{"required": ["value"]}, {"required": ["reason"]}]}},
+        {"properties": {"status": {"const": "not-attempted"}}, "required": ["reason"], "not": {"anyOf": [{"required": ["value"]}, {"required": ["exception"]}, {"required": ["message"]}, {"required": ["innerException"]}]}}
+      ]
+    },
+    "lookup": {"allOf": [{"$ref": "#/$defs/outcome"}, {"required": ["queryMode", "lookupKey"], "properties": {"stage": {"const": "lookup"}}}]},
+    "read": {"allOf": [{"$ref": "#/$defs/outcome"}, {"properties": {"stage": {"const": "read"}}}]},
+    "rewrite": {"allOf": [{"$ref": "#/$defs/outcome"}, {"properties": {"stage": {"const": "rewrite"}}}]},
+    "write": {"allOf": [{"$ref": "#/$defs/outcome"}, {"properties": {"stage": {"const": "write"}}}]},
+    "construction": {"allOf": [{"$ref": "#/$defs/outcome"}, {"properties": {"stage": {"const": "construction"}}}]},
+    "observation": {
+      "type": "object",
+      "required": ["id", "operation", "sourceCapture", "sourceCaseId"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "operation": {"enum": ["read", "write", "equality"]},
+        "sourceCapture": {"type": ["string", "null"]},
+        "sourceCaseId": {"type": ["string", "null"]},
+        "kind": {"$ref": "#/$defs/kind"},
+        "origin": {"enum": ["authored-stimulus", "actual-csharp-write", "actual-js-write"]},
+        "input": {"type": "string", "description": "Exact raw text; can be malformed JSON; do not normalize"},
+        "read": {"$ref": "#/$defs/read"},
+        "rewrite": {"$ref": "#/$defs/rewrite"},
+        "returnedObject": {"type": "boolean"},
+        "runtimeFieldAccess": {"allOf": [{"$ref": "#/$defs/lookup"}, {"properties": {"queryMode": {"const": "fixed-key"}}}]},
+        "originalKeyLookup": {"allOf": [{"$ref": "#/$defs/lookup"}, {"properties": {"queryMode": {"const": "original-key"}}}]},
+        "inputKey": {},
+        "inputValue": {},
+        "construction": {"$ref": "#/$defs/construction"},
+        "write": {"$ref": "#/$defs/write"},
+        "indented": {"type": "boolean"},
+        "first": {"type": "string"},
+        "second": {"type": "string"},
+        "count": {"type": "integer"},
+        "lookupFirst": {"type": "integer"},
+        "lookupFreshFirst": {"type": "integer"},
+        "lookupSecond": {"type": "integer"}
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {"properties": {"operation": {"const": "read"}, "sourceCapture": {"type": "string"}, "sourceCaseId": {"type": "string"}}, "required": ["kind", "origin", "input", "read", "rewrite", "returnedObject"]},
+        {"properties": {"operation": {"const": "write"}, "sourceCapture": {"type": "null"}, "sourceCaseId": {"type": "null"}}, "required": ["kind", "inputKey", "inputValue", "write"]},
+        {"properties": {"operation": {"const": "equality"}, "sourceCapture": {"type": "null"}, "sourceCaseId": {"type": "null"}}, "required": ["first", "second", "count", "lookupFirst", "lookupFreshFirst", "lookupSecond"]}
+      ]
+    }
+  }
+}

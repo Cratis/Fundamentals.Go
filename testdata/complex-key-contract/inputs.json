@@ -1,0 +1,662 @@
+[
+  {
+    "id": "string/missing",
+    "kind": "string",
+    "input": "{}"
+  },
+  {
+    "id": "string/null-map",
+    "kind": "string",
+    "input": "{\"map\":null}"
+  },
+  {
+    "id": "string/empty-map",
+    "kind": "string",
+    "input": "{\"map\":{}}"
+  },
+  {
+    "id": "string/array-map",
+    "kind": "string",
+    "input": "{\"map\":[]}"
+  },
+  {
+    "id": "string/populated-array-map",
+    "kind": "string",
+    "input": "{\"map\":[1]}"
+  },
+  {
+    "id": "string/number-map",
+    "kind": "string",
+    "input": "{\"map\":7}"
+  },
+  {
+    "id": "string/zero-map",
+    "kind": "string",
+    "input": "{\"map\":0}"
+  },
+  {
+    "id": "string/false-map",
+    "kind": "string",
+    "input": "{\"map\":false}"
+  },
+  {
+    "id": "string/string-map",
+    "kind": "string",
+    "input": "{\"map\":\"ab\"}"
+  },
+  {
+    "id": "string/malformed-outer",
+    "kind": "string",
+    "input": "{\"map\":{"
+  },
+  {
+    "id": "string/null-envelope",
+    "kind": "string",
+    "input": "null"
+  },
+  {
+    "id": "string/ordinary",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":42}}"
+  },
+  {
+    "id": "string/zero-value",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":0}}"
+  },
+  {
+    "id": "string/null-value",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":null}}"
+  },
+  {
+    "id": "string/invalid-value",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":\"not-number\"}}"
+  },
+  {
+    "id": "string/duplicate-json-property",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":1,\"plain\":2}}"
+  },
+  {
+    "id": "string/good-then-malformed-key",
+    "kind": "string",
+    "input": "{\"map\":{\"plain\":1,\"not-json\":2}}"
+  },
+  {
+    "id": "string/null-key",
+    "kind": "string",
+    "input": "{\"map\":{\"null\":3}}"
+  },
+  {
+    "id": "string/empty-key",
+    "kind": "string",
+    "input": "{\"map\":{\"\":3}}"
+  },
+  {
+    "id": "string/numeric-key",
+    "kind": "string",
+    "input": "{\"map\":{\"0\":3}}"
+  },
+  {
+    "id": "string/object-key",
+    "kind": "string",
+    "input": "{\"map\":{\"{}\":3}}"
+  },
+  {
+    "id": "string/array-key",
+    "kind": "string",
+    "input": "{\"map\":{\"[]\":3}}"
+  },
+  {
+    "id": "stringConcept/missing",
+    "kind": "stringConcept",
+    "input": "{}"
+  },
+  {
+    "id": "stringConcept/null-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":null}"
+  },
+  {
+    "id": "stringConcept/empty-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":{}}"
+  },
+  {
+    "id": "stringConcept/array-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":[]}"
+  },
+  {
+    "id": "stringConcept/populated-array-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":[1]}"
+  },
+  {
+    "id": "stringConcept/number-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":7}"
+  },
+  {
+    "id": "stringConcept/zero-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":0}"
+  },
+  {
+    "id": "stringConcept/false-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":false}"
+  },
+  {
+    "id": "stringConcept/string-map",
+    "kind": "stringConcept",
+    "input": "{\"map\":\"ab\"}"
+  },
+  {
+    "id": "stringConcept/malformed-outer",
+    "kind": "stringConcept",
+    "input": "{\"map\":{"
+  },
+  {
+    "id": "stringConcept/null-envelope",
+    "kind": "stringConcept",
+    "input": "null"
+  },
+  {
+    "id": "stringConcept/ordinary",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":42}}"
+  },
+  {
+    "id": "stringConcept/zero-value",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":0}}"
+  },
+  {
+    "id": "stringConcept/null-value",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":null}}"
+  },
+  {
+    "id": "stringConcept/invalid-value",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":\"not-number\"}}"
+  },
+  {
+    "id": "stringConcept/duplicate-json-property",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":1,\"\\\"plain\\\"\":2}}"
+  },
+  {
+    "id": "stringConcept/good-then-malformed-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"plain\\\"\":1,\"not-json\":2}}"
+  },
+  {
+    "id": "stringConcept/null-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"null\":3}}"
+  },
+  {
+    "id": "stringConcept/empty-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\":3}}"
+  },
+  {
+    "id": "stringConcept/numeric-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"0\":3}}"
+  },
+  {
+    "id": "stringConcept/object-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"{}\":3}}"
+  },
+  {
+    "id": "stringConcept/array-key",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"[]\":3}}"
+  },
+  {
+    "id": "guid/missing",
+    "kind": "guid",
+    "input": "{}"
+  },
+  {
+    "id": "guid/null-map",
+    "kind": "guid",
+    "input": "{\"map\":null}"
+  },
+  {
+    "id": "guid/empty-map",
+    "kind": "guid",
+    "input": "{\"map\":{}}"
+  },
+  {
+    "id": "guid/array-map",
+    "kind": "guid",
+    "input": "{\"map\":[]}"
+  },
+  {
+    "id": "guid/populated-array-map",
+    "kind": "guid",
+    "input": "{\"map\":[1]}"
+  },
+  {
+    "id": "guid/number-map",
+    "kind": "guid",
+    "input": "{\"map\":7}"
+  },
+  {
+    "id": "guid/zero-map",
+    "kind": "guid",
+    "input": "{\"map\":0}"
+  },
+  {
+    "id": "guid/false-map",
+    "kind": "guid",
+    "input": "{\"map\":false}"
+  },
+  {
+    "id": "guid/string-map",
+    "kind": "guid",
+    "input": "{\"map\":\"ab\"}"
+  },
+  {
+    "id": "guid/malformed-outer",
+    "kind": "guid",
+    "input": "{\"map\":{"
+  },
+  {
+    "id": "guid/null-envelope",
+    "kind": "guid",
+    "input": "null"
+  },
+  {
+    "id": "guid/ordinary",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":42}}"
+  },
+  {
+    "id": "guid/zero-value",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":0}}"
+  },
+  {
+    "id": "guid/null-value",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":null}}"
+  },
+  {
+    "id": "guid/invalid-value",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":\"not-number\"}}"
+  },
+  {
+    "id": "guid/duplicate-json-property",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":1,\"e094c582-9d91-4df0-b795-8d39fce089da\":2}}"
+  },
+  {
+    "id": "guid/good-then-malformed-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"e094c582-9d91-4df0-b795-8d39fce089da\":1,\"not-json\":2}}"
+  },
+  {
+    "id": "guid/null-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"null\":3}}"
+  },
+  {
+    "id": "guid/empty-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"\":3}}"
+  },
+  {
+    "id": "guid/numeric-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"0\":3}}"
+  },
+  {
+    "id": "guid/object-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"{}\":3}}"
+  },
+  {
+    "id": "guid/array-key",
+    "kind": "guid",
+    "input": "{\"map\":{\"[]\":3}}"
+  },
+  {
+    "id": "guidConcept/missing",
+    "kind": "guidConcept",
+    "input": "{}"
+  },
+  {
+    "id": "guidConcept/null-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":null}"
+  },
+  {
+    "id": "guidConcept/empty-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":{}}"
+  },
+  {
+    "id": "guidConcept/array-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":[]}"
+  },
+  {
+    "id": "guidConcept/populated-array-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":[1]}"
+  },
+  {
+    "id": "guidConcept/number-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":7}"
+  },
+  {
+    "id": "guidConcept/zero-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":0}"
+  },
+  {
+    "id": "guidConcept/false-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":false}"
+  },
+  {
+    "id": "guidConcept/string-map",
+    "kind": "guidConcept",
+    "input": "{\"map\":\"ab\"}"
+  },
+  {
+    "id": "guidConcept/malformed-outer",
+    "kind": "guidConcept",
+    "input": "{\"map\":{"
+  },
+  {
+    "id": "guidConcept/null-envelope",
+    "kind": "guidConcept",
+    "input": "null"
+  },
+  {
+    "id": "guidConcept/ordinary",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":42}}"
+  },
+  {
+    "id": "guidConcept/zero-value",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":0}}"
+  },
+  {
+    "id": "guidConcept/null-value",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":null}}"
+  },
+  {
+    "id": "guidConcept/invalid-value",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":\"not-number\"}}"
+  },
+  {
+    "id": "guidConcept/duplicate-json-property",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":1,\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":2}}"
+  },
+  {
+    "id": "guidConcept/good-then-malformed-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"\":1,\"not-json\":2}}"
+  },
+  {
+    "id": "guidConcept/null-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"null\":3}}"
+  },
+  {
+    "id": "guidConcept/empty-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\":3}}"
+  },
+  {
+    "id": "guidConcept/numeric-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"0\":3}}"
+  },
+  {
+    "id": "guidConcept/object-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"{}\":3}}"
+  },
+  {
+    "id": "guidConcept/array-key",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"[]\":3}}"
+  },
+  {
+    "id": "composite/missing",
+    "kind": "composite",
+    "input": "{}"
+  },
+  {
+    "id": "composite/null-map",
+    "kind": "composite",
+    "input": "{\"map\":null}"
+  },
+  {
+    "id": "composite/empty-map",
+    "kind": "composite",
+    "input": "{\"map\":{}}"
+  },
+  {
+    "id": "composite/array-map",
+    "kind": "composite",
+    "input": "{\"map\":[]}"
+  },
+  {
+    "id": "composite/populated-array-map",
+    "kind": "composite",
+    "input": "{\"map\":[1]}"
+  },
+  {
+    "id": "composite/number-map",
+    "kind": "composite",
+    "input": "{\"map\":7}"
+  },
+  {
+    "id": "composite/zero-map",
+    "kind": "composite",
+    "input": "{\"map\":0}"
+  },
+  {
+    "id": "composite/false-map",
+    "kind": "composite",
+    "input": "{\"map\":false}"
+  },
+  {
+    "id": "composite/string-map",
+    "kind": "composite",
+    "input": "{\"map\":\"ab\"}"
+  },
+  {
+    "id": "composite/malformed-outer",
+    "kind": "composite",
+    "input": "{\"map\":{"
+  },
+  {
+    "id": "composite/null-envelope",
+    "kind": "composite",
+    "input": "null"
+  },
+  {
+    "id": "composite/ordinary",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":42}}"
+  },
+  {
+    "id": "composite/zero-value",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":0}}"
+  },
+  {
+    "id": "composite/null-value",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":null}}"
+  },
+  {
+    "id": "composite/invalid-value",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":\"not-number\"}}"
+  },
+  {
+    "id": "composite/duplicate-json-property",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":1,\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":2}}"
+  },
+  {
+    "id": "composite/good-then-malformed-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":1,\"not-json\":2}}"
+  },
+  {
+    "id": "composite/null-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"null\":3}}"
+  },
+  {
+    "id": "composite/empty-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"\":3}}"
+  },
+  {
+    "id": "composite/numeric-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"0\":3}}"
+  },
+  {
+    "id": "composite/object-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"{}\":3}}"
+  },
+  {
+    "id": "composite/array-key",
+    "kind": "composite",
+    "input": "{\"map\":{\"[]\":3}}"
+  },
+  {
+    "id": "string/quotes",
+    "kind": "string",
+    "input": "{\"map\":{\"a\\\"b\":5}}"
+  },
+  {
+    "id": "string/backslash",
+    "kind": "string",
+    "input": "{\"map\":{\"a\\\\b\":5}}"
+  },
+  {
+    "id": "string/unicode-html",
+    "kind": "string",
+    "input": "{\"map\":{\"é雪😀<>&'\\\"\":5}}"
+  },
+  {
+    "id": "string/empty-string",
+    "kind": "string",
+    "input": "{\"map\":{\"\":5}}"
+  },
+  {
+    "id": "stringConcept/quotes",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"a\\\\\\\"b\\\"\":5}}"
+  },
+  {
+    "id": "stringConcept/backslash",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"a\\\\\\\\b\\\"\":5}}"
+  },
+  {
+    "id": "stringConcept/unicode-html",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"é雪😀<>&'\\\\\\\"\\\"\":5}}"
+  },
+  {
+    "id": "stringConcept/empty-string",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"\\\"\":5}}"
+  },
+  {
+    "id": "stringConcept/duplicate-decoded-escape",
+    "kind": "stringConcept",
+    "input": "{\"map\":{\"\\\"a\\\"\":1,\"\\\"\\\\u0061\\\"\":2}}"
+  },
+  {
+    "id": "guidConcept/empty-guid",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"00000000-0000-0000-0000-000000000000\\\"\":0}}"
+  },
+  {
+    "id": "guidConcept/invalid-guid",
+    "kind": "guidConcept",
+    "input": "{\"map\":{\"\\\"not-a-guid\\\"\":1}}"
+  },
+  {
+    "id": "composite/reordered-duplicate",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":1,\"{\\\"name\\\":\\\"tenant-a\\\",\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\"}\":2}}"
+  },
+  {
+    "id": "composite/whitespace-duplicate",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":1,\"{ \\\"id\\\" : \\\"e094c582-9d91-4df0-b795-8d39fce089da\\\", \\\"name\\\" : \\\"tenant-a\\\" }\":2}}"
+  },
+  {
+    "id": "composite/missing-members",
+    "kind": "composite",
+    "input": "{\"map\":{\"{}\":1}}"
+  },
+  {
+    "id": "composite/zero-members",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"00000000-0000-0000-0000-000000000000\\\",\\\"name\\\":\\\"\\\"}\":1}}"
+  },
+  {
+    "id": "composite/null-members",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":null,\\\"name\\\":null}\":1}}"
+  },
+  {
+    "id": "composite/invalid-guid-member",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"bad\\\",\\\"name\\\":\\\"a\\\"}\":1}}"
+  },
+  {
+    "id": "composite/wrong-case-members",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"Id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"Name\\\":\\\"a\\\"}\":1}}"
+  },
+  {
+    "id": "composite/quotes-unicode-html",
+    "kind": "composite",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"a\\\\\\\"\\\\\\\\é雪😀<>&\\\"}\":1}}"
+  },
+  {
+    "id": "compositeObjectValue/typed-value",
+    "kind": "compositeObjectValue",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":{\"number\":42,\"label\":\"answer\"}}}"
+  },
+  {
+    "id": "compositeObjectValue/missing-value-members",
+    "kind": "compositeObjectValue",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":{}}}"
+  },
+  {
+    "id": "compositeObjectValue/null-value",
+    "kind": "compositeObjectValue",
+    "input": "{\"map\":{\"{\\\"id\\\":\\\"e094c582-9d91-4df0-b795-8d39fce089da\\\",\\\"name\\\":\\\"tenant-a\\\"}\":null}}"
+  }
+]
