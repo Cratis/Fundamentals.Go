@@ -6,44 +6,21 @@
 package conceptstypes_test
 
 import (
-	"context"
 	"errors"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"go/types"
-	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/cratis/fundamentals.go/concepts"
 	"github.com/cratis/fundamentals.go/concepts/conceptstypes"
 )
 
 func TestUnderlyingGenericMethodsRuntimeParity(t *testing.T) {
-	fset := token.NewFileSet()
-	ctx, cancel := context.WithTimeout(t.Context(), 45*time.Second)
-	defer cancel()
-	imports, err := exportImporter(ctx, fset)
-	if err != nil {
-		t.Fatal(err)
-	}
-	file, err := parser.ParseFile(fset, filepath.Join("testdata", "genericmethods", "declarations_go127.go.txt"), nil, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// These expectations were checked by compiling this exact fixture and
-	// comparing with concepts.Underlying on Go 1.27. Generic methods are absent
-	// from reflect's method lists, including BEFORE promotion: they neither
-	// shadow nor collide with promoted ordinary methods. Fields still shadow.
-	// Keep future syntax in a text fixture so Go 1.26 gofmt can check all .go
-	// files. The gated test uses Go 1.27 type checking without a nested build.
-	config := types.Config{Importer: imports, GoVersion: "go1.27"}
-	pkg, err := config.Check("github.com/cratis/fundamentals.go/concepts/conceptstypes/testdata/genericmethods", fset, []*ast.File{file}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	pkg := genericMethodsPackage(t)
+	// TestUnderlyingGenericMethodsCompiledRuntimeParity compiles this same
+	// fixture to check these expectations against runtime reflection. Generic
+	// methods neither shadow nor collide with promoted ordinary methods in
+	// reflect's method lists. Fields still shadow.
 	for _, c := range []struct {
 		name       string
 		scalarName string
