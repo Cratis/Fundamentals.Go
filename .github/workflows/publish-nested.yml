@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       module:
-        description: 'Allow-listed directory (for example tools or integrations/example)'
+        description: 'Publishable allow-listed directory (unpublished recipes are refused)'
         type: string
         required: true
       bump:

@@ -26,8 +26,11 @@ def check_version(version, ceiling):
 
 
 def plan(config, module, bump, pr, releases, tags, sha, repository, ceiling):
-    if module not in config["nested"]:
+    modules = {entry["dir"]: entry["publish"] for entry in config["nested"]}
+    if module not in modules:
         raise ValueError("Select an allow-listed nested module, not the root")
+    if not modules[module]:
+        raise ValueError(f"{module}: unpublished modules cannot be released")
     if bump not in {"major", "minor", "patch"}:
         raise ValueError("Bump must be major, minor or patch")
     if config["module"] != "github.com/" + repository.lower():

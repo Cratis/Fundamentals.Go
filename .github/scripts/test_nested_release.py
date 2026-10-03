@@ -112,7 +112,7 @@ else:
                "RELEASE_PR": "16", "RELEASE_MODULE": "tools", "RELEASE_BUMP": "minor",
                "GITHUB_SHA": sha, "MAX_MAJOR": "0", "GITHUB_OUTPUT": str(output)}
         with patch.dict(os.environ, env), patch("nested_release.configuration", return_value={
-                "module": "github.com/cratis/fundamentals.go", "nested": ["tools"]}), \
+                "module": "github.com/cratis/fundamentals.go", "nested": [{"dir": "tools", "publish": True}]}), \
                 patch("nested_release.api", side_effect=[pr, [], []]), \
                 patch("nested_release.require_tag_protection") as protection:
             with self.assertRaises(subprocess.CalledProcessError):

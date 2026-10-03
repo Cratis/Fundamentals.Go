@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import unittest
 
+from go_modules import layout
 from nested_release import plan
 
 SCRIPT = Path(__file__).with_name("go_modules.py").resolve()
@@ -33,7 +34,9 @@ class ModuleLayout(unittest.TestCase):
         path.write_text(content)
 
     def configure(self, nested):
-        self.write(".github/go-modules.json", json.dumps({"module": MODULE, "nested": nested}))
+        self.write(".github/go-modules.json", json.dumps({"module": MODULE, "nested": [
+            {"dir": entry, "publish": True} if isinstance(entry, str) else entry for entry in nested
+        ]}))
 
     def nested(self, directory="tools", version="v0.1.0", extra=""):
         self.write(directory + "/go.mod", f"module {MODULE}/{directory}\n\ngo 1.26.0\n\nrequire {MODULE} {version}\n{extra}")
@@ -63,6 +66,28 @@ class ModuleLayout(unittest.TestCase):
         self.nested("integrations/example")
         self.configure(["tools", "integrations/example"])
         self.assertEqual(self.matrix(), {"module": [".", "tools", "integrations/example"]})
+
+    def test_unpublished_modules_are_gated_without_release_dependencies(self):
+        self.configure([{"dir": "recipes", "publish": False}, "tools"])
+        self.nested("recipes", version="v0.0.0", extra=f"replace {MODULE} => ../\n")
+        self.nested("tools")
+        self.assertEqual(self.matrix(), {"module": [".", "recipes", "tools"]})
+        _, dependencies = layout(self.root.resolve())
+        self.assertEqual(dependencies, [MODULE + "@v0.1.0"])
+
+    def test_publication_policy_is_explicit_and_boolean(self):
+        for entry in [{"dir": "recipes"}, {"dir": "recipes", "publish": "false"},
+                      {"dir": "recipes", "publish": 0},
+                      {"dir": "recipes", "publish": False, "extra": True}]:
+            with self.subTest(entry=entry):
+                self.configure([entry])
+                self.matrix("boolean publish")
+
+    def test_unpublished_exemption_does_not_weaken_root_policy(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        self.nested("recipes", version="v0.0.0", extra=f"replace {MODULE} => ../\n")
+        self.write("go.mod", f"module {MODULE}\ngo 1.26.0\nreplace example.com/x => ../x\n")
+        self.matrix("replace directives are forbidden")
 
     def test_replace_is_rejected_in_either_form(self):
         self.configure(["tools"])
@@ -111,7 +136,10 @@ def release(tag, sha="older"):
 
 class NestedRelease(unittest.TestCase):
     def setUp(self):
-        self.config = {"module": MODULE, "nested": ["tools", "integrations/example"]}
+        self.config = {"module": MODULE, "nested": [
+            {"dir": "tools", "publish": True}, {"dir": "integrations/example", "publish": True},
+            {"dir": "recipes", "publish": False}
+        ]}
         self.pr = {"title": "release(tools): minor", "body": "## Added\n\n- A generator (#14)\n",
                    "merged_at": "2026-10-03T00:00:00Z", "merge_commit_sha": SHA,
                    "base": {"ref": "main", "repo": {"full_name": REPOSITORY}},
@@ -160,6 +188,12 @@ class NestedRelease(unittest.TestCase):
             self.plan(bump="major", ceiling="1", releases=[release("tools/v1.0.0")])
         with self.assertRaisesRegex(ValueError, "must be 0 or 1"):
             self.plan(bump="major", ceiling="2")
+
+    def test_unpublished_module_cannot_be_released_even_on_retry(self):
+        self.pr["title"] = "release(recipes): minor"
+        for releases in [[], [release("recipes/v0.1.0", SHA)]]:
+            with self.subTest(releases=releases), self.assertRaisesRegex(ValueError, "unpublished"):
+                self.plan(module="recipes", releases=releases, tags=["recipes/v0.1.0"])
 
     def test_root_and_unlisted_modules_are_not_dispatch_targets(self):
         for module in [".", "unlisted", "../tools"]:

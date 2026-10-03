@@ -67,7 +67,8 @@ must first meet the standard-interfaces-and-recipes-first criteria in
 [decision 0001](../decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md).
 
 [`.github/go-modules.json`](../.github/go-modules.json) is the single allow-list.
-Its `nested` array is empty until a nested module is implemented. To add one:
+Each `nested` entry has an explicit `dir` and boolean `publish` policy.
+`recipes` is unpublished; the following steps apply to publishable modules:
 
 1. Create `tools/go.mod` or `integrations/<name>/go.mod` with module path
    `github.com/cratis/fundamentals.go/<directory>`. Use lowercase relative
@@ -76,12 +77,17 @@ Its `nested` array is empty until a nested module is implemented. To add one:
    is released. Pseudo-versions, workspaces and `replace` directives are not a
    substitute. If the tool needs new root APIs, release the root first.
 3. Add the exact directory to `nested` in the same change. For example, the
-   following illustrative configuration approves two implemented modules:
+   following illustrative configuration includes two publishable modules and
+   the unpublished recipes:
 
    ```json
    {
      "module": "github.com/cratis/fundamentals.go",
-     "nested": ["tools", "integrations/example"]
+     "nested": [
+       {"dir": "tools", "publish": true},
+       {"dir": "integrations/example", "publish": true},
+       {"dir": "recipes", "publish": false}
+     ]
    }
    ```
 
@@ -95,9 +101,10 @@ Its `nested` array is empty until a nested module is implemented. To add one:
    ruleset rather than trying to infer coverage from broader wildcard patterns.
 5. Run `python3 .github/scripts/go_modules.py matrix` from the repository root.
    It rejects unlisted or missing modules, wrong module identities, nonportable
-   paths and every `replace`, including dependency-to-dependency replacements.
-   `python3 .github/scripts/go_modules.py dependencies` additionally downloads
-   each required root version through the public proxy to prove it exists.
+   paths and every `replace` in publishable modules and the root, including
+   dependency-to-dependency replacements. `python3 .github/scripts/go_modules.py
+   dependencies` additionally downloads each publishable module's required root
+   version through the public proxy to prove it exists.
 6. Run the contribution guide's Go gates **inside each module**, with `GOWORK=off`.
    CI derives its matrix from the same allow-list: root plus every nested module
    gets build, vet, test, race, lint, tidy and govulncheck. The shared Go toolchain
@@ -106,6 +113,21 @@ Its `nested` array is empty until a nested module is implemented. To add one:
 Root `go test ./...` does not visit nested modules. A module's `go.sum` is its own;
 commit tidy changes there, not in the root. Do not add placeholder modules merely
 to reserve an allow-list entry.
+
+## Unpublished recipes
+
+The `recipes` module is CI-tested source, not a versioned dependency for consumers.
+Its explicit `publish: false` entry includes it in every Go gate, with `GOWORK=off`,
+but makes the nested release preflight refuse it, including retry attempts.
+Only unpublished modules are exempt from the `replace` ban and released-root
+requirement. The root always remains standard-library-only and replacement-free.
+
+Recipes require the root at the placeholder `v0.0.0` and replace it with `../`,
+so each run tests the checked-out library, not a previously released version.
+Their third-party dependencies and checksums live only in `recipes/go.mod` and
+`recipes/go.sum`. Do not tag or publish `recipes`, add a workspace, or use its
+local replacement as proof that a published integration can be installed.
+See [ecosystem recipes](recipes.md) for their supported boundaries.
 
 ## Release one nested module
 
@@ -136,8 +158,8 @@ still owns tag and release creation in its success-only post hook.
    release finishes; merge another dedicated PR to release another module.
 4. In **Actions → Publish nested module → Run workflow**, choose `main`, enter
    the directory, the matching bump and that PR's number. The workflow rejects
-   a PR not merged at this exact commit, incorrect intent, unlisted modules,
-   Dependabot, an exceeded major ceiling or a conflicting release at this SHA.
+   a PR not merged at this exact commit, incorrect intent, unlisted or unpublished
+   modules, Dependabot, an exceeded major ceiling or a conflicting release at this SHA.
    It reruns the Go and Markdown gates before publication. Before calling
    release-action, it validates the body with the repository's checker using
    `--label <title-bump> --strict --base main`. This is release-bound validation

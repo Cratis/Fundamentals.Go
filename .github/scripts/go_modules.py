@@ -27,12 +27,17 @@ def configuration(root):
         r"github\.com/[a-z0-9-]+/[a-z0-9.-]+", config["module"]
     ):
         raise ValueError("Expected a canonical lowercase GitHub root module")
-    nested = config["nested"]
-    if not isinstance(nested, list) or any(
-        not isinstance(path, str)
-        or not re.fullmatch(r"[a-z][a-z0-9_-]*(/[a-z][a-z0-9_-]*)*", path)
-        for path in nested
+    entries = config["nested"]
+    if not isinstance(entries, list) or any(
+        not isinstance(entry, dict) or set(entry) != {"dir", "publish"}
+        or not isinstance(entry["publish"], bool)
+        for entry in entries
     ):
+        raise ValueError("Nested modules must have dir and boolean publish fields")
+    nested = [entry["dir"] for entry in entries]
+    if any(not isinstance(path, str) or not re.fullmatch(
+        r"[a-z][a-z0-9_-]*(/[a-z][a-z0-9_-]*)*", path
+    ) for path in nested):
         raise ValueError("Nested modules must be safe lowercase relative directories")
     if len(set(nested)) != len(nested):
         raise ValueError("Duplicate nested module")
@@ -43,7 +48,8 @@ def configuration(root):
 
 def layout(root):
     config = configuration(root)
-    directories = ["."] + config["nested"]
+    policies = {entry["dir"]: entry["publish"] for entry in config["nested"]}
+    directories = ["."] + list(policies)
     # Include local untracked files, but not ignored caches or a developer's workspace.
     files = set(filter(None, run(
         "git", "ls-files", "--cached", "--others", "--exclude-standard", "-z", cwd=root
@@ -65,12 +71,15 @@ def layout(root):
         expected_path = config["module"] + ("" if directory == "." else "/" + directory)
         if module["Module"]["Path"] != expected_path:
             raise ValueError(f"{directory}: expected module {expected_path}")
-        if module.get("Replace"):
+        unpublished = directory != "." and not policies[directory]
+        if module.get("Replace") and not unpublished:
             raise ValueError(f"{directory}: replace directives are forbidden")
         requirements = module.get("Require") or []
         if directory == ".":
             if requirements:
                 raise ValueError("The root module must remain standard-library-only")
+            continue
+        if unpublished:
             continue
         versions = [entry["Version"] for entry in requirements if entry["Path"] == config["module"]]
         if len(versions) != 1 or not re.fullmatch(STABLE_VERSION, versions[0]) or versions[0].split(".")[0] not in {"v0", "v1"}:
@@ -98,6 +107,7 @@ def main():
             if result.get("Error") or result.get("Path") != path or result.get("Version") != version:
                 raise ValueError(f"Could not verify released root dependency {dependency}")
             print(f"Verified released root dependency: {dependency}")
+        print(f"Verified {len(dependencies)} released root dependencies across {len(matrix['module'])} allow-listed modules")
 
 
 if __name__ == "__main__":
