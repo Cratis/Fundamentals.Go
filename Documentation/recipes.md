@@ -29,6 +29,24 @@ always use the current source. Root `go build ./...` and `go test ./...` exclude
 this module; CI runs the same build, vet, test, race, lint, tidy and vulnerability
 gates inside it separately. See [unpublished modules](releases.md#unpublished-recipes).
 
+## Documentation tooling
+
+`documentationcheck` contains test-only authored-documentation checks, run by
+`go test ./...` inside `recipes/`, not by root-only tests. Goldmark v1.8.6 (MIT)
+parses CommonMark/GFM; go.yaml.in/yaml/v3 v3.0.5 (MIT and Apache-2.0) parses
+frontmatter and flat or nested `name`/`href`/`items` navigation. Neither adds a
+root dependency or runtime API.
+
+The check discovers `Documentation/**/*.md`, `toc.yml`, README and CONTRIBUTING.
+It verifies local Markdown destinations and explicit full/collapsed references;
+undefined shortcuts remain prose. External schemes and site-root routes are
+reported as unverified without network requests. MDX, raw HTML other than
+comments, and symlinked authored-tree entries are outside its profile. Anchors
+use rendered heading text, Unicode simple lowercase, letters/numbers/marks,
+underscores and hyphens; each whitespace becomes a hyphen, other punctuation
+and symbols are omitted, and duplicates take the first free `-N` suffix. This
+source-anchor profile does not claim complete GitHub or Starlight rendering parity.
+
 ## Exchange UUID values
 
 [UUID interop source and examples](https://github.com/Cratis/Fundamentals.Go/tree/develop/recipes/uuidinterop)
