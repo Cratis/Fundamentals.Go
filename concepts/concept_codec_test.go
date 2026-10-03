@@ -333,13 +333,100 @@ func TestConceptLostCodecs(t *testing.T) {
 	}
 }
 
+func TestAuthorIDDeclaration(t *testing.T) {
+	type BookID concepts.UUID
+	declared := reflect.TypeFor[AuthorID]()
+	if declared == reflect.TypeFor[BookID]() || declared == reflect.TypeFor[concepts.UUID]() {
+		t.Fatal("AuthorID lost its defined type identity")
+	}
+	for _, tc := range []struct {
+		typ   reflect.Type
+		depth int
+		names []string
+	}{
+		{declared, 0, []string{"ConceptValue", "MarshalJSON", "MarshalText", "Value"}},
+		{reflect.TypeFor[*AuthorID](), 1, []string{"ConceptValue", "MarshalJSON", "MarshalText", "Scan", "UnmarshalJSON", "UnmarshalText", "Value"}},
+	} {
+		r, ok, err := concepts.Underlying(tc.typ)
+		if err != nil || !ok || r.Type != reflect.TypeFor[concepts.UUID]() || r.Declared != declared || r.Kind != concepts.KindUUID || r.PointerDepth != tc.depth {
+			t.Fatalf("Underlying(%v) = %+v, %v, %v", tc.typ, r, ok, err)
+		}
+		var names []string
+		for i := range tc.typ.NumMethod() {
+			names = append(names, tc.typ.Method(i).Name)
+		}
+		if !reflect.DeepEqual(names, tc.names) {
+			t.Fatalf("%v methods = %v, want %v", tc.typ, names, tc.names)
+		}
+	}
+}
+
+func TestAuthorIDWire(t *testing.T) {
+	for _, tc := range []struct {
+		id   AuthorID
+		text string
+	}{
+		{AuthorID{0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}, sqlUUIDText},
+		{AuthorID{}, "00000000-0000-0000-0000-000000000000"},
+	} {
+		t.Run(tc.text, func(t *testing.T) {
+			text, err := tc.id.MarshalText()
+			if err != nil || string(text) != tc.text {
+				t.Fatalf("text = %q, %v, want %q", text, err, tc.text)
+			}
+			var decoded AuthorID
+			if err := decoded.UnmarshalText(text); err != nil || decoded != tc.id {
+				t.Fatalf("text round trip = %x, %v, want %x", [16]byte(decoded), err, [16]byte(tc.id))
+			}
+			for _, source := range []any{tc.id, &tc.id} {
+				data, err := json.Marshal(source)
+				if err != nil || string(data) != `"`+tc.text+`"` {
+					t.Fatalf("JSON = %s, %v", data, err)
+				}
+				if err := json.Unmarshal(data, &decoded); err != nil || decoded != tc.id {
+					t.Fatalf("JSON round trip = %x, %v, want %x", [16]byte(decoded), err, [16]byte(tc.id))
+				}
+			}
+			for _, pair := range []struct{ source, target any }{
+				{map[string]AuthorID{"author": tc.id}, new(map[string]AuthorID)},
+				{map[AuthorID]string{tc.id: "author"}, new(map[AuthorID]string)},
+			} {
+				data, err := json.Marshal(pair.source)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := json.Unmarshal(data, pair.target); err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(reflect.ValueOf(pair.target).Elem().Interface(), pair.source) {
+					t.Fatalf("map round trip = %v, want %v", pair.target, pair.source)
+				}
+			}
+		})
+	}
+}
+
+func TestValidatingAuthorIDDecoderFailureAtomicity(t *testing.T) {
+	original := RequiredAuthorID{0xff}
+	for _, text := range []string{"bad", "00000000-0000-0000-0000-000000000000"} {
+		id := original
+		if err := id.UnmarshalText([]byte(text)); err == nil || id != original {
+			t.Fatalf("validating decoder %q = %x, %v, want unchanged value and error", text, [16]byte(id), err)
+		}
+	}
+	id := original
+	if err := id.UnmarshalText([]byte(sqlUUIDText)); err != nil || concepts.UUID(id).String() != sqlUUIDText {
+		t.Fatalf("validating decoder success = %v, %v", id, err)
+	}
+}
+
 func TestForwardingDecoderFailureAtomicity(t *testing.T) {
 	id, err := concepts.ParseUUID("00112233-4455-6677-8899-aabbccddeeff")
 	if err != nil {
 		t.Fatal(err)
 	}
 	original := AuthorID(id)
-	for _, data := range []string{`null`, `42`, `"bad"`, `"00112233-4455-6677-8899-aabbccddeeff" true`} {
+	for _, data := range []string{`null`, " \n null \t", `42`, `"bad"`, `"00112233-4455-6677-8899-aabbccddeeff" true`} {
 		value := original
 		if err := value.UnmarshalJSON([]byte(data)); err == nil || value != original {
 			t.Fatalf("UUID decoder %s: %v, %v", data, value, err)

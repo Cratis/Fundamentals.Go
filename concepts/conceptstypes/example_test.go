@@ -29,20 +29,16 @@ func ExampleUnderlying() {
 	const source = `package domain
 import "github.com/cratis/fundamentals.go/concepts"
 type AuthorID concepts.UUID
+type BookID concepts.UUID
+var _ concepts.Concept[concepts.UUID] = AuthorID{}
 func (id AuthorID) ConceptValue() concepts.UUID { return concepts.UUID(id) }
 func (id AuthorID) MarshalText() ([]byte, error) { return concepts.UUID(id).MarshalText() }
 func (id AuthorID) MarshalJSON() ([]byte, error) { return concepts.UUID(id).MarshalJSON() }
 func (id *AuthorID) UnmarshalText(data []byte) error {
-    var value concepts.UUID
-    if err := value.UnmarshalText(data); err != nil { return err }
-    *id = AuthorID(value)
-    return nil
+    return (*concepts.UUID)(id).UnmarshalText(data)
 }
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
-    var value concepts.UUID
-    if err := value.UnmarshalJSON(data); err != nil { return err }
-    *id = AuthorID(value)
-    return nil
+    return (*concepts.UUID)(id).UnmarshalJSON(data)
 }`
 	file, err := parser.ParseFile(fset, "domain.go", source, 0)
 	if err != nil {
@@ -55,7 +51,16 @@ func (id *AuthorID) UnmarshalJSON(data []byte) error {
 		fmt.Println(err)
 		return
 	}
-	r, ok, err := conceptstypes.Underlying(pkg.Scope().Lookup("AuthorID").Type())
+	id := pkg.Scope().Lookup("AuthorID").Type()
+	r, ok, err := conceptstypes.Underlying(id)
 	fmt.Println(ok, r.Kind, r.Type, r.PointerDepth, err)
-	// Output: true uuid github.com/cratis/fundamentals.go/concepts.UUID 0 <nil>
+	fmt.Println("distinct:", !types.Identical(id, pkg.Scope().Lookup("BookID").Type()), !types.Identical(id, r.Type))
+	fmt.Println("methods:", types.NewMethodSet(id).Len(), types.NewMethodSet(types.NewPointer(id)).Len())
+	pointer, ok, err := conceptstypes.Underlying(types.NewPointer(id))
+	fmt.Println("pointer:", ok, types.Identical(pointer.Type, r.Type), types.Identical(pointer.Declared, id), pointer.Kind == r.Kind, pointer.PointerDepth, err)
+	// Output:
+	// true uuid github.com/cratis/fundamentals.go/concepts.UUID 0 <nil>
+	// distinct: true true
+	// methods: 3 5
+	// pointer: true true true true 1 <nil>
 }

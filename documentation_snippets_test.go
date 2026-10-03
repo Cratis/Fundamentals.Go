@@ -84,6 +84,38 @@ func TestDocumentationSnippets(t *testing.T) {
 	}
 }
 
+func TestConceptDocumentationSnippets(t *testing.T) {
+	page := readDocumentationFile(t, "Documentation/concepts.md")
+	blocks := regexp.MustCompile("(?s)```go\n(.*?)\n```").FindAllStringSubmatch(page, -1)
+	if len(blocks) != 4 {
+		t.Fatalf("want four concept declaration excerpts, got %d", len(blocks))
+	}
+	fset := token.NewFileSet()
+	source, err := parser.ParseFile(fset, "concepts/example_test.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, block := range blocks {
+		text := block[1]
+		if !strings.HasPrefix(text, "package ") {
+			text = "package domain\n" + text
+		}
+		excerpt, err := parser.ParseFile(fset, "concepts.md", text, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, declaration := range excerpt.Decls {
+			if imports, ok := declaration.(*ast.GenDecl); ok && imports.Tok == token.IMPORT {
+				for _, spec := range imports.Specs {
+					assertDocumentationNode(t, fset, spec, source.Imports)
+				}
+				continue
+			}
+			assertDocumentationNode(t, fset, declaration, source.Decls)
+		}
+	}
+}
+
 func readDocumentationFile(t *testing.T, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(path)

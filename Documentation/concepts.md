@@ -33,28 +33,26 @@ func (id AuthorID) ConceptValue() concepts.UUID { return concepts.UUID(id) }
 func (id AuthorID) MarshalText() ([]byte, error) { return concepts.UUID(id).MarshalText() }
 func (id AuthorID) MarshalJSON() ([]byte, error) { return concepts.UUID(id).MarshalJSON() }
 func (id *AuthorID) UnmarshalText(data []byte) error {
-    var value concepts.UUID
-    if err := value.UnmarshalText(data); err != nil {
-        return err
-    }
-    *id = AuthorID(value)
-    return nil
+    return (*concepts.UUID)(id).UnmarshalText(data)
 }
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
-    var value concepts.UUID
-    if err := value.UnmarshalJSON(data); err != nil {
-        return err
-    }
-    *id = AuthorID(value)
-    return nil
+    return (*concepts.UUID)(id).UnmarshalJSON(data)
 }
 ```
 
 Defined types do not inherit methods. Without forwarding, a UUID-derived type
 encodes as an array of bytes, not a UUID string. Value encoders work even for
-unaddressable map values. Pointer decoders assign only after successful parsing,
-so malformed input leaves your value unchanged. Text codecs also support JSON
-map keys; see rule 12 for a Go 1.26 decoding difference.
+unaddressable map values. Pointer decoders use ordinary Go pointer conversions,
+not `unsafe`, to delegate to UUID's failure-atomic codecs. Malformed input and
+JSON `null` leave your value unchanged; successful decoding updates it directly.
+Text codecs also support JSON map keys; see rule 12 for a Go 1.26 decoding difference.
+
+Keep manual defined types when you need caller-owned domain methods. An alias
+shares the aliased type's identity; an alias to an instantiated generic type
+cannot acquire your own receiver methods. A generic tagged-ID convenience would
+add another type-identity model, while shared generation would add tool ownership
+and distribution contracts. The small amount of forwarding here does not justify
+either; no generic ID or generator is needed.
 
 The compile-time assertion checks the marker's exact return type; it does not
 check codecs. Run `Underlying` to validate the complete declaration, and test
@@ -67,12 +65,7 @@ to `AuthorID` and import `database/sql/driver` in the same file:
 ```go
 func (id AuthorID) Value() (driver.Value, error) { return concepts.UUID(id).Value() }
 func (id *AuthorID) Scan(src any) error {
-    var value concepts.UUID
-    if err := value.Scan(src); err != nil {
-        return err
-    }
-    *id = AuthorID(value)
-    return nil
+    return (*concepts.UUID)(id).Scan(src)
 }
 ```
 
@@ -88,6 +81,41 @@ order. Read them as text or convert explicitly before scanning; `Scan` never
 silently reorders bytes. The forwarding pattern is compiled and tested in
 [`concepts/uuid_sql_test.go`](../concepts/uuid_sql_test.go) using `AuthorID` from
 the examples.
+
+### Validate before assigning
+
+Direct pointer forwarding is for passthrough codecs only. If your application
+rejects a syntactically valid UUID, parse into a temporary, validate, then assign.
+This decode-only example assumes `fmt` and `concepts` are imported:
+
+```go
+type RequiredAuthorID concepts.UUID
+
+func (id RequiredAuthorID) IsZero() bool { return concepts.UUID(id).IsZero() }
+func (id *RequiredAuthorID) UnmarshalText(data []byte) error {
+    var value concepts.UUID
+    if err := value.UnmarshalText(data); err != nil {
+        return err
+    }
+    candidate := RequiredAuthorID(value)
+    if candidate.IsZero() {
+        return fmt.Errorf("author ID must be nonzero")
+    }
+    *id = candidate
+    return nil
+}
+```
+
+The all-zero UUID parses successfully but fails this application's rule without
+changing the original ID. Use the same temporary/validate/assign sequence for
+validating JSON and SQL decoders; validating after direct delegation is too late.
+The [compiled example and regressions](../concepts/example_test.go) keep
+passthrough `AuthorID` and validating `RequiredAuthorID` separate.
+
+A defined array type does not enforce constructor privacy or invariants: literals,
+explicit conversions and byte mutation can bypass your decoder. Use a named
+private-field wrapper with controlled constructors when you need to restrict
+construction. Domain validity does not establish authorization or stream identity.
 
 ### Convert legacy GUID input explicitly
 

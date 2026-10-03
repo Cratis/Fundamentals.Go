@@ -45,6 +45,14 @@ func TestUUIDValue(t *testing.T) {
 			if scanned != tc.id {
 				t.Fatalf("round trip = %v, want %v", scanned, tc.id)
 			}
+			forwarded, err := AuthorID(tc.id).Value()
+			if err != nil || forwarded != tc.want {
+				t.Fatalf("AuthorID.Value() = %v, %v, want %q", forwarded, err, tc.want)
+			}
+			var author AuthorID
+			if err := author.Scan(forwarded); err != nil || author != AuthorID(tc.id) {
+				t.Fatalf("AuthorID SQL round trip = %v, %v, want %v", author, err, tc.id)
+			}
 		})
 	}
 }
@@ -75,9 +83,13 @@ func TestUUIDScan(t *testing.T) {
 			if id.String() != tc.text {
 				t.Fatalf("String() = %q, want %q", id.String(), tc.text)
 			}
+			var author AuthorID
+			if err := author.Scan(tc.src); err != nil || author.ConceptValue() != tc.want {
+				t.Fatalf("AuthorID.Scan() bytes = %x, %v, want %x", [16]byte(author), err, [16]byte(tc.want))
+			}
 			if bytes, ok := tc.src.([]byte); ok {
 				bytes[0] ^= 0xff
-				if id != tc.want {
+				if id != tc.want || author.ConceptValue() != tc.want {
 					t.Fatal("Scan retained the caller's byte slice")
 				}
 			}
@@ -116,6 +128,10 @@ func TestUUIDScanRejectsInputWithoutMutation(t *testing.T) {
 			}
 			if id != original {
 				t.Fatalf("failed Scan() changed target from %v to %v", original, id)
+			}
+			author := AuthorID(original)
+			if err := author.Scan(tc.src); err == nil || author.ConceptValue() != original {
+				t.Fatalf("failed AuthorID.Scan() = %v, %v, want unchanged target and error", author, err)
 			}
 		})
 	}
@@ -168,6 +184,21 @@ func TestUUIDConceptSQLForwarding(t *testing.T) {
 	}
 	if scanned != id {
 		t.Fatal("failed concept Scan changed the target")
+	}
+	nullable := sql.Null[AuthorID]{V: id, Valid: true}
+	if err := nullable.Scan(nil); err != nil || nullable.Valid || nullable.V != (AuthorID{}) {
+		t.Fatalf("nullable AuthorID.Scan(nil) = %+v, %v", nullable, err)
+	}
+	if value, err := nullable.Value(); err != nil || value != nil {
+		t.Fatalf("nullable AuthorID.Value() = %v, %v, want SQL NULL", value, err)
+	}
+	for _, text := range []string{sqlUUIDText, "00000000-0000-0000-0000-000000000000"} {
+		if err := nullable.Scan(text); err != nil || !nullable.Valid || nullable.V.ConceptValue().String() != text {
+			t.Fatalf("nullable AuthorID.Scan(%q) = %+v, %v", text, nullable, err)
+		}
+		if value, err := nullable.Value(); err != nil || value != text {
+			t.Fatalf("nullable AuthorID.Value() = %v, %v, want %q", value, err, text)
+		}
 	}
 	for _, typ := range []reflect.Type{reflect.TypeFor[AuthorID](), reflect.TypeFor[*AuthorID]()} {
 		r, ok, err := concepts.Underlying(typ)
