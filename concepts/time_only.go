@@ -81,7 +81,13 @@ func parseClock(text string) (int64, error) {
 			return 0, err
 		}
 	}
-	return int64(h*3600+m*60+s)*ticksPerSecond + int64(f), nil
+	// Seven digits and the range checks above already bound these values; the
+	// explicit checks make the int64 conversions provably safe.
+	seconds := h*3600 + m*60 + s
+	if seconds >= 86400 || f >= uint64(ticksPerSecond) {
+		return 0, fmt.Errorf("invalid time of day")
+	}
+	return int64(seconds)*ticksPerSecond + int64(f), nil
 }
 
 func decimal(text string) (uint64, error) {
