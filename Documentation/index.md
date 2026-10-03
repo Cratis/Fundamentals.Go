@@ -18,7 +18,7 @@ You need Go 1.26 or later, not a server, DI container or C# background.
 
 This documentation targets the root module **v0.3.0; the API remains experimental**.
 It uses only the standard library. Minor v0 releases may change APIs with migration
-notes. After publication, install the lowercase module path
+notes. Install the lowercase module path
 `github.com/cratis/fundamentals.go@v0.3.0`; see [release status](releases.md).
 Beginning with v0.3.0, `concepts.ParseDotNetGUID` adds explicit .NET 10.0.12
 compatibility conversion without changing strict UUID defaults.

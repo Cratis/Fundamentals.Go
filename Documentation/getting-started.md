@@ -17,8 +17,8 @@ standard-library-only root module.
 
 ## Create a small Go program
 
-With Go **1.26 or later**, run these commands in a new directory after v0.3.0
-is published; see [release status](releases.md):
+With Go **1.26 or later**, run these commands in a new directory;
+see [release status](releases.md):
 
 ```sh
 mkdir author-example
