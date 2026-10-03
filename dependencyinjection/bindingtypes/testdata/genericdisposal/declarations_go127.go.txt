@@ -1,0 +1,95 @@
+// Copyright (c) Cratis. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+package genericdisposal
+
+import "context"
+
+type Dependency struct{}
+
+type Ordinary struct{}
+
+func (Ordinary) Close() error { return nil }
+
+type Generic struct{}
+
+func (Generic) Close[T any]() error { return nil }
+
+type Ambiguous struct {
+	Ordinary
+	Generic
+}
+type Shadowed struct{ Ordinary }
+
+func (Shadowed) Close[T any]() error { return nil }
+
+type ContextOrdinary struct{}
+
+func (ContextOrdinary) Close(context.Context) error { return nil }
+
+type ContextAmbiguous struct {
+	ContextOrdinary
+	Generic
+}
+
+type WrongArgument struct{}
+
+func (WrongArgument) Close(int) error { return nil }
+
+type WrongResult struct{}
+
+func (WrongResult) Close() bool { return false }
+
+type Variadic struct{}
+
+func (Variadic) Close(...context.Context) error { return nil }
+
+type PointerReceiver struct{}
+
+func (*PointerReceiver) Close() error { return nil }
+
+type FieldShadowed struct {
+	Ordinary
+	Close int
+}
+type Left struct{ Ordinary }
+type Right struct{ Ordinary }
+type OrdinaryAmbiguous struct {
+	Left
+	Right
+}
+
+func NewAmbiguous(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) Ambiguous {
+	panic("not executed")
+}
+func NewShadowed(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) Shadowed {
+	panic("not executed")
+}
+func NewContextAmbiguous(context.Context, *Dependency, *Dependency, *Dependency, *Dependency, *Dependency) ContextAmbiguous {
+	panic("not executed")
+}
+func NewGeneric(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) Generic {
+	panic("not executed")
+}
+func NewWrongArgument(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) WrongArgument {
+	panic("not executed")
+}
+func NewWrongResult(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) WrongResult {
+	panic("not executed")
+}
+func NewVariadic(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) Variadic {
+	panic("not executed")
+}
+func NewPointerReceiver(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) PointerReceiver {
+	panic("not executed")
+}
+func NewFieldShadowed(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) FieldShadowed {
+	panic("not executed")
+}
+func NewOrdinaryAmbiguous(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) OrdinaryAmbiguous {
+	panic("not executed")
+}
+func Small(*Dependency, *Dependency, *Dependency, *Dependency) Ambiguous { panic("not executed") }
+func Pointer(*Dependency, *Dependency, *Dependency, *Dependency, *Dependency) *Ambiguous {
+	panic("not executed")
+}

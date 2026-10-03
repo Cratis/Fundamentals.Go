@@ -1,19 +1,21 @@
 // Copyright (c) Cratis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-package conceptstypes
+// Package typeinspection supplies non-mutating views of checked Go types.
+package typeinspection
 
 import "go/types"
 
-// runtimeMethodSet excludes generic methods BEFORE resolving promotion, matching
+// RuntimeMethodSet excludes generic methods BEFORE resolving promotion, matching
 // the runtime's method lists. A generic method neither shadows nor collides with
 // a promoted ordinary method; fields and ordinary methods still do. Filtering a
 // completed method set would lose the ordinary methods hidden by go/types.
 //
 // A temporary view copies only receiver structure and embedded type graphs.
 // Method signatures retain their original parameter/result types, preserving
-// nominal scalar identity. The caller's type information is never modified.
-func runtimeMethodSet(t types.Type) *types.MethodSet {
+// nominal type identity. The caller's type information is never modified.
+// Calls are safe concurrently when callers do not mutate the supplied types.
+func RuntimeMethodSet(t types.Type) *types.MethodSet {
 	clones := make(map[*types.Named]*types.Named)
 	instances := make(map[*types.Named][]*types.Named)
 	var visible func(types.Type) types.Type
