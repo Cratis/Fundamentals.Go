@@ -18,8 +18,8 @@ C# layout, application vertical slices and .NET test tooling do not apply.
   domain-value primitives for Arc.Go and Chronicle.Go.
 - Packages: `concepts` (UUID, DateOnly, TimeOnly, TimeSpan, the `Concept[T]`
   contract, `Underlying` and `CheckJSON`), `correlation` (shared correlation-ID
-  context), and the optional `dependencyinjection` contract with its
-  `container` and `ditest` conformance suites. The [parity map](parity.md)
+  context), and the optional `dependencyinjection` contract with its default
+  `container` and its `ditest` conformance suites. The [parity map](parity.md)
   records what is implemented and what remains.
 - Stay small and dependency-light. Use the standard library unless an external
   dependency is justified by capability, maintenance, license and compatibility.
