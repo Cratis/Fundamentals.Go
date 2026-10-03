@@ -139,6 +139,61 @@ func TestAnonymousPrivateEmbeddedInterfaceSpelling(t *testing.T) {
 	compileSpelling(t, s.pkg, plan.Bindings[0])
 }
 
+func TestAnonymousPublicEmbeddedInterfaceSpelling(t *testing.T) {
+	s := checkSource(t, "example/p", `package p
+ type privateValue struct{}
+ type hidden interface { private() privateValue }
+ type Public interface { hidden }
+ type Foo struct{}
+ func Embedded(interface{Public}) Foo { panic("not executed") }
+ func Explicit(interface{Public; Work()}) Foo { panic("not executed") }
+ func PrivateEmbedding(interface{hidden}) Foo { panic("not executed") }
+ func PrivateMethod(interface{Public; private() privateValue}) Foo { panic("not executed") }
+ func PrivateSignature(interface{Public; Work() privateValue}) Foo { panic("not executed") }
+ `)
+	emit := checkSource(t, "example/consumer", "package consumer").pkg
+	for _, name := range []string{"Embedded", "Explicit"} {
+		t.Run(name, func(t *testing.T) {
+			fn := s.pkg.Scope().Lookup(name).(*types.Func)
+			sig := fn.Type().(*types.Signature)
+			arg := sig.Params().At(0).Type().(*types.Interface)
+			before := typeString(fn.Type())
+			embedded := arg.EmbeddedType(0)
+			methods := make([]*types.Func, arg.NumExplicitMethods())
+			for i := range methods {
+				methods[i] = arg.ExplicitMethod(i)
+			}
+			plan := bt.Analyze([]*types.Package{s.pkg}, bt.Config{EmitPackage: emit, Constructors: []*types.Func{fn}})
+			if len(plan.Bindings) != 1 {
+				t.Fatalf("public embedded interface with private internals: %+v", plan)
+			}
+			b := plan.Bindings[0]
+			if len(b.Arguments) != 1 || len(b.Dependencies) != 1 ||
+				!types.Identical(b.Service, sig.Results().At(0).Type()) ||
+				!types.Identical(b.Arguments[0], arg) || !types.Identical(b.Dependencies[0], arg) {
+				t.Fatal("normalization changed type identity")
+			}
+			// Compile an external constructor call using the plan's exact spellings.
+			compileSpelling(t, s.pkg, b)
+			if fn.Type() != sig || sig.Params().At(0).Type() != arg || before != typeString(fn.Type()) ||
+				arg.NumEmbeddeds() != 1 || arg.EmbeddedType(0) != embedded || arg.NumExplicitMethods() != len(methods) {
+				t.Fatal("mutated source types")
+			}
+			for i, method := range methods {
+				if arg.ExplicitMethod(i) != method {
+					t.Fatal("mutated explicit source method")
+				}
+			}
+		})
+	}
+	for _, name := range []string{"PrivateEmbedding", "PrivateMethod", "PrivateSignature"} {
+		t.Run(name, func(t *testing.T) {
+			fn := s.pkg.Scope().Lookup(name).(*types.Func)
+			requireCode(t, bt.Analyze([]*types.Package{s.pkg}, bt.Config{EmitPackage: emit, Constructors: []*types.Func{fn}}), bt.InaccessibleDeclaration)
+		})
+	}
+}
+
 func TestPublicAliasChainNestedSpellings(t *testing.T) {
 	s := checkSource(t, "example/p", `package p
  type privateType struct{ private int }

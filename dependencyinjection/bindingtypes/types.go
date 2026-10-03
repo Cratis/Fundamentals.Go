@@ -276,8 +276,9 @@ func accessible(t types.Type, emit *types.Package) bool {
 				return false
 			}
 		}
-		for i := 0; i < t.NumMethods(); i++ {
-			if !accessibleObject(t.Method(i), emit) || !accessible(t.Method(i).Type(), emit) {
+		// Inherited methods are named through the validated embedded spellings.
+		for i := 0; i < t.NumExplicitMethods(); i++ {
+			if !accessibleObject(t.ExplicitMethod(i), emit) || !accessible(t.ExplicitMethod(i).Type(), emit) {
 				return false
 			}
 		}

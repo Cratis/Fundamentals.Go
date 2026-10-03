@@ -15,7 +15,8 @@ not establish whole-product parity.
 Implemented: UUID, DateOnly, TimeOnly, TimeSpan, correlation context. Partial:
 typed concepts, conversion, serialization naming (explicit non-pluralizing
 policies), dependency injection (exact typed bindings,
-lifetimes, scopes and an optional container; conventions are not implemented).
+lifetimes, scopes, an optional container and convention planning).
+Generation and rendering remain product-owned; no full generator parity is claimed.
 Go-specific: concept declaration discovery, dependency-injection conformance
 levels, rune-based string casing. Everything else is Not implemented; see the tracking issues per area. See [Updating this map](#updating-this-map) for the
 status vocabulary.
@@ -202,8 +203,9 @@ Source inspection establishes a contract, not executable Go parity.
 The dependency baseline comes from [inventory issue #10][issue-10]. The accepted
 [DI ownership decision][di-decision] on [#9][issue-9] supersedes the earlier
 suggestion to leave Arc's container in Arc.Go. DI is **Partial** in Fundamentals.Go:
-contracts, the default container and conformance suites are implemented;
-conventions are not ([#14][issue-14]).
+contracts, the default container, conformance suites and convention planning
+are available ([#14][issue-14]). Generation and rendering remain product-owned;
+this does not establish full generator parity.
 
 | Consumer baseline | Revision | Inspected scope |
 | --- | --- | --- |
@@ -315,7 +317,7 @@ boundary or [#5][issue-5]'s deferrals, not duplicate issues.
 
 | Area and C# authority | Consumer evidence | Status | Disposition and tracking | Migration boundary |
 | --- | --- | --- | --- | --- |
-| Types discovery: `Types/Types.cs`, `ContractToImplementorsMap.cs`, `ProjectReferencedAssemblies.cs`, `PackageReferencedAssemblies.cs`, `CompositeAssemblyProvider.cs`, `GeneratedTypeDiscoveryRegistry.cs`, `TypesServiceCollectionExtensions.cs`, `TypeDiscoveryDiagnostics.cs` | Types A29/C10; application features, extension providers and schema universe | Not implemented | Go-idiom replacement: explicit catalogs/contributions; shared registration/generation planned [#11][issue-11]/[#14][issue-14] under [#9][issue-9] | No assembly loading, global `Types.Instance` or CLR diagnostics port. Arc/Chronicle own feature registration and completeness checks; composition must not silently omit required contributors. |
+| Types discovery: `Types/Types.cs`, `ContractToImplementorsMap.cs`, `ProjectReferencedAssemblies.cs`, `PackageReferencedAssemblies.cs`, `CompositeAssemblyProvider.cs`, `GeneratedTypeDiscoveryRegistry.cs`, `TypesServiceCollectionExtensions.cs`, `TypeDiscoveryDiagnostics.cs` | Types A29/C10; application features, extension providers and schema universe | Not implemented | Go-idiom replacement: explicit catalogs/contributions; shared registration and constructor planning available [#11][issue-11]/[#14][issue-14] under [#9][issue-9]; generation remains product-owned | No assembly loading, global `Types.Instance` or CLR diagnostics port. Arc/Chronicle own feature registration and completeness checks; composition must not silently omit required contributors. |
 | Types activation: `Types/InstancesOf.cs`, `ImplementationsOf.cs`, `KnownInstancesOf.cs` and corresponding interfaces | Types A29/C10; discovered instances in both; no direct `IImplementationsOf` client use established | Not implemented | Go-idiom replacement: explicit factory/instance lists; DI work [#11][issue-11]–[#14][issue-14]; no promise of container-wide enumeration | Factories resolve using the active operation scope; discovery is not activation. Exact instance lists stay caller-owned; do not cache request-scoped extensions globally. |
 | Reflection: `Reflection/TypeExtensions.cs`, `DictionaryExtensions.cs`, `PropertyExtensions.cs`, `ParameterExtensions.cs`, `MethodExtensions.cs`, `ExpressionExtensions.cs`, `TypeConstructorExtensions.cs`, `TypeInfo.cs`, `MethodCalls.cs` | A9/C7; classification, schema/nullability, expression paths and invocation metadata | Not implemented | Out of scope; concept declaration inspection is the Go-specific row in Surfaces | Use `reflect`, explicit tags, typed factories and generated field identifiers without conflating scalar, collection and stream kinds. Product field plans, presence and handler/schema agreement remain local. |
 | DependencyInjection contracts/lifetimes: `DependencyInjection/SingletonAttribute.cs`, `ScopedAttribute.cs`, `IgnoreConventionAttribute.cs`, `ConventionServiceBinding.cs`, `ConventionSelfBinding.cs`; Microsoft DI as used by Fundamentals | A41/C16; both products' providers and operation-scoped activation | Partial | Ported: contracts [#11][issue-11], default container moved from Arc.Go [#12][issue-12], conformance suites [#13][issue-13]; design accepted on [#9][di-decision]; see [Dependency injection surfaces](#dependency-injection-surfaces) | Fundamentals owns `dependencyinjection`, `dependencyinjection/container` and `dependencyinjection/ditest`. Plain constructors remain first-class; no product imports the container. Arc principal/tenant/staging and Chronicle delivery activation remain product-owned. Type-level lifetime directives are normalized by `bindingtypes.ReadDirectives`; product renderers remain responsible for applying plans ([#14][issue-14]). |
@@ -398,7 +400,8 @@ accidental CLR behavior into a new Go guarantee.
   interface/self singleton bindings are separate descriptors and need not share
   an instance. Go stance: explicit lifetimes/owned-versus-borrowed bindings and
   close-once forwarding are implemented and covered by `dependencyinjection/ditest`
-  ([#11][issue-11]–[#13][issue-13]); convention registration is not ([#14][issue-14]).
+  ([#11][issue-11]–[#13][issue-13]). Convention planning is available
+  ([#14][issue-14]); products own generated registration and rendering.
 - **Enumeration is activation:** `Types/InstancesOf.cs` captures discovered
   concrete types and a provider, then calls `GetService(concreteType)` on every
   enumeration. It neither enumerates interface registrations nor falls back to

@@ -369,6 +369,11 @@ bindings prevent incompatible factory results without unsafe code; successful
 provider lookups check result types, while resolver fixtures explicitly exercise
 nil, typed-nil and wrong-type results through `di.Resolve`.
 
+For compiled ecosystem examples, see [Ecosystem recipes](recipes.md).
+The samber/do and dig bridges qualify only for resolver-only borrowed-singleton
+use. The Fx recipe hosts the Fundamentals provider; its provider-level result
+does not establish native Fx operation-scope equivalence.
+
 ## Know the limits
 
 This is not full Microsoft.Extensions.DependencyInjection compatibility.
