@@ -85,12 +85,20 @@ Its `nested` array is empty until a nested module is implemented. To add one:
    }
    ```
 
-4. Run `python3 .github/scripts/go_modules.py matrix` from the repository root.
+4. Have a repository administrator extend the active **version tags** ruleset
+   before the module's first release. Its existing `refs/tags/v*` pattern covers
+   only root versions: add `refs/tags/<directory>/v*`, for example
+   `refs/tags/tools/v*` or `refs/tags/integrations/example/v*`. Keep both update
+   and deletion protection, with no exclusions or bypass actors. Adding a module
+   to the allow-list includes this administrative step; do not publish until it
+   is complete. The nested preflight requires that explicit prefix in this
+   ruleset rather than trying to infer coverage from broader wildcard patterns.
+5. Run `python3 .github/scripts/go_modules.py matrix` from the repository root.
    It rejects unlisted or missing modules, wrong module identities, nonportable
    paths and every `replace`, including dependency-to-dependency replacements.
    `python3 .github/scripts/go_modules.py dependencies` additionally downloads
    each required root version through the public proxy to prove it exists.
-5. Run the contribution guide's Go gates **inside each module**, with `GOWORK=off`.
+6. Run the contribution guide's Go gates **inside each module**, with `GOWORK=off`.
    CI derives its matrix from the same allow-list: root plus every nested module
    gets build, vet, test, race, lint, tidy and govulncheck. The shared Go toolchain
    matrix applies to all modules; adding a module must not silently raise it.
@@ -117,7 +125,12 @@ still owns tag and release creation in its success-only post hook.
    suppresses *automatic root publication*; the title declares the nested bump.
    Do not add a root bump label, and do not mix root changes needing publication
    into this PR. Its body is the nested module's release notes, following the
-   same release-note rules as any other PR. Put review/test details in comments.
+   same release-note rules as root releases. Use only an optional `## Summary`
+   and the applicable `## Added`, `## Changed`, `## Fixed`, `## Removed`,
+   `## Security` or `## Deprecated` sections, with user-facing change bullets.
+   Put bare issue references at the end of their delivering bullets. No
+   `Closes`/`Fixes`/`Refs` lines, hidden issue references, test-plan or verification
+   sections, or relative links. Put review/test details in comments.
 3. Merge only after checks pass. Wait for automatic Publish to finish its
    intentional root no-op. Keep `main` at that merge commit until the nested
    release finishes; merge another dedicated PR to release another module.
@@ -125,7 +138,19 @@ still owns tag and release creation in its success-only post hook.
    the directory, the matching bump and that PR's number. The workflow rejects
    a PR not merged at this exact commit, incorrect intent, unlisted modules,
    Dependabot, an exceeded major ceiling or a conflicting release at this SHA.
-   It reruns the Go and Markdown gates before publication.
+   It reruns the Go and Markdown gates before publication. Before calling
+   release-action, it validates the body with the repository's checker using
+   `--label <title-bump> --strict --base main`. This is release-bound validation
+   even though the real PR label remains `no-release`; no label is changed.
+   The diff comparison uses the merge commit's first parent, so it checks the
+   delivered change rather than an empty diff against already-merged `main`.
+   An unavailable rules fetch or unchecked diff is a failure, not a warning-only
+   release. The preflight also reads the repository rulesets through the GitHub
+   API and refuses publication unless **version tags** protects the module's
+   explicit prefix. Ruleset reads need no additional token permissions for this
+   public repository; an API failure blocks release, with no manual override.
+   Administrators must audit bypass actors manually when extending the ruleset:
+   the API can omit that list for tokens without administrative permissions.
 5. Confirm the release, actual tag target and proxy indexing jobs succeed.
    The first minor creates `<directory>/v0.1.0`; the first patch creates
    `<directory>/v0.0.1`. Later bumps use only this module's stable releases.
@@ -175,8 +200,10 @@ python3 -B -m unittest discover -s .github/scripts -p 'test_*.py' -v
 
 It creates throwaway Git/module fixtures outside the checkout, exercises the
 same layout/matrix CLI used by CI, and tests independent version planning,
-PR intent, retries, conflicts and major ceilings without publishing. Actual
-public-proxy installation still requires a real authorized release.
+PR intent, retries, conflicts, major ceilings and tag-ruleset coverage without
+publishing. Offline fixtures exercise the actual strict checker CLI against its
+bundled reviewed rules, including prohibited bodies and hidden issue references.
+Actual public-proxy installation still requires a real authorized release.
 
 ## Recovery
 

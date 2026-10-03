@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 import uuid
 
 from go_modules import STABLE_VERSION, configuration, run
@@ -83,6 +84,41 @@ def plan(config, module, bump, pr, releases, tags, sha, repository, ceiling):
             "version": version, "tag": tag, "publish": str(publish).lower()}
 
 
+def validate_release_notes(body, bump, repository, cwd=Path(".")):
+    # Use a release-bound intent only for validation; never relabel the PR.
+    checker = Path(__file__).resolve().parents[2] / ".cratis/ai/hooks/scripts/cratis-check-pr.mjs"
+    with tempfile.TemporaryDirectory(prefix="nested-release-notes-") as directory:
+        notes = Path(directory) / "body.md"
+        notes.write_text(body, encoding="utf-8")
+        subprocess.run(["node", str(checker), "--body-file", str(notes), "--label", bump,
+                        "--base", "main", "--repo", repository, "--strict"],
+                       cwd=cwd, check=True, timeout=90)
+
+
+def check_tag_protection(module, rulesets):
+    # Require explicit namespace coverage instead of approximating GitHub's
+    # fnmatch semantics. Exclusions cannot prove full namespace coverage.
+    pattern = f"refs/tags/{module}/v*"
+    for ruleset in rulesets:
+        refs = ruleset.get("conditions", {}).get("ref_name", {})
+        rules = {rule["type"] for rule in ruleset.get("rules", [])}
+        if (ruleset.get("name") == "version tags" and ruleset.get("target") == "tag"
+                and ruleset.get("enforcement") == "active"
+                and pattern in refs.get("include", []) and not refs.get("exclude")
+                and {"update", "deletion"} <= rules):
+            return
+    raise ValueError(f"Active version tags ruleset must protect {pattern} against updates and deletion "
+                     "without exclusions before releasing")
+
+
+def require_tag_protection(repository, module):
+    summaries = api(f"repos/{repository}/rulesets?per_page=100&includes_parents=false", pages=True)
+    rulesets = [api(f"repos/{repository}/rulesets/{entry['id']}") for entry in summaries
+                if entry.get("name") == "version tags" and entry.get("target") == "tag"
+                and entry.get("enforcement") == "active"]
+    check_tag_protection(module, rulesets)
+
+
 def api(path, pages=False):
     args = ["gh", "api", path]
     if pages:
@@ -105,6 +141,10 @@ def main():
     result = plan(config, os.environ["RELEASE_MODULE"], os.environ["RELEASE_BUMP"],
                   pr, releases, tags, os.environ["GITHUB_SHA"], repository,
                   os.environ["MAX_MAJOR"])
+    # plan has proved the exact title matches the dispatched module and bump.
+    bump = pr["title"].split(": ", 1)[1]
+    validate_release_notes(pr["body"], bump, repository)
+    require_tag_protection(repository, os.environ["RELEASE_MODULE"])
     with open(os.environ["GITHUB_OUTPUT"], "a") as output:
         for name, value in result.items():
             output.write(f"{name}={value}\n")

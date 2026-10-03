@@ -46,7 +46,7 @@ jobs:
         run: python3 .github/scripts/go_modules.py dependencies
 
   test:
-    name: Test (${{ matrix.module }}, ${{ matrix.os }}, Go ${{ matrix.go }})
+    name: ${{ matrix.module == '.' && format('Test ({0}, Go {1})', matrix.os, matrix.go) || format('Test ({0}, Go {1}) ({2})', matrix.os, matrix.go, matrix.module) }}
     needs: modules
     defaults:
       run:
@@ -80,7 +80,7 @@ jobs:
         run: go test -count=1 -timeout=2m ./...
 
   race:
-    name: Race detector (${{ matrix.module }})
+    name: ${{ matrix.module == '.' && 'Race detector' || format('Race detector ({0})', matrix.module) }}
     needs: modules
     strategy:
       fail-fast: false
@@ -104,7 +104,7 @@ jobs:
       - run: go test -race -count=1 -timeout=3m ./...
 
   lint:
-    name: Go lint and module hygiene (${{ matrix.module }})
+    name: ${{ matrix.module == '.' && 'Go lint and module hygiene' || format('Go lint and module hygiene ({0})', matrix.module) }}
     needs: modules
     strategy:
       fail-fast: false
@@ -147,7 +147,7 @@ jobs:
           args: --timeout=3m
 
   vulnerabilities:
-    name: Go vulnerability check (${{ matrix.module }})
+    name: ${{ matrix.module == '.' && 'Go vulnerability check' || format('Go vulnerability check ({0})', matrix.module) }}
     needs: modules
     strategy:
       fail-fast: false

@@ -62,7 +62,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Validate PR intent and plan one independently versioned module
+          fetch-depth: 2
+      - name: Compare merged release notes against the delivered change
+        # The checker compares HEAD with origin/main. At publication HEAD is
+        # already merged, so use its first parent as the local comparison base.
+        run: git update-ref refs/remotes/origin/main HEAD^1
+      - name: Validate release notes, tag protection and independent version intent
         id: plan
         env:
           GH_TOKEN: ${{ github.token }}
