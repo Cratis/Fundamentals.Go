@@ -6,7 +6,7 @@ description: Released scalar signatures, canonical wire formats, ranges, zero va
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-These APIs are available in **v0.2.0**, in
+The strict scalar APIs are available in **v0.2.0**, in
 `github.com/cratis/fundamentals.go/concepts`. Use them directly or forward their
 codecs from a [domain concept](concepts.md). For a first JSON round trip, follow
 [Getting started](getting-started.md).
@@ -62,6 +62,46 @@ The byte sequence for that example is `00 11 22 33 44 55 66 77 88 99 aa bb cc dd
 .NET `Guid.ToByteArray()` and SQL Server `uniqueidentifier` raw bytes use mixed
 endianness for the first fields. Read text or convert that representation
 explicitly; a cast or `Scan` does **not** reorder it.
+
+### Explicit .NET GUID conversion
+
+`ParseDotNetGUID(text string) (UUID, error)` is **develop-only**, intended for the
+next minor API release (v0.3), not available in v0.2.0. Use it explicitly when
+converting legacy input accepted by **.NET 10.0.12 `Guid.Parse(string)`**. With `fmt` and `concepts` imported, this function-body
+excerpt prints the canonical UUID:
+
+```go
+id, err := concepts.ParseDotNetGUID(" {00112233-4455-6677-8899-AABBCCDDEEFF} ")
+if err != nil {
+    fmt.Println(err)
+    return
+}
+fmt.Println(id)
+// Output: 00112233-4455-6677-8899-aabbccddeeff
+```
+
+This is **compatibility conversion, not canonical-input validation or correlation
+ID admission**. It accepts N/D/B/P/X forms, the runtime's exact 25 outer-whitespace
+characters, and whitespace anywhere in X. It also preserves surprising legacy
+behavior: X fields two and three truncate uint32 values to uint16; certain empty
+values after legacy prefixes become zero; a triggered D compatibility fallback
+can accept trailing NULs in its final eight-character numeric component. URNs,
+arbitrary wrappers and invalid UTF-8 are rejected. A valid all-zero input succeeds;
+rejection returns `UUID{}` and a non-nil error, without .NET exception/message
+contracts. Bytes remain RFC/network order.
+
+No default decoder changes: `ParseUUID`, `UnmarshalText`, `UnmarshalJSON`, SQL
+`Scan`, concept forwarding and standard JSON map-key behavior remain strict.
+Consumers choose their own binding, nonzero-ID and validation policy; do not
+replace those policies automatically. Built-in .NET Guid JSON conversion is a
+separate, narrower boundary, not this parser's target.
+
+Scanning is linear in input length, with no arbitrary compatibility length cap;
+X permits long leading zeros. Limit untrusted payloads at your application
+boundary. The [capture provenance and schema](../concepts/testdata/guid_parse.README.md)
+and [executable example](../concepts/uuid_dotnet_test.go) define the pinned profile;
+null strings, malformed UTF-16 and other .NET versions are not Go equivalence
+claims.
 
 ### SQL and nullable columns
 
