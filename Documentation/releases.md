@@ -6,10 +6,11 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-The current released base is Fundamentals.Go v0.2.0 at commit `532d218`; v0.1.0
-was released at `e50913e`. This documentation prepares the **v0.3.0 compatibility
-release**; it does not assert that the tag already exists. The release workflow
-assigns its release commit and tag after the authorized merge.
+This page describes the **v0.3.0 compatibility release**. Earlier releases are
+v0.2.0 at commit `532d218` and v0.1.0 at `e50913e`. Consult the
+[release list](https://github.com/Cratis/Fundamentals.Go/releases) for published
+tags. The release workflow assigns each release commit and tag after the
+authorized merge; verify publication rather than inferring it from this page.
 
 v0.3.0 adds opt-in `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12
 ([#28](https://github.com/Cratis/Fundamentals.Go/issues/28)), with strict UUID

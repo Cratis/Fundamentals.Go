@@ -67,10 +67,10 @@ proof that an API exists. Agree on the contract before consumers adopt it.
 - Push verified, coherent work to `develop` freely under the maintainer's
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
-- The current released base is Fundamentals.Go **v0.2.0 at commit `532d2181c610f67730133f61e768a943379da571`**.
-  This documentation prepares **v0.3.0**, not an already-published tag; its release
-  commit and tag are assigned by the release workflow. Consumers use
-  published tags for released APIs and may pin **pushed** develop commits using
+- The v0.2.0 baseline was released at `532d2181c610f67730133f61e768a943379da571`.
+  This documentation targets **v0.3.0**. Check the public release list and proxy
+  for publication; the release workflow assigns the commit and tag. Consumers
+  use published tags for released APIs and may pin **pushed** develop commits using
   Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
   use local replacements as evidence that a consumer can resolve the module.
 - Collect release-bound changes in a release PR from `develop` to `main` with

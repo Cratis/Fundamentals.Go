@@ -22,7 +22,7 @@ Releases remain **v0.x** while the API is experimental; a minor version may cont
 
 ## Installation
 
-Requires Go **1.26 or later**. After v0.3.0 is published:
+Requires Go **1.26 or later**. Install the v0.3.0 compatibility release:
 
 ```sh
 go get github.com/cratis/fundamentals.go@v0.3.0
