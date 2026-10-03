@@ -43,6 +43,14 @@ This source commit is not a published package pin. Chronicle.Go's older
 Fundamentals **7.19.6**; these observations do **not** establish equivalence to
 that package or its configured serializer profile.
 
+The golden is historical, not a statement about current C# packages. A later
+[source change](https://github.com/Cratis/Fundamentals/commit/e8ac1ecca23fa95063f6d4e65b052819b4b565a5)
+accepts numeric combinations of declared flags; that change was inspected, not
+recaptured here. The separate non-Int32 enum-concept write failure is tracked in
+[Fundamentals #1150](https://github.com/Cratis/Fundamentals/issues/1150). Neither
+update changes the pinned observations below. Capture another profile separately
+rather than silently replacing the golden.
+
 ## Int32 acceptance matrix
 
 These are serializer-level observations with the original factories. `Plain`
