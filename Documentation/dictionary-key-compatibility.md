@@ -8,8 +8,9 @@ description: Captured embedded JSON property names, typed ValueMap interoperabil
 
 Use this reference to distinguish ordinary text map keys from embedded JSON keys,
 and read acceptance from usable lookup or successful writing. **Go complex-key
-implementation is Not implemented.** These are develop-only contract observations,
-not released v0.2.0 codec support, a shared registry or an `Underlying` extension.
+implementation is Not implemented.** These are source-distributed contract
+observations included with v0.3.0, not Go codec, runtime or schema support,
+a shared registry or an `Underlying` extension.
 
 ## Authority and profile
 

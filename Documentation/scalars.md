@@ -1,12 +1,12 @@
 ---
 title: UUID and temporal scalar reference
-description: Released scalar signatures, canonical wire formats, ranges, zero values, parsing failures and UUID SQL interoperability.
+description: Scalar signatures, canonical wire formats, explicit .NET GUID conversion, ranges, zero values, parsing failures and UUID SQL interoperability.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-The strict scalar APIs are available in **v0.2.0**, in
+The strict scalar APIs are available beginning with **v0.2.0**, in
 `github.com/cratis/fundamentals.go/concepts`. Use them directly or forward their
 codecs from a [domain concept](concepts.md). For a first JSON round trip, follow
 [Getting started](getting-started.md).
@@ -65,10 +65,10 @@ explicitly; a cast or `Scan` does **not** reorder it.
 
 ### Explicit .NET GUID conversion
 
-`ParseDotNetGUID(text string) (UUID, error)` is **develop-only**, intended for the
-next minor API release (v0.3), not available in v0.2.0. Use it explicitly when
-converting legacy input accepted by **.NET 10.0.12 `Guid.Parse(string)`**. With `fmt` and `concepts` imported, this function-body
-excerpt prints the canonical UUID:
+`ParseDotNetGUID(text string) (UUID, error)` is available beginning with **v0.3.0**.
+Use it explicitly when converting legacy input accepted by
+**.NET 10.0.12 `Guid.Parse(string)`**. With `fmt` and `concepts` imported, this
+function-body excerpt prints the canonical UUID:
 
 ```go
 id, err := concepts.ParseDotNetGUID(" {00112233-4455-6677-8899-AABBCCDDEEFF} ")
@@ -106,7 +106,7 @@ claims.
 ### SQL and nullable columns
 
 UUID is the **only** shared scalar implementing `database/sql.Scanner` and
-`database/sql/driver.Valuer` in v0.2.0. `Scan` accepts:
+`database/sql/driver.Valuer` in v0.3.0. `Scan` accepts:
 
 - A `string` in the strict dashed text format.
 - A `[]byte` of exactly 16 bytes, copied as RFC-order binary data.

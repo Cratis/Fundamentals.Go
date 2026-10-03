@@ -49,7 +49,7 @@ source-anchor profile does not claim complete GitHub or Starlight rendering pari
 
 ## Exchange UUID values
 
-[UUID interop source and examples](https://github.com/Cratis/Fundamentals.Go/tree/develop/recipes/uuidinterop)
+[UUID interop source and examples](https://github.com/Cratis/Fundamentals.Go/tree/main/recipes/uuidinterop)
 use google/uuid v1.6.0 and gofrs/uuid/v5 v5.5.1. All three UUID types store 16 bytes
 in RFC/network order. Convert values directly, not through .NET's mixed-endian
 `Guid.ToByteArray` representation:
@@ -87,9 +87,9 @@ host the Fundamentals provider rather than claiming a native container is one.
 
 | Recipe | Qualification | Supported boundary and gaps |
 | --- | --- | --- |
-| [samber/do v2.1.0](https://github.com/Cratis/Fundamentals.Go/tree/develop/recipes/samberdo) | `RunResolver` passes; level 1 fails | Native lazy singleton caching, exact keys, borrowed scope handles and catalog. Rejects owned, scoped and transient bindings. No infrastructure facade or context guards. |
-| [dig v1.19.0](https://github.com/Cratis/Fundamentals.Go/tree/develop/recipes/dig) | `RunResolver` passes; level 1 fails | Same borrowed-singleton subset; serialized native calls because dig is not concurrent-safe. No resource disposal, infrastructure facade or context guards. |
-| [fx v1.24.0 hosting](https://github.com/Cratis/Fundamentals.Go/blob/develop/recipes/dig/fx_test.go) | Hosted Fundamentals provider passes `RunProvider` (level 1) | The provider remains Fundamentals, not a native fx adapter. Actual fx start, stop and startup rollback are exercised separately. Level 2 is not claimed for this hosting recipe. |
+| [samber/do v2.1.0](https://github.com/Cratis/Fundamentals.Go/tree/main/recipes/samberdo) | `RunResolver` passes; level 1 fails | Native lazy singleton caching, exact keys, borrowed scope handles and catalog. Rejects owned, scoped and transient bindings. No infrastructure facade or context guards. |
+| [dig v1.19.0](https://github.com/Cratis/Fundamentals.Go/tree/main/recipes/dig) | `RunResolver` passes; level 1 fails | Same borrowed-singleton subset; serialized native calls because dig is not concurrent-safe. No resource disposal, infrastructure facade or context guards. |
+| [fx v1.24.0 hosting](https://github.com/Cratis/Fundamentals.Go/blob/main/recipes/dig/fx_test.go) | Hosted Fundamentals provider passes `RunProvider` (level 1) | The provider remains Fundamentals, not a native fx adapter. Actual fx start, stop and startup rollback are exercised separately. Level 2 is not claimed for this hosting recipe. |
 
 For either native bridge, construct borrowed singleton descriptors with
 `di.NewBinding(di.Singleton, di.Borrowed, factory, dependencies...)`, pass them to
@@ -157,7 +157,7 @@ The startup-failure test also proves rollback closes the provider once.
 
 ## Load types for a generator
 
-[Package-loading source](https://github.com/Cratis/Fundamentals.Go/tree/develop/recipes/packagesloading)
+[Package-loading source](https://github.com/Cratis/Fundamentals.Go/tree/main/recipes/packagesloading)
 uses `golang.org/x/tools/go/packages` v0.51.0 to load a fixture under
 `packagesloading/testdata`, then passes every exported type to
 `conceptstypes.Underlying`. The fixture stays inside the recipes module, so it

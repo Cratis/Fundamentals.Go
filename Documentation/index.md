@@ -1,6 +1,6 @@
 ---
 title: Fundamentals for Go
-description: Start with typed domain values, then find released scalar, correlation, naming and optional dependency-injection contracts.
+description: Start with typed domain values in Fundamentals.Go v0.3.0, then find scalar, correlation, naming and optional dependency-injection contracts.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
@@ -14,11 +14,14 @@ keeping domain identity in your own Go types.
 **Start with [a UUID-backed author and a JSON round trip](getting-started.md).**
 You need Go 1.26 or later, not a server, DI container or C# background.
 
-## Released packages
+## Packages
 
-The root module **v0.2.0 is released and experimental**. It uses only the standard
-library. Minor v0 releases may change APIs with migration notes. Install the
-lowercase module path `github.com/cratis/fundamentals.go@v0.2.0`.
+This documentation targets the root module **v0.3.0; the API remains experimental**.
+It uses only the standard library. Minor v0 releases may change APIs with migration
+notes. After publication, install the lowercase module path
+`github.com/cratis/fundamentals.go@v0.3.0`; see [release status](releases.md).
+Beginning with v0.3.0, `concepts.ParseDotNetGUID` adds explicit .NET 10.0.12
+compatibility conversion without changing strict UUID defaults.
 
 | Your task | Package and guide |
 | --- | --- |
@@ -45,9 +48,11 @@ capability requires the optional container. The
 keeps standard interfaces and recipes ahead of additional integration modules.
 
 The [parity map](parity.md) distinguishes implemented contracts, deliberate Go
-adaptations and remaining C# gaps. Documentation of the released packages does
-not mean whole-product parity. [Enum JSON compatibility](enum-compatibility.md)
-is **develop-only contract evidence**, not part of v0.2.0 and not a Go enum codec.
+adaptations and remaining C# gaps. Package documentation does not mean
+whole-product parity. [Enum JSON compatibility](enum-compatibility.md) and
+[dictionary-key JSON compatibility](dictionary-key-compatibility.md) describe
+source-distributed contract fixtures included with v0.3.0, not Go enum or
+complex-key codecs, runtime or schema support.
 
 ## Contribute or publish
 

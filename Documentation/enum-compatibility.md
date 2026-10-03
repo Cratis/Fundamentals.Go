@@ -8,8 +8,8 @@ description: Captured bare-enum and enum-concept acceptance at the pinned C# aut
 
 Use this reference to distinguish enum read acceptance, numeric writes and schema
 admission. **Go enum codecs are Not implemented.** These captures are
-**develop-only evidence**, not part of the released v0.2.0 baseline. They do not
-add an enum package, registry, serializer or an enum
+**source-distributed contract evidence** included with v0.3.0, not Go runtime or
+schema support. They do not add an enum package, registry, serializer or an enum
 representation to `concepts.Underlying`.
 
 ## Authority and scope

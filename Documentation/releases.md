@@ -6,10 +6,22 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-Fundamentals.Go v0.2.0 is released at commit `532d218`; v0.1.0 was released at
-`e50913e`. Experimental releases remain v0.x until an approved stable launch.
-New public capabilities use `minor` intent; a minor version may contain breaking
-changes, with migration notes.
+The current released base is Fundamentals.Go v0.2.0 at commit `532d218`; v0.1.0
+was released at `e50913e`. This documentation prepares the **v0.3.0 compatibility
+release**; it does not assert that the tag already exists. The release workflow
+assigns its release commit and tag after the authorized merge.
+
+v0.3.0 adds opt-in `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12
+([#28](https://github.com/Cratis/Fundamentals.Go/issues/28)), with strict UUID
+defaults unchanged. It includes source-distributed enum and complex-key JSON
+contract evidence ([#17](https://github.com/Cratis/Fundamentals.Go/issues/17),
+[#18](https://github.com/Cratis/Fundamentals.Go/issues/18)), not Go enum or
+complex-key implementations, runtime or schema support. The root remains
+standard-library-only; ecosystem recipes remain unpublished.
+
+Experimental releases remain v0.x until an approved stable launch. New public
+capabilities use `minor` intent; a minor version may contain breaking changes,
+with migration notes.
 
 ## Development and release intent
 
@@ -75,7 +87,7 @@ Each `nested` entry has an explicit `dir` and boolean `publish` policy.
 1. Create `tools/go.mod` or `integrations/<name>/go.mod` with module path
    `github.com/cratis/fundamentals.go/<directory>`. Use lowercase relative
    directories; modules cannot contain other modules.
-2. Require a **published stable root version**, such as the released `v0.1.0`.
+2. Require a **published stable root version**, such as the released `v0.2.0`.
    Pseudo-versions, workspaces and `replace` directives are not a substitute. If the tool needs new root APIs, release the root first.
 3. Add the exact directory to `nested` in the same change. For example, the
    following illustrative configuration includes two publishable modules and

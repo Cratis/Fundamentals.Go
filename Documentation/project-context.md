@@ -67,14 +67,18 @@ proof that an API exists. Agree on the contract before consumers adopt it.
 - Push verified, coherent work to `develop` freely under the maintainer's
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
-- Fundamentals.Go **v0.2.0 is released at commit `532d2181c610f67730133f61e768a943379da571`**. Consumers use
+- The current released base is Fundamentals.Go **v0.2.0 at commit `532d2181c610f67730133f61e768a943379da571`**.
+  This documentation prepares **v0.3.0**, not an already-published tag; its release
+  commit and tag are assigned by the release workflow. Consumers use
   published tags for released APIs and may pin **pushed** develop commits using
   Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
   use local replacements as evidence that a consumer can resolve the module.
 - Collect release-bound changes in a release PR from `develop` to `main` with
   the appropriate intent label. The v0.2.0 release is complete; do not describe
-  released packages as future work. Enum contract captures on `develop` are
-  evidence only, not released enum codecs or new runtime APIs.
+  its packages as future work. The release-bound v0.3.0 adds explicit
+  `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12 without changing
+  strict UUID defaults. Enum and complex-key JSON corpora are source-distributed
+  evidence, not Go enum or complex-key implementations, runtime or schema support.
 - Confirm public proxy retrieval after publication, then tell the consumer
   sessions the version and commit. The configured release workflow, not a manual
   competing tag, produces the release after the authorized merge.
