@@ -1,0 +1,46 @@
+# Copyright (c) Cratis. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+"""Compare a separate capture with the golden without accepting or overwriting drift."""
+import argparse
+import json
+import pathlib
+import sys
+
+
+def json_equal(actual, expected):
+    """Compare decoded JSON recursively, preserving boolean and integer/float types."""
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(actual, dict):
+        return actual.keys() == expected.keys() and all(
+            json_equal(actual[key], expected[key]) for key in actual
+        )
+    if isinstance(actual, list):
+        return len(actual) == len(expected) and all(
+            json_equal(a, e) for a, e in zip(actual, expected)
+        )
+    return actual == expected
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("capture", type=pathlib.Path)
+    parser.add_argument("--golden", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "testdata/enum-contract/fixtures.dotnet.json")
+    args = parser.parse_args()
+    actual = json.loads(args.capture.read_text(encoding="utf-8"))
+    expected = json.loads(args.golden.read_text(encoding="utf-8"))
+    if json_equal(actual, expected):
+        print("Capture matches committed fixture: 236 observations (224 serializer-level, 12 direct diagnostics).")
+        return 0
+    if not json_equal(actual.get("runtime"), expected.get("runtime")):
+        print("Runtime/platform identity drift; retain this as a separate output, not a replacement golden.", file=sys.stderr)
+        print("Expected:", expected.get("runtime"), file=sys.stderr)
+        print("Actual:", actual.get("runtime"), file=sys.stderr)
+    for key in ["source", "enumDefinitions", "count", "cases"]:
+        if not json_equal(actual.get(key), expected.get(key)):
+            print("Fixture drift in " + key, file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

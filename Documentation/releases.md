@@ -6,9 +6,9 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-Fundamentals.Go v0.1.0 was released at commit `e50913e`. The current additive
-package release targets v0.2.0 with `minor` intent. Experimental releases remain
-v0.x until an approved stable launch; a minor version may contain breaking
+Fundamentals.Go v0.2.0 is released at commit `532d218`; v0.1.0 was released at
+`e50913e`. Experimental releases remain v0.x until an approved stable launch.
+New public capabilities use `minor` intent; a minor version may contain breaking
 changes, with migration notes.
 
 ## Development and release intent

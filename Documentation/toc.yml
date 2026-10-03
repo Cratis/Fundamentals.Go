@@ -1,13 +1,23 @@
 - name: Overview
   href: index.md
+- name: Getting started
+  href: getting-started.md
+- name: Scalar reference
+  href: scalars.md
 - name: Concepts
   href: concepts.md
+- name: Correlation context
+  href: correlation.md
 - name: Dependency injection
   href: dependency-injection.md
+- name: Constructor planning
+  href: constructor-bindings.md
 - name: Naming
   href: naming.md
 - name: Ecosystem recipes
   href: recipes.md
+- name: Enum JSON compatibility
+  href: enum-compatibility.md
 - name: Parity
   href: parity.md
 - name: Releases

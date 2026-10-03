@@ -9,7 +9,14 @@ The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamenta
 
 ## Status
 
-**Experimental (v0.x).** Package `concepts` provides UUID, DateOnly, TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package `concepts/conceptstypes` provides matching compile-time recognition for generators using `go/types`. Package `correlation` provides shared correlation-ID context. Package `naming` shares [acronym-friendly casing and explicit naming policies](Documentation/naming.md), without choosing product defaults. Package `dependencyinjection` provides an optional dependency-injection contract, with a default container and conformance suites; plain constructors need none of it. Start with [concept authoring and recognition](Documentation/concepts.md) and [dependency injection](Documentation/dependency-injection.md); the [parity map](Documentation/parity.md) records implemented contracts and remaining gaps.
+**v0.2.0 is released and experimental.** Start with [a UUID-backed domain value and a JSON round trip](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/getting-started.md). You need only Go: no server, container or C# knowledge.
+
+- [Scalars and concepts](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/scalars.md): `concepts` supplies UUID, DateOnly, TimeOnly, TimeSpan, explicit domain codecs, `Underlying` and `CheckJSON`; `concepts/conceptstypes` adds compile-time recognition.
+- [Correlation context](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/correlation.md) and [naming policies](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/naming.md): shared metadata and explicit casing, without choosing product policies.
+- [Optional dependency injection](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/dependency-injection.md): exact typed bindings, a default container, constructor planning and test-only conformance suites. Plain constructors need none of it.
+- [Ecosystem recipes](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/recipes.md): compiled, unpublished examples in a separate module; the released root stays standard-library-only.
+
+The [documentation overview](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/index.md) covers every released public package. The [parity map](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/parity.md) records remaining C# gaps. Develop's enum contract evidence is not a released enum codec.
 
 Releases remain **v0.x** while the API is experimental; a minor version may contain breaking changes, with migration notes.
 
@@ -18,7 +25,7 @@ Releases remain **v0.x** while the API is experimental; a minor version may cont
 Requires Go **1.26 or later**:
 
 ```sh
-go get github.com/cratis/fundamentals.go@latest
+go get github.com/cratis/fundamentals.go@v0.2.0
 ```
 
 Use the lowercase module path exactly as shown. CI checks Go 1.26 and 1.27 with `GOWORK=off` and `GOTOOLCHAIN=local`.
@@ -36,7 +43,9 @@ go test -race -count=1 -timeout=3m ./...
 golangci-lint run
 ```
 
-See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main/CONTRIBUTING.md) for the full checks and release conventions, and the [documentation overview](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/index.md) for scope and limitations.
+The root commands exclude the nested, unpublished `recipes/` module; run its gates separately as described in the contribution guide.
+
+See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/develop/CONTRIBUTING.md) for the full checks and release conventions, and the [documentation overview](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/index.md) for scope and limitations.
 
 ## Community and security
 
