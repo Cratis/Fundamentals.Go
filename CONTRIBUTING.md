@@ -20,7 +20,7 @@ Install Go 1.26 or later, golangci-lint v2.14.0, actionlint v1.7.12, ShellCheck,
 
 ## Verify your change
 
-Run each Go phase in **both the root and `recipes/`**, with each supported Go toolchain where applicable. Root `./...` patterns exclude the nested module. Run workflow and Markdown checks once from the repository root. Execute these as separate phases, not a single long shell chain:
+Run each Go phase in **both the root and `recipes/`**, with each supported Go toolchain where applicable. Root `./...` patterns exclude the nested module, including the test-only authored-documentation checker in `recipes/documentationcheck`. Root `go test ./...` alone does not run that check. Run workflow and Markdown checks once from the repository root. Execute these as separate phases, not a single long shell chain:
 
 ```sh
 export GOWORK=off
