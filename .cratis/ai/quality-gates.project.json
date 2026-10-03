@@ -1,0 +1,73 @@
+{
+  "$comment": [
+    "Repository-owned default native Go gates. The managed runner merges by existing ID; these IDs have no language execution semantics.",
+    "Root changes also check the unpublished recipes module, which consumes the root. Recipes-only changes check recipes only.",
+    "Build, vet and tests only, not the full CI matrix, race detector, lint, formatting, module hygiene, vulnerability checks or opt-in contract probes.",
+    "The remaining frontend-lint gate requires a real root Node package; managed Pi harness packages are never this repository's application."
+  ],
+  "gates": [
+    {
+      "id": "backend-build-debug",
+      "description": "Compile root Go packages",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "build"]
+    },
+    {
+      "id": "backend-specs",
+      "description": "Test root Go packages and fixtures",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "test"]
+    },
+    {
+      "id": "backend-build-release",
+      "description": "Vet root Go packages",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "vet"]
+    },
+    {
+      "id": "frontend-lint",
+      "description": "Lint a root Node application, when present",
+      "changed": ["**/*.ts", "**/*.tsx"],
+      "excludeChanged": ["ContractTests/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["yarn"], "paths": ["package.json", "yarn.lock"], "packageScripts": ["lint:ci"]},
+      "command": ["yarn", "lint:ci"]
+    },
+    {
+      "id": "frontend-compile",
+      "description": "Compile unpublished Go recipes against the root",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "build"]
+    },
+    {
+      "id": "frontend-compile-specs",
+      "description": "Vet unpublished Go recipes",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "vet"]
+    },
+    {
+      "id": "frontend-specs",
+      "description": "Test unpublished Go recipes and authored documentation snippets",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "test"]
+    }
+  ]
+}
