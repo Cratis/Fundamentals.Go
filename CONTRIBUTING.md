@@ -1,6 +1,6 @@
 # Contributing to Fundamentals for Go
 
-Thank you for helping build the Go counterpart of Cratis Fundamentals. This repository currently contains tooling and a package scaffold, not implemented domain-value primitives. Discuss larger changes before implementation, and document only capabilities that exist and have been verified.
+Thank you for helping build the Go counterpart of Cratis Fundamentals. The [parity map](Documentation/parity.md) records which C# Fundamentals surfaces are implemented. Discuss larger changes before implementation, and document only capabilities that exist and have been verified.
 
 The [Cratis contribution guide](https://github.com/Cratis/.github/blob/main/contributing.md) and [code of conduct](https://github.com/Cratis/.github/blob/main/CODE_OF_CONDUCT.md) apply.
 
@@ -14,7 +14,7 @@ The [Cratis contribution guide](https://github.com/Cratis/.github/blob/main/cont
 
 ## Layout and setup
 
-The repository has one root module, `github.com/cratis/fundamentals.go`, with package `fundamentals`. Product documentation lives in `Documentation/`. Add capability packages only as implementation needs them; use lowercase package directories, co-located `_test.go` files, and compiling `Example` tests for public usage. The scaffold's package-documentation test is not a feature example.
+The repository has one root module, `github.com/cratis/fundamentals.go`, with package `fundamentals`. Product documentation lives in `Documentation/`. Add capability packages only as implementation needs them; use lowercase package directories, co-located `_test.go` files, and compiling `Example` tests for public usage. The root package-documentation test is not a feature example.
 
 Install Go 1.26 or later, golangci-lint v2.14.0, actionlint v1.7.12, ShellCheck, and markdownlint-cli2. CI tests Go 1.26 and 1.27, including the latest patches; golangci-lint must be built with a Go version at least as new as the code it analyzes.
 
@@ -48,7 +48,7 @@ govulncheck ./...
 
 No source files should appear in `gofmt -l` output. After `go mod tidy`, also check `git status --short -- go.mod go.sum` for untracked manifests. Commit `go.sum` when dependencies require it. Do not commit nested modules, local `replace` directives, or personal `go.work` files: released modules must build without sibling checkouts.
 
-Pull requests run the Linux matrix; scheduled and manual builds also check macOS and Windows. Workflow lint invokes ShellCheck when available. There are no service-dependent integration tests in this scaffold. CodeQL runs separately in GitHub Actions with autobuild and test-source extraction enabled so the scaffold is analyzed.
+Pull requests run the Linux matrix; scheduled and manual builds also check macOS and Windows. Workflow lint invokes ShellCheck when available. There are no service-dependent integration tests. CodeQL runs separately in GitHub Actions with autobuild and test-source extraction enabled.
 
 ## Conventions
 

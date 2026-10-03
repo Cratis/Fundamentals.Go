@@ -84,7 +84,7 @@ container passes (`container/conformance_test.go`). Guide:
 | Request isolation | `container.WithContextGuard`; singleton factories see contexts with all values hidden | Go-specific | Guards run on every scoped resolution, including through factory resolvers. |
 | Failed-value disposal | Independent cooperative 30-second cleanup budget | Go-specific | Not configurable yet. |
 | Client-lifetime artifacts | `Singleton` binding resolved from a short-lived startup scope | Go-specific | The provider owns the instance until `Provider.Close`; the application controls shutdown order. |
-| Context cancellation | `Resolve` checks `ctx.Err()` first | Go-specific | A canceled context returns the bare context error before closed or expired-resolver errors. |
+| Context cancellation | `di.Resolve[T]` checks `ctx.Err()` before calling the resolver | Go-specific | Through `di.Resolve[T]`, a canceled context returns the bare context error first. Calling a container scope's or factory resolver's `Resolve` directly reports `ErrClosed` or `ErrResolverExpired` before the context error. |
 
 ## Shared scalar guarantees
 

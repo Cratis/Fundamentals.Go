@@ -12,7 +12,8 @@ import (
 	_ "github.com/cratis/fundamentals.go"
 )
 
-// TestPackageDocumentation is a scaffold smoke test, not evidence of API parity.
+// TestPackageDocumentation checks the root package documentation; it is not
+// evidence of API parity.
 // The external package import also checks the canonical consumer import path.
 func TestPackageDocumentation(t *testing.T) {
 	file, err := parser.ParseFile(token.NewFileSet(), "doc.go", nil, parser.ParseComments)

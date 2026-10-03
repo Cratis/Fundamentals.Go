@@ -77,9 +77,9 @@ func CheckJSON(r Representation, data []byte) error {
 	return nil
 }
 
-// validRepresentation checks the same declaration contract as Underlying, but
-// uses exact marker interfaces instead of reconstructing discovery and errors.
-// No application values or representation graphs need to be allocated.
+// validRepresentation reports whether r names an allowlisted scalar whose Kind
+// agrees with Type and whose PointerDepth is nonnegative. Declared is not
+// inspected, and no application values are allocated.
 func validRepresentation(r Representation) bool {
 	kind, _ := scalarMetadata(r.Type)
 	return kind != KindInvalid && kind == r.Kind && r.PointerDepth >= 0

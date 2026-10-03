@@ -61,9 +61,8 @@ func (k ScalarKind) String() string {
 	return names[k]
 }
 
-// scalarMetadata returns both the kind and its exact marker interface. Using
-// Implements with this interface validates the signature without constructing
-// reflected method types or walking the declaration's representation graph.
+// scalarMetadata returns the kind of an exact allowlisted scalar type, or
+// KindInvalid, together with the matching Concept[T] interface type.
 func scalarMetadata(t reflect.Type) (ScalarKind, reflect.Type) {
 	switch t {
 	case reflect.TypeFor[string]():
