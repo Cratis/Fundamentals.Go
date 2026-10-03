@@ -108,15 +108,22 @@ native checks on an isolated copy of the current source, without changing your
 working tree. CI discovers the fake-Go routing tests with the existing
 `.github/scripts/test_*.py` self-tests; hosted Go jobs still run the real matrix.
 
-The routing test helper owns a fresh POSIX process group and terminates, escalates,
-and reaps it on timeout or interruption before deleting fixtures. Its hanging-child
-regression uses readiness and termination events and verifies an unrelated process
-survives. Native Windows Python (including under Git Bash) lacks POSIX process
-groups, so only those process-group regressions are explicitly skipped; routing
-coverage still runs, with the built-in `taskkill /PID /T /F` for tree cleanup on
-failure. Neither cleanup mechanism covers descendants that deliberately detach
-from its group or process tree. This helper is test-local and does not replace
-managed hook or Pi runner cancellation.
+The routing test helper owns a fresh POSIX session/process group. On interruption
+it keeps the exited leader unreaped, allows a full three-second cooperative cleanup
+grace (including pi-phase's separately grouped producer), then escalates and reaps
+before deleting fixtures. Regressions deliver real SIGINT during communication and
+verify supervisor cleanup and an unrelated process's survival. Arbitrary callbacks
+that deliberately detach without bounded supervisor cleanup are not supported.
+This helper is test-local and does not replace managed hook or Pi cancellation.
+
+Fixtures use LF writes and compare working directories in Bash's physical path
+format, avoiding native Windows CRLF scripts and drive-letter versus Git Bash
+`$PWD` mismatches. Native Windows Python lacks POSIX process groups: only the
+process-group regressions are skipped, and failure cleanup uses built-in
+`taskkill /PID /T /F`. The other routing tests remain enabled but still require
+compatible Bash, jq, and Git executables; native Windows Python with Git Bash has
+not been verified locally. Neither cleanup mechanism is a sandbox for arbitrary
+detached descendants.
 
 Plans, scratch files, and work records belong only in the ignored `.ai-work/` directory and are never committed. Durable follow-ups belong in GitHub issues.
 
