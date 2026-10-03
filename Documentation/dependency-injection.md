@@ -114,6 +114,88 @@ code, use `di.Bind` or `di.BindBorrowed` with a `di.Factory[T]` and explicit
 custom registrars; accessors and `Validate` let an adapter inspect it, while
 `Construct` invokes and validates its result without owning cleanup.
 
+## Convention-based bindings
+
+When a product generator wires many services, you can share constructor rules
+without sharing a generator. `dependencyinjection/bindingtypes` analyzes already
+type-checked packages and returns a registration plan. It never loads packages,
+executes constructors, touches files or emits code. Arc and Chronicle own their
+renderers and artifact discovery; Fundamentals supplies only the planner.
+
+Put lifetime directives on type doc comments, not constructors. This excerpt
+from the [render fixture](../dependencyinjection/internal/bindingcorpus/render/render.go)
+requests one resource per scope:
+
+```go
+// Foo records close calls.
+//cratis:scoped
+type Foo struct{ Closes int }
+```
+
+`//cratis:singleton` requests provider caching; `//cratis:ignore-convention`
+excludes a type from DI conventions only. No lifetime directive means transient.
+`ReadDirectives(files, info)` normalizes these comments into `TypePolicy` values.
+Parse with `parser.ParseComments` and populate `types.Info.Defs`. Grouped type
+blocks need per-type doc comments. Unknown, malformed, misplaced, repeated or
+conflicting directives are errors. Export data drops comments: supply source
+metadata or explicit policies for external packages rather than inferring their
+lifetimes.
+
+Pass packages from one coherent importer universe to `Analyze(pkgs, cfg)`.
+`Config.EmitPackage` controls accessibility and defaults to the sole input
+package; supply it explicitly when analyzing multiple packages. A nil
+`Constructors` discovers exact package-level `NewX` functions associated with
+local named `X`; a non-nil slice is a whitelist, including an empty whitelist.
+There is no richest-constructor heuristic or `X{}` fallback. Accepted signatures
+return `T` or `(T, error)`, with one optional leading exact `context.Context`.
+Value and pointer keys stay distinct. Nongeneric wrappers may return closed
+generic types; open generic functions, variadics and extra results fail.
+
+Set `MatchIFoo` to opt into same-package `IFoo` → `Foo` matching, or use
+`Config.Interfaces` for idiomatic interface names and exact implementations.
+Structural implementation uniqueness is limited to the packages you supply.
+Ignored and constructorless competitors still count; aliases and `Foo`/`*Foo`
+count as one family. Ambiguity is an error, resolved only by an explicit mapping.
+Interface-returning constructors bind their interface directly, not an inferred
+concrete implementation. Self-bindings are owned; forwarders are borrowed and
+inherit the concrete lifetime, so they share its cache and close it once.
+
+Inspect `Plan.Diagnostics` using stable codes `BT001`–`BT013`, not message text.
+Any error makes `Bindings` nil: never render a partial plan. Missing ordinary
+dependencies produce informational `MissingDependency` obligations, or errors
+with `RequireAllDependencies`. Scalar configuration requires an explicit provider
+or `Existing` declaration and otherwise produces `MissingConfiguration`. The
+container's `Build` still validates the final graph, cycles and captive lifetimes.
+The [planner example](../dependencyinjection/bindingtypes/corpus_test.go) shows
+type-checking and analysis without running application code.
+
+Products render constructor bindings with `di.Bind`, optionally using
+`BindFunc1` through `BindFunc4` for one through four ordered arguments. There is
+no `BindFunc0`. For larger arities, resolve arguments in order and declare unique
+exact dependency keys. Disposable value results with more than four arguments
+are rejected until a safe runtime adapter exists: returning a zero value after
+dependency failure could incorrectly transfer cleanup responsibility. Always
+preserve a non-nil constructor result returned with an error. Render forwarders
+with `di.BindBorrowed`, resolving their exact concrete key. The
+[hand-authored render-equivalence tests](../dependencyinjection/bindingtypes/render_test.go)
+exercise caching, forwarding, close-once behavior and failed-result cleanup.
+
+Duplicates remain strict. `KeepExisting` skips only keys explicitly listed in
+`Config.Existing`, with their actual lifetimes: those bindings have action
+`RetainExisting` and diagnostic `BT013`, and emit no registration. Multiple
+generated candidates still fail. Preflight existing keys through `Catalog` when
+available; otherwise your composition code must attest the supplied manifest.
+Propagate every registration error—never catch `ErrDuplicate` and report success.
+Applying unchanged generated wiring twice is not idempotent; refresh `Existing`
+and replan to skip registered keys. If two product generators run in one app,
+one owns the service registrations and the other lists those keys in `Existing`.
+
+The checked-in [source corpus and expectation manifest](../dependencyinjection/internal/bindingcorpus/cases.json)
+is available to product renderer tests from their pinned Fundamentals module.
+Consume fixture files, not the Go `internal` package. Each product must compile
+and run its own output in an independent consumer module with `GOWORK=off` and
+no sibling replacements; these shared planner tests do not certify a renderer.
+
 ## Choose lifetime and ownership separately
 
 | Lifetime | Successful values | Owner of owned results |
@@ -287,8 +369,9 @@ nil, typed-nil and wrong-type results through `di.Resolve`.
 ## Know the limits
 
 This is not full Microsoft.Extensions.DependencyInjection compatibility.
-Conventions and constructor generation are not implemented. There is no runtime
-assembly scanning, implicit constructor or method invocation, named/keyed
+Convention planning is available, but constructor code generation belongs to
+products. There is no runtime assembly scanning, implicit constructor or method
+invocation, named/keyed
 services, open-generic activation, collection synthesis, last-registration-wins,
 root resolution or injectable current `Provider`/`Resolver`. Factories in the
 default container receive only a restricted resolver, limited to declared direct
