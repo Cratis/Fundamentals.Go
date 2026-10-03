@@ -199,9 +199,12 @@ codes, not message text, for tooling; source positions need the original file se
 | `BT012 MissingConfiguration` | Explicitly provide or attest the scalar configuration key |
 | `BT013 ExistingRegistrationRetained` | Information: emit nothing for the retained key |
 
-Supported constructors return `T` or `(T, error)`, optionally accepting exact
-`context.Context` first. Nongeneric wrappers may return closed generic types.
-Open generic constructors, variadics and extra results are unsupported. There is
+Supported constructors return a named type `T`, a supported pointer to a named
+type, or that result paired with exactly the predeclared `error` type. They may
+accept exact `context.Context` first. Built-in scalars, anonymous result types
+and pointers to interfaces are unsupported, even for explicitly selected factories.
+Nongeneric wrappers may return closed generic types. Open generic constructors,
+variadics and extra results are unsupported. There is
 no richest-constructor selection, implicit `T{}` fallback, field injection or
 runtime scanning. The [normative convention rules](dependency-injection.md#convention-based-bindings)
 and [parity map](parity.md#dependency-injection-surfaces) describe the remaining

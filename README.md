@@ -45,7 +45,7 @@ golangci-lint run
 
 The root commands exclude the nested, unpublished `recipes/` module; run its gates separately as described in the contribution guide.
 
-See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main/CONTRIBUTING.md) for the full checks and release conventions, and the [documentation overview](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/index.md) for scope and limitations.
+See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/develop/CONTRIBUTING.md) for the full checks and release conventions, and the [documentation overview](https://github.com/Cratis/Fundamentals.Go/blob/develop/Documentation/index.md) for scope and limitations.
 
 ## Community and security
 
