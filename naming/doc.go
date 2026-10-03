@@ -11,7 +11,9 @@
 // Unicode tables for BMP runes only, matching C#'s UTF-16 char operations:
 // supplementary letters are neither uppercase nor case-converted. Invariant
 // lowercasing preserves İ and uppercasing preserves ı, as in .NET. Long s (ſ)
-// uppercases to S; it is not one of .NET's explicit invariant exceptions. Neither
+// uppercases to S, matching .NET's default ICU globalization; .NET's
+// invariant-globalization mode (DOTNET_SYSTEM_GLOBALIZATION_INVARIANT) preserves
+// it instead. Neither
 // mapping expands ß to SS. Results depend on the Go toolchain's Unicode tables
 // rather than the .NET runtime's globalization tables; neither API normalizes
 // combining marks.
