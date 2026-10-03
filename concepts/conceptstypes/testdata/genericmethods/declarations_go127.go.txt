@@ -1,0 +1,137 @@
+// Copyright (c) Cratis. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+//go:build go1.27
+
+// Package genericmethods supplies the Go 1.27 declarations used to establish
+// the runtime expectations in the generic-method tests. It is stored as text
+// because the Go 1.26 formatter rejects generic-method syntax even in a gated
+// .go file. The Go 1.27-gated test type-checks this source explicitly.
+package genericmethods
+
+import "github.com/cratis/fundamentals.go/concepts"
+
+// MarkerOnly has a marker invisible to runtime reflection.
+type MarkerOnly string
+
+func (MarkerOnly) ConceptValue[T any]() string { panic("marker") }
+
+// PointerMarker has a pointer marker invisible to runtime reflection.
+type PointerMarker string
+
+func (*PointerMarker) ConceptValue[T any]() string { panic("marker") }
+
+// Full has ordinary codecs but only a generic marker.
+type Full string
+
+func (Full) ConceptValue[T any]() string  { panic("marker") }
+func (Full) MarshalText() ([]byte, error) { panic("codec") }
+func (Full) MarshalJSON() ([]byte, error) { panic("codec") }
+func (*Full) UnmarshalText([]byte) error  { panic("codec") }
+func (*Full) UnmarshalJSON([]byte) error  { panic("codec") }
+
+// Ordinary has a runtime-visible marker and codecs.
+type Ordinary string
+
+func (Ordinary) ConceptValue() string         { panic("marker") }
+func (Ordinary) MarshalText() ([]byte, error) { panic("codec") }
+func (Ordinary) MarshalJSON() ([]byte, error) { panic("codec") }
+func (*Ordinary) UnmarshalText([]byte) error  { panic("codec") }
+func (*Ordinary) UnmarshalJSON([]byte) error  { panic("codec") }
+
+// PromotedGeneric promotes only a generic marker.
+type PromotedGeneric struct{ MarkerOnly }
+
+// PromotedOrdinary promotes a runtime-visible marker.
+type PromotedOrdinary struct{ Ordinary }
+
+// ShadowedMarker's generic method shadows Ordinary's marker in go/types, but
+// reflection still exposes Ordinary's promoted marker.
+type ShadowedMarker struct{ Ordinary }
+
+func (ShadowedMarker) ConceptValue[T any]() string { panic("marker") }
+
+// AmbiguousMarker's markers conflict in go/types, but only the ordinary marker
+// participates in runtime promotion.
+type AmbiguousMarker struct {
+	Ordinary
+	MarkerOnly
+}
+
+// Nested returns a type with an invisible marker, not a nested concept.
+type Nested string
+
+func (Nested) ConceptValue() MarkerOnly { panic("marker") }
+
+// PointerNested returns a pointer to a type with an invisible marker.
+type PointerNested string
+
+func (PointerNested) ConceptValue() *PointerMarker { panic("marker") }
+
+// GenericMarshalText has an invisible text encoder.
+type GenericMarshalText string
+
+func (GenericMarshalText) ConceptValue() string                { panic("marker") }
+func (GenericMarshalText) MarshalText[T any]() ([]byte, error) { panic("codec") }
+
+// GenericMarshalJSON has an invisible JSON encoder.
+type GenericMarshalJSON string
+
+func (GenericMarshalJSON) ConceptValue() string                { panic("marker") }
+func (GenericMarshalJSON) MarshalText() ([]byte, error)        { panic("codec") }
+func (GenericMarshalJSON) MarshalJSON[T any]() ([]byte, error) { panic("codec") }
+
+// GenericValueUnmarshalText has an invisible value decoder, not a value-unmarshaler.
+type GenericValueUnmarshalText string
+
+func (GenericValueUnmarshalText) ConceptValue() string              { panic("marker") }
+func (GenericValueUnmarshalText) MarshalText() ([]byte, error)      { panic("codec") }
+func (GenericValueUnmarshalText) MarshalJSON() ([]byte, error)      { panic("codec") }
+func (GenericValueUnmarshalText) UnmarshalText[T any]([]byte) error { panic("codec") }
+
+// GenericValueUnmarshalJSON has an invisible value JSON decoder.
+type GenericValueUnmarshalJSON string
+
+func (GenericValueUnmarshalJSON) ConceptValue() string              { panic("marker") }
+func (GenericValueUnmarshalJSON) MarshalText() ([]byte, error)      { panic("codec") }
+func (GenericValueUnmarshalJSON) MarshalJSON() ([]byte, error)      { panic("codec") }
+func (*GenericValueUnmarshalJSON) UnmarshalText([]byte) error       { panic("codec") }
+func (GenericValueUnmarshalJSON) UnmarshalJSON[T any]([]byte) error { panic("codec") }
+
+// GenericPointerUnmarshalText has an invisible pointer text decoder.
+type GenericPointerUnmarshalText string
+
+func (GenericPointerUnmarshalText) ConceptValue() string               { panic("marker") }
+func (GenericPointerUnmarshalText) MarshalText() ([]byte, error)       { panic("codec") }
+func (GenericPointerUnmarshalText) MarshalJSON() ([]byte, error)       { panic("codec") }
+func (*GenericPointerUnmarshalText) UnmarshalText[T any]([]byte) error { panic("codec") }
+
+// GenericPointerUnmarshalJSON has an invisible pointer JSON decoder.
+type GenericPointerUnmarshalJSON string
+
+func (GenericPointerUnmarshalJSON) ConceptValue() string               { panic("marker") }
+func (GenericPointerUnmarshalJSON) MarshalText() ([]byte, error)       { panic("codec") }
+func (GenericPointerUnmarshalJSON) MarshalJSON() ([]byte, error)       { panic("codec") }
+func (*GenericPointerUnmarshalJSON) UnmarshalText([]byte) error        { panic("codec") }
+func (*GenericPointerUnmarshalJSON) UnmarshalJSON[T any]([]byte) error { panic("codec") }
+
+// GenericDateEncoder does not supply runtime-visible calendar forwarding.
+type GenericDateEncoder concepts.DateOnly
+
+func (GenericDateEncoder) MarshalJSON[T any]() ([]byte, error) { panic("codec") }
+
+// GenericTimeEncoder does not supply runtime-visible calendar forwarding.
+type GenericTimeEncoder concepts.TimeOnly
+
+func (GenericTimeEncoder) MarshalText[T any]() ([]byte, error) { panic("codec") }
+
+// GenericDateMarker lacks both a visible marker and calendar forwarding.
+type GenericDateMarker concepts.DateOnly
+
+func (GenericDateMarker) ConceptValue[T any]() concepts.DateOnly { panic("marker") }
+
+// GenericDateWithEncoder is codec-only after its generic marker is hidden.
+type GenericDateWithEncoder concepts.DateOnly
+
+func (GenericDateWithEncoder) ConceptValue[T any]() concepts.DateOnly { panic("marker") }
+func (GenericDateWithEncoder) MarshalText() ([]byte, error)           { panic("codec") }

@@ -13,10 +13,12 @@ not establish whole-product parity.
 ## Status summary
 
 Implemented: UUID, DateOnly, TimeOnly, TimeSpan, correlation context. Partial:
-typed concepts, conversion, dependency injection (exact typed bindings,
-lifetimes, scopes and an optional container; conventions are not implemented).
+typed concepts, conversion, serialization naming (explicit non-pluralizing
+policies), dependency injection (exact typed bindings,
+lifetimes, scopes, an optional container and convention planning).
+Generation and rendering remain product-owned; no full generator parity is claimed.
 Go-specific: concept declaration discovery, dependency-injection conformance
-levels. Everything else is Not implemented; see the tracking issues per area. See [Updating this map](#updating-this-map) for the
+levels, rune-based string casing. Everything else is Not implemented; see the tracking issues per area. See [Updating this map](#updating-this-map) for the
 status vocabulary.
 
 ## Authority
@@ -42,7 +44,7 @@ every parsing form or operation on the corresponding .NET type.
 | Surface | C# source or contract | Go surface | Status | Executable parity evidence | Deviations |
 | --- | --- | --- | --- | --- | --- |
 | Typed scalar concepts | `Source/DotNET/Fundamentals/Concepts/ConceptAs.cs`, `ConceptExtensions.cs`, `ConceptMap.cs`, `ConceptFactory.cs`; `Source/DotNET/Fundamentals/Json/ConceptAsJsonConverter.cs`; `Source/DotNET/Fundamentals.Specs/Json/for_ConceptAsJsonConverter` including `when_converting_guid_concept_to_json.cs`, `when_converting_date_only_concept_from_json.cs`, `when_converting_time_only_concept_to_json.cs` | `concepts.Concept[T]`, explicit domain codecs, `CheckJSON` | Partial | `concepts/concept_codec_test.go`, `concepts/check_json_test.go`, `concepts/example_test.go`; all 11 `concepts/testdata/scalars.json` fixtures exercised through concepts | Named values and explicit codecs replace inheritance and the shared converter; exact scalar allowlist, integer literal policy and canonical-output validation. See concept deviations below. |
-| Concept declaration discovery | Go adaptation of `ConceptExtensions.IsConcept`, `GetConceptValueType` and `ConceptMap` under `Source/DotNET/Fundamentals/Concepts` | `concepts.Underlying`, `Representation`, `ScalarKind`, `TypeError`, `ErrInvalidConcept` | Go-specific | `concepts/underlying_test.go` shared declaration corpus, exact-type and concurrent tests; `concepts/check_json_test.go` | Metadata only, no application execution or cache; nesting rejected; anonymous fields rejected only in concept candidates. No `go/types` counterpart or proxy-generation agreement claimed. |
+| Concept declaration discovery | Go adaptation of `ConceptExtensions.IsConcept`, `GetConceptValueType` and `ConceptMap` under `Source/DotNET/Fundamentals/Concepts` | `concepts.Underlying`, `conceptstypes.Underlying`, `Representation`, `ScalarKind`, `TypeError`, `ErrInvalidConcept` | Go-specific | `concepts/internal/corpus` shared declarations and outcomes; `concepts/underlying_test.go` and `concepts/conceptstypes/underlying_test.go` corpus parity, exact-type and concurrent tests; `concepts/check_json_test.go` | Standard-library `go/types` counterpart with corpus parity. Metadata only, no application execution or cache; nesting rejected; anonymous fields rejected only in concept candidates by both recognizers. Proxy-generation agreement remains Arc.Go's to establish. |
 | Shared UUID | `System.Guid`, System.Text.Json; `Source/DotNET/Fundamentals.Specs/Json/for_ConceptAsJsonConverter/GuidConcept.cs` and `when_converting_guid_concept_{to,from}_json.cs` in the same directory | `concepts.UUID [16]byte`; `NewUUID`, `ParseUUID`, `String`, `IsZero`, text/JSON codecs | Implemented | `concepts/golden_test.go`, `concepts/scalars_test.go`, `concepts/boundaries_test.go`, `concepts/codecs_test.go`, `concepts/example_test.go`; `testdata/scalars.json` | Strict dashed D input only; no Guid.Parse N/B/P/X forms or whitespace. Bytes are RFC/network order, not Guid.ToByteArray mixed-endian order. Callers convert transport bytes explicitly outside this module. |
 | UUID database/sql interoperability | `System.Guid`; C# relies on database providers' Guid mapping | `concepts.UUID.Value`, `(*concepts.UUID).Scan`; optional forwarding on UUID-backed concepts | Go-specific | `concepts/uuid_sql_test.go`, `concepts/example_test.go` | Standard-library SQL interfaces: canonical dashed string output; strict text or 16 RFC/network-order bytes on input; failure-atomic rejection of null, malformed input and unsupported types. Nullable columns use `sql.Null[T]` or pointers. SQL Server `uniqueidentifier` raw bytes use .NET mixed-endian order: read as text or convert explicitly; no silent reordering. |
 | DateOnly | `Source/DotNET/Fundamentals/Json/DateOnlyJsonConverter.cs` and `Source/DotNET/Fundamentals.Specs/Json/for_DateOnlyJsonConverter` | `concepts.DateOnly`; `NewDateOnly`, `ParseDateOnly`, `Date`, `String`, text/JSON codecs | Implemented | `concepts/golden_test.go`, `concepts/scalars_test.go`, `concepts/boundaries_test.go`, `concepts/codecs_test.go`, `concepts/temporal_fuzz_test.go`, `concepts/example_test.go`; `testdata/scalars.json` | Invariant yyyy-MM-dd input only; C# also reads timestamps and culture-dependent date strings. Normalize to the canonical date before passing it to Go. |
@@ -75,11 +77,13 @@ container passes (`container/conformance_test.go`). Guide:
 | `IServiceScopeFactory` | `container.Registry.BindScopeFactory` facade | Implemented | The facade implements `ScopeFactory`, `Catalog` and `ScopeOwner`, not `Close` or resolution. Open scopes from methods, never inside a factory callback. |
 | Injectable `IServiceProvider` | None | Not implemented | No injectable current provider or resolver, by design. |
 | `ValidateScopes` / `ValidateOnBuild` | `Build` validation | Go-specific | Always on: missing edges, cycles and transitive captive lifetimes fail `Build`. |
-| `IFoo` → `Foo`, `[Singleton]`/`[Scoped]` with transient fallback, `[IgnoreConvention]`, self-bindings, generated convention metadata | Manual bindings and `BindBorrowed` forwarding | Not implemented | Convention generation is [#14][issue-14]. No `TransientAttribute` or `ISelfBindable` exists at the pinned revision. |
-| Existing registrations win; convention registration is idempotent | Duplicate registration fails | Not implemented | Deliberate: duplicates never silently win. Generated registrations will use an explicit override plan ([#14][issue-14]). |
+| `IFoo` → `Foo` convention | `bindingtypes.Analyze`, opt-in `MatchIFoo`, explicit `Interfaces` | Partial | Same-package pairing with structural method sets across the supplied universe; aliases and pointer/value shapes count as one family. Ignored and constructorless competitors still count. Ambiguity fails unless explicitly mapped; `bindingtypes/corpus_test.go` and `internal/bindingcorpus/cases.json` cover the rules. Products own rendering ([#14][issue-14]). |
+| `[Singleton]`/`[Scoped]`, transient fallback; `[IgnoreConvention]` | Type doc directives normalized by `bindingtypes.ReadDirectives`, explicit `TypePolicy` | Partial | Duplicate/conflicting policies fail rather than singleton taking precedence. Ignore excludes DI only; export data requires supplied policies. Directive and export-data tests are in `bindingtypes/corpus_test.go` and `validation_test.go`. No `TransientAttribute` exists at the pinned revision. Products own rendering. |
+| Self-bindings and generated convention metadata | Pure constructor plans in `dependencyinjection/bindingtypes` | Partial | Exact `NewX` or explicit constructors, no arbitrary activation or zero-value fallback; scalar dependencies need explicit configuration. Closed generic wrappers are supported, not open activation. `bindingtypes/corpus_test.go` covers signatures/accessibility; `generic_disposal_go127_test.go` checks runtime-visible disposal promotion and rejects disposable value results with more than four dependencies (BT006), with a compiled reflection witness; `render_test.go` exercises hand-authored equivalent wiring. No `ISelfBindable` exists at the pin; product emitters remain product-owned. |
+| Existing registrations win; convention registration is idempotent | `RejectDuplicates` default; explicit `Existing` plus `KeepExisting` → `RetainExisting` | Partial | Only listed keys are skipped (BT013), using attested lifetimes; generated ambiguity still fails. Unchanged registration functions remain strict and propagate duplicate errors, not silently idempotent. Refresh the manifest and replan; corpus override tests and `bindingtypes/render_test.go` cover this deliberate difference ([#14][issue-14]). |
 | `IInstancesOf<T>`, `IImplementationsOf<T>`, keyed services, diagnostics registration | None | Not implemented | `Key` identifies a type, not a named service. A future collection API must select a scope and report errors explicitly. |
 | Assembly scanning, `ActivatorUtilities`, artifact-method invocation | Explicit registration; consumer-owned activation | Out of scope | Explicit or generated registration replaces scanning. Chronicle.Go may use validated registration-time reflection for its artifacts. |
-| Separate interface and self descriptors | `BindBorrowed` interface forwarding over an owned concrete binding | Go-specific | Intentional difference accepted on [#9][di-decision]: forwarding shares the concrete instance and closes it once; C# may create separate instances. |
+| Separate interface and self descriptors | `BindBorrowed` interface forwarding over an owned concrete binding | Go-specific | Intentional difference accepted on [#9][di-decision]: forwarding shares the concrete instance and closes it once; C# may create separate instances. `bindingtypes.Analyze` plans borrowed forwarders with the effective concrete lifetime; `bindingtypes/render_test.go` verifies caching and disposal. |
 | Provider and resolver access rules | Frozen registry, expiring restricted factory resolvers, provider drains child scopes | Go-specific | Factories receive a resolver limited to declared edges that expires when the callback returns. |
 | Request isolation | `container.WithContextGuard`; singleton factories see contexts with all values hidden | Go-specific | Guards run on every scoped resolution, including through factory resolvers. |
 | Failed-value disposal | Independent cooperative 30-second cleanup budget | Go-specific | Not configurable yet. |
@@ -97,6 +101,62 @@ Zero values are Guid.Empty, 0001-01-01, midnight and zero duration. DateOnly spa
 years 0001–9999; TimeOnly spans one day at 100 ns precision. TimeSpan preserves
 both signed int64 tick extremes. UUID accepts uppercase hex and emits lowercase
 text without a BCL byte-order conversion or an external UUID dependency.
+
+## Naming evidence and deviations
+
+[#21][issue-21] ports `Strings/StringExtensions.cs:16-99` and the property/model
+operations in `Serialization/INamingPolicy.cs`, `DefaultNamingPolicy.cs`,
+`CamelCaseNamingPolicy.cs` and `NamespacedNamingPolicy.cs` at the authority
+revision above. Go surface: `naming.PascalCase`, `CamelCase`, `Policy`, `Default`,
+`CamelCasePolicy`, `Namespaced` and `NewNamespaced`. Evidence:
+`naming/golden_test.go`, `policy_test.go`, `example_test.go`, the `FuzzCase` target,
+and 56 case/17 policy expectations in `naming/testdata/*.json`. The
+[fixture provenance](../naming/testdata/README.md) distinguishes copied spec
+expectations from source-derived cases and deliberate Go adaptations.
+
+Casing uses BMP-aware helpers to match C#'s UTF-16 char operations: supplementary
+letters are neither classified as uppercase nor case-converted. Explicit
+invariant exceptions preserve `İ` when lowercasing and `ı` when uppercasing, as
+in [.NET 10 ChangeCaseInvariant][invariant-casing]. Long s (`ſ`) is not an explicit
+exception there and uppercases to `S`. Neither expands `ß` to `SS` or normalizes
+combining marks. Remaining casing differences are **Go-specific**: Unicode tables
+can differ by Go toolchain and .NET globalization runtime. Go has no null string
+or unpaired UTF-16 characters. Pascal reconstructs runes, replacing invalid
+UTF-8 bytes with U+FFFD; Camel preserves original bytes on early returns and
+replaces invalid bytes throughout its converting path. Separator configuration
+uses a Go rune, allowing supplementary characters; invalid runes become U+FFFD
+instead of preserving a C# surrogate char. See [Naming](naming.md) for examples.
+
+Policies are **Partial**: model inputs are explicit namespace/name strings, with
+pluralization disabled, not CLR types. Humanizer, `ReadModelNameAttribute`
+discovery, serializer-specific `JsonPropertyNamingPolicy` objects and
+`NamingPolicyCollectionExtensions` registration are not ported. If an explicit
+storage-name override exists, consumers use it unchanged without invoking the
+policy. Otherwise, they pluralize the inferred name if required before calling
+the policy. No shared default, serializer, field plan or tag precedence is
+introduced. Namespace segments always camel-case; the separator before the model
+remains a literal `-` even without a namespace.
+
+Read-only consumer comparison for this change (not adoption evidence):
+
+- Arc.Go `origin/develop` at `d7afbc20396e5386f04e93ebf252790e4f5999a1`,
+  `serialization/fields.go:16-23`: the same acronym/non-uppercase guards, then
+  lowercases only the first rune. This is equivalent to the reachable C# loop
+  for matching classification/casing tables, but shares Go's supplementary-rune
+  and invariant-Turkish differences; it does not port the full loop.
+- Chronicle.Go `origin/develop` at `e2165d05a135ddc2f57190514be8f61797fddde6`,
+  `serialization/plan.go:57-75`: now defaults to preserved names, not `urlValue`.
+  `serialization/naming.go:37-60` opts into acronym-friendly camel casing and
+  faithfully copies the loop, but restricts uppercase classification to BMP
+  runes to approximate C# char behavior. Its `unicode.ToLower` still differs
+  for Turkish `İ`, and converting malformed UTF-8 reconstructs replacement
+  runes. `naming.go:63-73` retains the legacy initial-uppercase-run algorithm:
+  `URLValue` → `urlValue`, `ID` → `id`, unlike C# Fundamentals. The issue's older
+  default description no longer matches this consumer revision. Read-model root
+  `ID` → `Id` handling (`plan.go:62-66`) remains product-owned, not this API.
+
+Consumers must verify adoption and existing persisted names in their own tests;
+these inspections establish neither a migration nor a consumer release pin.
 
 ## Concept deviations
 
@@ -143,8 +203,9 @@ Source inspection establishes a contract, not executable Go parity.
 The dependency baseline comes from [inventory issue #10][issue-10]. The accepted
 [DI ownership decision][di-decision] on [#9][issue-9] supersedes the earlier
 suggestion to leave Arc's container in Arc.Go. DI is **Partial** in Fundamentals.Go:
-contracts, the default container and conformance suites are implemented;
-conventions are not ([#14][issue-14]).
+contracts, the default container, conformance suites and convention planning
+are available ([#14][issue-14]). Generation and rendering remain product-owned;
+this does not establish full generator parity.
 
 | Consumer baseline | Revision | Inspected scope |
 | --- | --- | --- |
@@ -231,7 +292,7 @@ new work are not an approved API or a v0.1.0 requirement.
 
 | Area and C# authority | Consumer evidence | Status | Disposition and tracking | Migration boundary |
 | --- | --- | --- | --- | --- |
-| Concepts: `Concepts/ConceptAs.cs`, `ConceptExtensions.cs`, `ConceptMap.cs`, `ConceptFactory.cs`, `TypesExtensions.cs`, `ConceptAsTypeConverter.cs`; `Json/ConceptAsJsonConverterFactory.cs` | A27/C71; domain values, binding, schema/proxy recognition; converter registration is distinct from JSON | Partial | Ported scalar codecs and Go-specific declaration recognition, [#2][issue-2]/[#4][issue-4]; compile-time recognition planned [#15][issue-15], tooling release [#16][issue-16] | Fundamentals owns `concepts`; Arc owns binding/validation/proxies, Chronicle owns event-schema admission. No universal wrapper, reflective factory or process-global TypeConverter registry. Evidence and deviations are in Surfaces above. |
+| Concepts: `Concepts/ConceptAs.cs`, `ConceptExtensions.cs`, `ConceptMap.cs`, `ConceptFactory.cs`, `TypesExtensions.cs`, `ConceptAsTypeConverter.cs`; `Json/ConceptAsJsonConverterFactory.cs` | A27/C71; domain values, binding, schema/proxy recognition; converter registration is distinct from JSON | Partial | Ported scalar codecs and Go-specific declaration recognition, [#2][issue-2]/[#4][issue-4]; compile-time declaration recognition delivered in `concepts/conceptstypes` [#15][issue-15], standard-library tooling surface [#16][issue-16]; product generators and JavaScript parity remain separate | Fundamentals owns `concepts`; Arc owns binding/validation/proxies, Chronicle owns event-schema admission. No universal wrapper, reflective factory or process-global TypeConverter registry. Evidence and deviations are in Surfaces above. |
 | BCL Guid, DateOnly, TimeOnly, TimeSpan; `Json/DateOnlyJsonConverter.cs`, `TimeOnlyJsonConverter.cs`, `Json/ConceptAsJsonConverter.cs` (Guid/DateOnly/TimeOnly/TimeSpan branches only), `Json/ConceptAsJsonConverterFactory.cs` | Both via JSON and concepts; Arc rich JS proxy scalars; not the Guids area count | Implemented | Ported canonical wire subset, [#2][issue-2] | Reuse shared codecs; retain consumer parser compatibility adapters and Chronicle BCL byte conversion. Do not narrow TimeSpan to `time.Duration`. See executable evidence above. |
 | Conversion: `Conversion/TypeConverters.cs`, `DateOnlyTypeConverter.cs`, `TimeOnlyTypeConverter.cs`; `Concepts/StringExtensions.cs`, `Types/TypeConversion.cs` | Conversion A1/C0; Arc startup registration; general conversion reached indirectly by both concept factories | Partial | Shared typed text codecs [#2][issue-2]/[#4][issue-4]; Go-idiom replacement for registration; additional permissive conversions deferred → [#5][issue-5] | Shared parsers return errors, not legacy invalid-input sentinels. HTTP empty/absent/query validation remains Arc-owned; no general object-conversion package. |
 | Json options and DOM: `Json/Globals.cs`, `JsonElementExtensions.cs`, `JsonObjectExtensions.cs`, `JsonValueExtensions.cs` | Json A1/C2; both configure shared converter families, not one universal Globals profile | Not implemented | Out of scope: general serializers, global options and heuristic DOM conversion; [#5][issue-5] boundary | Use `encoding/json`/`json.RawMessage` with product-owned field plans. Keep null/presence, unknown fields and numeric/schema limits local; do not globally guess dates or delete null elements. |
@@ -239,14 +300,15 @@ new work are not an approved API or a v0.1.0 requirement.
 | Json bare enums and enum concepts: `Json/EnumConverter.cs`, `EnumConverterFactory.cs`, `ConceptAsJsonConverter.cs` | Json A1/C2; both default converter profiles; Arc proxy/API contracts and Chronicle event values | Not implemented | Proposed focused enum wire-contract decision and fixtures ([#17][issue-17]); later than v0.1.0 | Numeric output is not enough: bare numeric input requires a defined int32 value, string parsing is more permissive, and concepts differ. Product binders/schema/enum declarations stay local; no enum registry API is approved here. |
 | Json complex keys: `Json/ComplexKeyDictionaryJsonConverterFactory.cs`; distinct utility `DictionaryJsonConverter.cs` | Json A1/C2; both serializer profiles; Arc OpenAPI/proxy ValueMap and Chronicle schema integration | Not implemented | Proposed embedded-JSON key contract and interoperability fixtures ([#18][issue-18]); later than v0.1.0 | Standard text map keys are not embedded JSON keys. Keep map traversal, field plans, schema documents and TS ValueMap generation in products; evaluate only a narrow reusable key codec, not a shared serializer. |
 | Remaining Json adapters: `Json/TypeJsonConverter.cs`, `UriJsonConverter.cs`, `TypeWithObjectPropertiesJsonConverter.cs`, `TypeWithObjectPropertiesJsonConverterFactory.cs`, `EnumerableModelWithIdToConceptOrPrimitiveEnumerableConverterFactory.cs`, `EnumerableModelWithIdToConceptOrPrimitiveEnumerableConverter.cs` | Json A1/C2; Type/URI/legacy `_id` converters are registered; no direct sidecar utility use established | Not implemented | Out of scope: CLR type activation, general object mapping and legacy model-to-ID projections; [#5][issue-5] boundary | Product-owned allowlisted codecs only if a wire contract needs them. URI remains scalar text. Never copy the legacy empty `Write` as a successful codec. |
-| Strings: `Strings/StringExtensions.cs`; `Serialization/AcronymFriendlyJsonCamelCaseNamingPolicy.cs` | Strings A9/C0; direct Arc names; indirect Chronicle policy use, plus Infrastructure | Not implemented | Deferred → existing naming proposal [#5][deferred-proposals], not a new issue | An explicitly named pure policy may be extracted later. Preserve `URLValue`/`IPAddress`/`ID` wholesale; do not replace Chronicle.Go's `urlValue` default or move either field plan. General text work uses `strings`/`unicode`. |
-| Serialization naming: `Serialization/INamingPolicy.cs`, `NamingPolicy.cs`, `DefaultNamingPolicy.cs`, `CamelCaseNamingPolicy.cs`, `NamespacedNamingPolicy.cs`, `NamingPolicyCollectionExtensions.cs` | Serialization A11/C48; Arc MongoDB; Chronicle schemas, read models, reducers and projections | Not implemented | Deferred → [#5][deferred-proposals], separately named persistence policies | Keep explicit storage names, property paths and tag precedence product-owned. No automatic Humanizer dependency or universal camelCase default; preserve existing names during migration. |
-| ReadModels: `ReadModels/ReadModelNameAttribute.cs`, `Serialization/NamingPolicy.cs` | A0/C0 direct; both indirectly through `GetReadModelName` as sampled above | Not implemented | Go-idiom replacement: explicit storage-name registration; optional policy deferred → [#5][deferred-proposals] | An explicit name bypasses pluralization, prefixing and casing. It is not Arc query identity or Chronicle event-type identity; no attribute package moves here. |
+| Strings: `Strings/StringExtensions.cs`; `Serialization/AcronymFriendlyJsonCamelCaseNamingPolicy.cs` | Strings A9/C0; direct Arc names; indirect Chronicle policy use, plus Infrastructure | Go-specific | Ported casing rules → [#21][issue-21]; `naming.PascalCase`, `CamelCase` | Preserve `URLValue`/`IPAddress`/`ID` wholesale. BMP-aware UTF-16 classification and invariant exceptions match C#; remaining Unicode-table, null and malformed-text differences are recorded in Naming evidence above; golden fixtures and fuzzing exercise the contract. Product defaults and field plans remain local. |
+| Serialization naming: `Serialization/INamingPolicy.cs`, `NamingPolicy.cs`, `DefaultNamingPolicy.cs`, `CamelCaseNamingPolicy.cs`, `NamespacedNamingPolicy.cs`, `NamingPolicyCollectionExtensions.cs` | Serialization A11/C48; Arc MongoDB; Chronicle schemas, read models, reducers and projections | Partial | Ported pure non-pluralizing policies → [#21][issue-21]; `naming.Policy`, `Default`, `CamelCasePolicy`, `Namespaced`, `NewNamespaced` | `naming/policy_test.go` and `testdata/policy.json` cover explicit string names and literal final `-`. CLR metadata, Humanizer, serializer objects and DI registration are omitted; rune separator differences are documented above. Explicit storage overrides, paths, tags and defaults stay product-owned. |
+| ReadModels: `ReadModels/ReadModelNameAttribute.cs`, `Serialization/NamingPolicy.cs` | A0/C0 direct; both indirectly through `GetReadModelName` as sampled above | Not implemented | Go-idiom replacement: explicit storage-name registration; optional string-based naming policies [#21][issue-21] | An explicit name bypasses pluralization, prefixing and casing. It is not Arc query identity or Chronicle event-type identity; no attribute package moves here. |
 | Serialization polymorphism: `Serialization/DerivedTypeAttribute.cs`, `DerivedTypeId.cs`, `DerivedTypes.cs`, `IDerivedTypes.cs`, `DerivedTypeJsonConverter.cs`, `DerivedTypeJsonConverterFactory.cs` | Serialization A11/C48; Arc JSON/proxies/MongoDB, Chronicle JSON/schema and projected children | Not implemented | Deferred → existing registry proposal [#5][deferred-proposals] | Candidate shared immutable ID/target metadata only. Product serializers and generated metadata remain local. C# IDs are globally unique, including across different targets; missing/unknown discriminators differ. No assembly scanning or shared general serializer. |
 | Geospatial: `Geospatial/Point.cs`, `LineString.cs`, `LinearRing.cs`, `Polygon.cs`; `Json/PointJsonConverter.cs`, `LineStringJsonConverter.cs`, `PolygonJsonConverter.cs` | A4/C1; Arc MongoDB/proxy maps, Chronicle schema generation; JSON indirectly in both | Not implemented | Deferred → existing geometry/GeoJSON proposal [#5][deferred-proposals] | Potential shared values/codecs retain longitude-first coordinates, rings and holes. Slice ownership and malformed input need fixtures. Database adapters, OpenAPI and event schemas stay product-owned; no geospatial engine. |
 
 The [concrete proposals][deferred-proposals] on [#5][issue-5] remain the tracking
-location for naming, derived-type metadata and geometry. Their older blanket
+location for derived-type metadata and geometry; naming is implemented separately
+under [#21][issue-21]. Their older blanket
 exclusion of shared DI is superseded by [#9][issue-9]–[#14][issue-14]. Small
 concept conversion/collection edge cases belong with [#4][issue-4]'s existing
 boundary or [#5][issue-5]'s deferrals, not duplicate issues.
@@ -255,11 +317,11 @@ boundary or [#5][issue-5]'s deferrals, not duplicate issues.
 
 | Area and C# authority | Consumer evidence | Status | Disposition and tracking | Migration boundary |
 | --- | --- | --- | --- | --- |
-| Types discovery: `Types/Types.cs`, `ContractToImplementorsMap.cs`, `ProjectReferencedAssemblies.cs`, `PackageReferencedAssemblies.cs`, `CompositeAssemblyProvider.cs`, `GeneratedTypeDiscoveryRegistry.cs`, `TypesServiceCollectionExtensions.cs`, `TypeDiscoveryDiagnostics.cs` | Types A29/C10; application features, extension providers and schema universe | Not implemented | Go-idiom replacement: explicit catalogs/contributions; shared registration/generation planned [#11][issue-11]/[#14][issue-14] under [#9][issue-9] | No assembly loading, global `Types.Instance` or CLR diagnostics port. Arc/Chronicle own feature registration and completeness checks; composition must not silently omit required contributors. |
+| Types discovery: `Types/Types.cs`, `ContractToImplementorsMap.cs`, `ProjectReferencedAssemblies.cs`, `PackageReferencedAssemblies.cs`, `CompositeAssemblyProvider.cs`, `GeneratedTypeDiscoveryRegistry.cs`, `TypesServiceCollectionExtensions.cs`, `TypeDiscoveryDiagnostics.cs` | Types A29/C10; application features, extension providers and schema universe | Not implemented | Go-idiom replacement: explicit catalogs/contributions; shared registration and constructor planning available [#11][issue-11]/[#14][issue-14] under [#9][issue-9]; generation remains product-owned | No assembly loading, global `Types.Instance` or CLR diagnostics port. Arc/Chronicle own feature registration and completeness checks; composition must not silently omit required contributors. |
 | Types activation: `Types/InstancesOf.cs`, `ImplementationsOf.cs`, `KnownInstancesOf.cs` and corresponding interfaces | Types A29/C10; discovered instances in both; no direct `IImplementationsOf` client use established | Not implemented | Go-idiom replacement: explicit factory/instance lists; DI work [#11][issue-11]–[#14][issue-14]; no promise of container-wide enumeration | Factories resolve using the active operation scope; discovery is not activation. Exact instance lists stay caller-owned; do not cache request-scoped extensions globally. |
 | Reflection: `Reflection/TypeExtensions.cs`, `DictionaryExtensions.cs`, `PropertyExtensions.cs`, `ParameterExtensions.cs`, `MethodExtensions.cs`, `ExpressionExtensions.cs`, `TypeConstructorExtensions.cs`, `TypeInfo.cs`, `MethodCalls.cs` | A9/C7; classification, schema/nullability, expression paths and invocation metadata | Not implemented | Out of scope; concept declaration inspection is the Go-specific row in Surfaces | Use `reflect`, explicit tags, typed factories and generated field identifiers without conflating scalar, collection and stream kinds. Product field plans, presence and handler/schema agreement remain local. |
-| DependencyInjection contracts/lifetimes: `DependencyInjection/SingletonAttribute.cs`, `ScopedAttribute.cs`, `IgnoreConventionAttribute.cs`, `ConventionServiceBinding.cs`, `ConventionSelfBinding.cs`; Microsoft DI as used by Fundamentals | A41/C16; both products' providers and operation-scoped activation | Partial | Ported: contracts [#11][issue-11], default container moved from Arc.Go [#12][issue-12], conformance suites [#13][issue-13]; design accepted on [#9][di-decision]; see [Dependency injection surfaces](#dependency-injection-surfaces) | Fundamentals owns `dependencyinjection`, `dependencyinjection/container` and `dependencyinjection/ditest`. Plain constructors remain first-class; no product imports the container. Arc principal/tenant/staging and Chronicle delivery activation remain product-owned. Attribute-driven lifetimes are not implemented ([#14][issue-14]). |
-| DependencyInjection conventions: `DependencyInjection/ServiceCollectionExtensions.cs`, `ICanProvideConventionsForDependencyInjection.cs`; `Source/DotNET/Fundamentals.TypeDiscovery.Generator/TypeDiscoveryCollector.cs`, `GeneratedSourceBuilder.cs` | DI A41/C16; Arc calls convention registration; Chronicle also explicitly registers/activates artifacts | Not implemented | Planned typed constructor bindings [#14][issue-14], tooling prerequisite [#16][issue-16]; runtime ownership [#11][issue-11]–[#13][issue-13] | Explicit/generated package contributions replace assembly scanning. Record duplicate/override and ownership differences before claiming parity; operation adapters stay in Arc.Go/Chronicle.Go. Generator plans are not implementations. |
+| DependencyInjection contracts/lifetimes: `DependencyInjection/SingletonAttribute.cs`, `ScopedAttribute.cs`, `IgnoreConventionAttribute.cs`, `ConventionServiceBinding.cs`, `ConventionSelfBinding.cs`; Microsoft DI as used by Fundamentals | A41/C16; both products' providers and operation-scoped activation | Partial | Ported: contracts [#11][issue-11], default container moved from Arc.Go [#12][issue-12], conformance suites [#13][issue-13]; design accepted on [#9][di-decision]; see [Dependency injection surfaces](#dependency-injection-surfaces) | Fundamentals owns `dependencyinjection`, `dependencyinjection/container` and `dependencyinjection/ditest`. Plain constructors remain first-class; no product imports the container. Arc principal/tenant/staging and Chronicle delivery activation remain product-owned. Type-level lifetime directives are normalized by `bindingtypes.ReadDirectives`; product renderers remain responsible for applying plans ([#14][issue-14]). |
+| DependencyInjection conventions: `DependencyInjection/ServiceCollectionExtensions.cs`, `ICanProvideConventionsForDependencyInjection.cs`; `Source/DotNET/Fundamentals.TypeDiscovery.Generator/TypeDiscoveryCollector.cs`, `GeneratedSourceBuilder.cs` | DI A41/C16; Arc calls convention registration; Chronicle also explicitly registers/activates artifacts | Partial | Pure standard-library constructor planner `dependencyinjection/bindingtypes` in the root module ([#14][issue-14]); shared source/JSON corpus, directive/export-data tests and hand-authored render-equivalence tests; runtime ownership [#11][issue-11]–[#13][issue-13] | Explicit package universes replace assembly scanning. Structural ambiguity includes ignored and constructorless families; selected constructors replace arbitrary activation. Strict duplicates, explicit existing-key decisions and borrowed forwarding intentionally differ from C#. No nested tools module or shared emitter/CLI: Arc.Go and Chronicle.Go own rendering and operation adapters. |
 | Execution: `Execution/CorrelationId.cs`, `CorrelationIdAccessor.cs`, `ICorrelationIdAccessor.cs`, `ICorrelationIdModifier.cs` | A29/C35, Connections 4; HTTP/pipeline and RPC/event propagation | Implemented | Ported explicit-context contract [#8][issue-8], replacing ambient storage; tests above | Shared UUID-backed context key only. `AddCorrelationIdSupport` has no counterpart; `WithID`/`FromContext` need no registration (Go-idiom replacement). Ingress parsing/generation, headers, principal, tenancy, causation, store/namespace and detached-operation policy stay local. No Fundamentals `ExecutionContext` class exists to port. |
 | Monads: `Monads/Result.cs`, `Result{TError}.cs`, `Result{TResult,TError}.cs`, `Catch.cs`, `Catch{TResult}.cs`, `Catch{TResult,TError}.cs`, `Option.cs` | A4/C15; Result in both, Catch in Chronicle activation/reactors; no direct client Option use established | Not implemented | Out of scope as a shared union framework; Go-idiom replacement recorded by [#10][issue-10] | Use `(T, error)`, `errors.Is/As`, `(T, bool)` and product-specific outcomes. Preserve domain rejection versus infrastructure failure and explicit presence; do not flatten Arc command outcomes or confuse Option with three-state JSON Optional. |
 | Collections: `Collections/CollectionExtensions.cs`, `ItemAlreadyAddedToBinaryTree.cs` | A0/C1; Chronicle constraint discovery; dependencies/server also use helpers | Not implemented | Out of scope as a shared collection framework; Go-idiom replacement, [#10][issue-10] | `range`, `len`, `append`, `slices` and maps replace helpers; preserve sequential effects and duplicate lookup values. The directory's binary-tree exception is not a tree implementation to port. |
@@ -338,7 +400,8 @@ accidental CLR behavior into a new Go guarantee.
   interface/self singleton bindings are separate descriptors and need not share
   an instance. Go stance: explicit lifetimes/owned-versus-borrowed bindings and
   close-once forwarding are implemented and covered by `dependencyinjection/ditest`
-  ([#11][issue-11]–[#13][issue-13]); convention registration is not ([#14][issue-14]).
+  ([#11][issue-11]–[#13][issue-13]). Convention planning is available
+  ([#14][issue-14]); products own generated registration and rendering.
 - **Enumeration is activation:** `Types/InstancesOf.cs` captures discovered
   concrete types and a provider, then calls `GetService(concreteType)` on every
   enumeration. It neither enumerates interface registrations nor falls back to
@@ -382,7 +445,7 @@ accidental CLR behavior into a new Go guarantee.
   `urlValue`. `Serialization/DefaultNamingPolicy.cs` preserves properties and
   pluralizes read-model names by default; `CamelCaseNamingPolicy.cs` is opt-in.
   Pinned ChronicleClient chooses Default; Arc's profile chooses acronym-friendly
-  camelCase. Go stance: separate named policies ([#5][issue-5]), never silently merge the
+  camelCase. Go stance: separate named policies ([#21][issue-21]), never silently merge the
   existing Go defaults.
 - **Read-model overrides and namespaces:** `Serialization/NamingPolicy.cs`
   returns a directly declared `ReadModelNameAttribute` verbatim, bypassing all
@@ -391,7 +454,8 @@ accidental CLR behavior into a new Go guarantee.
   `NamespacedNamingPolicy.cs` always camelCases namespace segments, uses the
   configurable separator *between* those segments, but a literal final `-`
   before the model (even with no remaining namespace). Go stance: explicit
-  stable storage names first; optional named policies stay deferred under [#5][issue-5].
+  stable storage names first; optional non-pluralizing named policies are provided
+  by [#21][issue-21], with explicit string metadata.
 - **Map keys contain JSON:** `Json/ComplexKeyDictionaryJsonConverterFactory.cs`
   serializes complex keys to compact JSON and uses that text as property names.
   A string concept key contains embedded quotes; repeated decoded keys overwrite.
@@ -530,5 +594,7 @@ implementation claims.
 [issue-16]: https://github.com/Cratis/Fundamentals.Go/issues/16
 [issue-17]: https://github.com/Cratis/Fundamentals.Go/issues/17
 [issue-18]: https://github.com/Cratis/Fundamentals.Go/issues/18
+[issue-21]: https://github.com/Cratis/Fundamentals.Go/issues/21
+[invariant-casing]: https://github.com/dotnet/runtime/blob/v10.0.0/src/native/libs/System.Globalization.Native/pal_casing.c#L65-L109
 [deferred-proposals]: https://github.com/Cratis/Fundamentals.Go/issues/5#issuecomment-5960868484
 [di-decision]: https://github.com/Cratis/Fundamentals.Go/issues/9#issuecomment-5961365677

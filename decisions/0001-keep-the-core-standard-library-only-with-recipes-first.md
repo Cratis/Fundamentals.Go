@@ -24,6 +24,11 @@ applies-to:
 > accountable decider. The stage is `implemented` because the root module
 > already meets the verification criteria below; `verified` follows the first
 > release.
+>
+> **2026-10-03 — clarification.** Compiled, CI-tested recipes now exist in the
+> unpublished `recipes/` module. Its explicit `publish: false` policy permits a
+> local root replacement; the released-root requirement below continues to apply
+> to publishable nested modules. The root remains standard-library-only.
 
 ## Context
 

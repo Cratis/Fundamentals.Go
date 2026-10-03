@@ -28,3 +28,6 @@ coverage.out
 Thumbs.db
 
 # Do NOT ignore go.sum, generated .go files, testdata, .cratis, or managed harnesses.
+
+# Python bytecode from workflow script self-tests
+__pycache__/

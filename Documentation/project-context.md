@@ -60,16 +60,16 @@ proof that an API exists. Agree on the contract before consumers adopt it.
 - Push verified, coherent work to `develop` freely under the maintainer's
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
-- Consumers can pin **pushed** develop commits using Go pseudo-versions until
-  the first release. Share the full commit SHA on #3; never use local replacements
-  as evidence that a consumer can resolve the module.
-- Collect the initial implementation into **one release PR from `develop` to
-  `main`, labeled `minor`, for v0.1.0**. The setup PR is separate and carries
-  `no-release`; it does not publish the library.
-- Fundamentals.Go **v0.1.0 must be tagged before Arc.Go or Chronicle.Go release**.
-  Confirm public proxy retrieval, then tell the consumer sessions the version
-  and commit. The configured release workflow, not a manual competing tag,
-  produces the release after the authorized merge.
+- Fundamentals.Go **v0.1.0 is released at commit `e50913e`**. Consumers use
+  published tags for released APIs and may pin **pushed** develop commits using
+  Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
+  use local replacements as evidence that a consumer can resolve the module.
+- Collect release-bound changes in a release PR from `develop` to `main` with
+  the appropriate intent label. The current additive package release targets
+  **v0.2.0 with `minor` intent**; initial v0.1.0 bootstrap sequencing is complete.
+- Confirm public proxy retrieval after publication, then tell the consumer
+  sessions the version and commit. The configured release workflow, not a manual
+  competing tag, produces the release after the authorized merge.
 - Permission to push `develop` does not itself authorize merging a PR. Follow
   the maintainer's release instructions and [release policy](releases.md).
 - Exactly one PR intent: `major`, `minor`, `patch` or `no-release`. A stable v1

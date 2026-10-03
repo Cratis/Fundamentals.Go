@@ -15,7 +15,8 @@ dependency-light set of primitives without depending on one another.
 
 **Experimental (v0.x).** Package `concepts` provides UUID, DateOnly,
 TimeOnly, TimeSpan, the Concept contract, Underlying and CheckJSON. Package
-`correlation` provides shared correlation-ID context. Package
+`concepts/conceptstypes` provides matching compile-time recognition with `go/types`.
+Package `correlation` provides shared correlation-ID context. Package
 `dependencyinjection` provides an optional dependency-injection contract, with a
 default container and conformance suites. Releases remain v0.x while the API
 is experimental. Go 1.26 or later is required.
