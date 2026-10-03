@@ -53,20 +53,10 @@ func (id AuthorID) ConceptValue() concepts.UUID  { return concepts.UUID(id) }
 func (id AuthorID) MarshalText() ([]byte, error) { return concepts.UUID(id).MarshalText() }
 func (id AuthorID) MarshalJSON() ([]byte, error) { return concepts.UUID(id).MarshalJSON() }
 func (id *AuthorID) UnmarshalText(data []byte) error {
- var value concepts.UUID
- if err := value.UnmarshalText(data); err != nil {
-  return err
- }
- *id = AuthorID(value)
- return nil
+ return (*concepts.UUID)(id).UnmarshalText(data)
 }
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
- var value concepts.UUID
- if err := value.UnmarshalJSON(data); err != nil {
-  return err
- }
- *id = AuthorID(value)
- return nil
+ return (*concepts.UUID)(id).UnmarshalJSON(data)
 }
 
 func main() {
@@ -100,8 +90,8 @@ marker, not the correctness of your codecs.
 Go defined types do **not** inherit methods. Without the forwarding methods,
 a UUID-derived value can encode as a byte array instead of a UUID string. Value
 receivers encode even unaddressable values, such as map entries. Pointer decoders
-parse into a temporary and assign only after success, preserving the old value
-on malformed input. JSON field names come from explicit tags, not a global
+delegate through ordinary Go pointer conversions to UUID's failure-atomic codecs,
+preserving the old value on malformed input. JSON field names come from explicit tags, not a global
 naming policy. The example panics only to stop a failed demonstration; application
 code should return or handle these errors at its boundary.
 

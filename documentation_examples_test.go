@@ -21,20 +21,10 @@ func (id AuthorID) ConceptValue() concepts.UUID  { return concepts.UUID(id) }
 func (id AuthorID) MarshalText() ([]byte, error) { return concepts.UUID(id).MarshalText() }
 func (id AuthorID) MarshalJSON() ([]byte, error) { return concepts.UUID(id).MarshalJSON() }
 func (id *AuthorID) UnmarshalText(data []byte) error {
-	var value concepts.UUID
-	if err := value.UnmarshalText(data); err != nil {
-		return err
-	}
-	*id = AuthorID(value)
-	return nil
+	return (*concepts.UUID)(id).UnmarshalText(data)
 }
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
-	var value concepts.UUID
-	if err := value.UnmarshalJSON(data); err != nil {
-		return err
-	}
-	*id = AuthorID(value)
-	return nil
+	return (*concepts.UUID)(id).UnmarshalJSON(data)
 }
 
 func Example_domainRoundTrip() {

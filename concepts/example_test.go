@@ -86,29 +86,32 @@ func (id AuthorID) ConceptValue() concepts.UUID  { return concepts.UUID(id) }
 func (id AuthorID) MarshalText() ([]byte, error) { return concepts.UUID(id).MarshalText() }
 func (id AuthorID) MarshalJSON() ([]byte, error) { return concepts.UUID(id).MarshalJSON() }
 func (id *AuthorID) UnmarshalText(data []byte) error {
-	var value concepts.UUID
-	if err := value.UnmarshalText(data); err != nil {
-		return err
-	}
-	*id = AuthorID(value)
-	return nil
+	return (*concepts.UUID)(id).UnmarshalText(data)
 }
 func (id *AuthorID) UnmarshalJSON(data []byte) error {
-	var value concepts.UUID
-	if err := value.UnmarshalJSON(data); err != nil {
-		return err
-	}
-	*id = AuthorID(value)
-	return nil
+	return (*concepts.UUID)(id).UnmarshalJSON(data)
 }
 
 func (id AuthorID) Value() (driver.Value, error) { return concepts.UUID(id).Value() }
 func (id *AuthorID) Scan(src any) error {
+	return (*concepts.UUID)(id).Scan(src)
+}
+
+// RequiredAuthorID demonstrates application validation, not passthrough decoding.
+// Its defined array representation still permits literals and explicit conversions.
+type RequiredAuthorID concepts.UUID
+
+func (id RequiredAuthorID) IsZero() bool { return concepts.UUID(id).IsZero() }
+func (id *RequiredAuthorID) UnmarshalText(data []byte) error {
 	var value concepts.UUID
-	if err := value.Scan(src); err != nil {
+	if err := value.UnmarshalText(data); err != nil {
 		return err
 	}
-	*id = AuthorID(value)
+	candidate := RequiredAuthorID(value)
+	if candidate.IsZero() {
+		return fmt.Errorf("author ID must be nonzero")
+	}
+	*id = candidate
 	return nil
 }
 
