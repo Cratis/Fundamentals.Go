@@ -4,6 +4,8 @@
   href: concepts.md
 - name: Dependency injection
   href: dependency-injection.md
+- name: Naming
+  href: naming.md
 - name: Parity
   href: parity.md
 - name: Releases
