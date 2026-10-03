@@ -30,11 +30,19 @@ import (
 // exportImporter resolves module imports with the running Go toolchain, not
 // GOPATH or a workspace. Only the test loader invokes go list; Underlying never
 // loads packages. The gc importer caches packages and preserves their identity.
-func exportImporter(ctx context.Context, fset *token.FileSet) (types.Importer, error) {
-	command := exec.CommandContext(ctx, "go", "list", "-export", "-deps", "-json", "github.com/cratis/fundamentals.go/concepts")
+func exportImporter(ctx context.Context, fset *token.FileSet, packages ...string) (types.Importer, error) {
+	if len(packages) == 0 {
+		packages = []string{"github.com/cratis/fundamentals.go/concepts"}
+	}
+	args := append([]string{"list", "-export", "-deps", "-json"}, packages...)
+	command := exec.CommandContext(ctx, "go", args...)
 	command.Env = append(os.Environ(), "GOWORK=off")
 	data, err := command.Output()
 	if err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return nil, fmt.Errorf("load export data: %w: %s", err, exitErr.Stderr)
+		}
 		return nil, fmt.Errorf("load export data: %w", err)
 	}
 	exports := make(map[string]string)

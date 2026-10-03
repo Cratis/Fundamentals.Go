@@ -70,8 +70,8 @@ func Underlying(t types.Type) (Representation, bool, error) {
 	if kind := sharedKind(declared); kind != concepts.KindInvalid {
 		return Representation{Type: declared, Kind: kind, Declared: declared, PointerDepth: depth}, true, nil
 	}
-	valueMethods := types.NewMethodSet(declared)
-	pointerMethods := types.NewMethodSet(types.NewPointer(declared))
+	valueMethods := runtimeMethodSet(declared)
+	pointerMethods := runtimeMethodSet(types.NewPointer(declared))
 	marker := valueMethods.Lookup(nil, "ConceptValue")
 	if marker == nil && pointerMethods.Lookup(nil, "ConceptValue") == nil {
 		if isCalendarStruct(declared) && !hasCodec(valueMethods, "MarshalJSON", false) && !hasCodec(valueMethods, "MarshalText", false) {
@@ -151,8 +151,8 @@ func stripPointers(t types.Type) (types.Type, int, bool) {
 }
 
 func hasConceptMethod(t types.Type) bool {
-	return types.NewMethodSet(t).Lookup(nil, "ConceptValue") != nil ||
-		types.NewMethodSet(types.NewPointer(t)).Lookup(nil, "ConceptValue") != nil
+	return runtimeMethodSet(t).Lookup(nil, "ConceptValue") != nil ||
+		runtimeMethodSet(types.NewPointer(t)).Lookup(nil, "ConceptValue") != nil
 }
 
 func sharedKind(t types.Type) concepts.ScalarKind {
@@ -235,25 +235,22 @@ func hasCodec(methods *types.MethodSet, name string, decoder bool) bool {
 	return types.Identical(method.Type(), expected)
 }
 
-// isCalendarStruct compares with the actual shared calendar types. A convertible
-// struct preserves their private fields' declaring package, even when unnamed.
-// ConvertibleTo follows reflect's rule, including ignored struct tags; field
-// spelling alone is not sufficient evidence of calendar identity.
+// isCalendarStruct matches the exact shared calendar storage, ignoring tags as
+// reflect's conversion rule does. Export-data importers can leave the private
+// fields' package scope partial, so recognition must not look up scalar names
+// in that scope. Their declaring package paths still preserve field identity.
 func isCalendarStruct(t types.Type) bool {
 	s, ok := t.Underlying().(*types.Struct)
 	if !ok {
 		return false
 	}
-	for i := 0; i < s.NumFields(); i++ {
-		pkg := s.Field(i).Pkg()
-		if pkg == nil || pkg.Path() != "github.com/cratis/fundamentals.go/concepts" {
-			continue
-		}
-		for _, name := range []string{"DateOnly", "TimeOnly"} {
-			if obj := pkg.Scope().Lookup(name); obj != nil && types.ConvertibleTo(t, obj.Type()) {
-				return true
-			}
-		}
+	matches := func(index int, name string, kind types.BasicKind) bool {
+		field := s.Field(index)
+		pkg := field.Pkg()
+		return !field.Embedded() && pkg != nil &&
+			pkg.Path() == "github.com/cratis/fundamentals.go/concepts" &&
+			field.Name() == name && types.Identical(field.Type(), types.Typ[kind])
 	}
-	return false
+	return (s.NumFields() == 3 && matches(0, "year", types.Uint16) && matches(1, "month", types.Uint8) && matches(2, "day", types.Uint8)) ||
+		(s.NumFields() == 1 && matches(0, "ticks", types.Int64))
 }

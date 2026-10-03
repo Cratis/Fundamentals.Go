@@ -6,6 +6,8 @@
 // concepts.Underlying, sharing ScalarKind, InvalidReason and ErrInvalidConcept.
 // Callers own package loading and pass fully type-checked types to Underlying.
 // Shared scalars are identified by their canonical concepts package path and name.
+// Methods with their own type parameters are excluded before resolving promotion,
+// matching runtime reflection; generic receiver instantiations remain supported.
 //
 // Although go/types can distinguish promoted methods, this package deliberately
 // applies the runtime recognizer's conservative embedded-field rule: any
