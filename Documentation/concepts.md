@@ -168,9 +168,8 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
 10. Success returns the exact scalar `Type`, its `ScalarKind` in `Kind`,
     pointer-stripped input `Declared`, and `PointerDepth`, with true, nil.
     `Kind` is set for every recognized result and agrees with `Type`. Kind values
-    are stable and never renumbered, so reflect-free tooling such as a future
-    [`go/types` counterpart (#15)](https://github.com/Cratis/Fundamentals.Go/issues/15)
-    can share these constants. Every error returns zero, false and
+    are stable and never renumbered; the reflect-free `conceptstypes` package
+    shares these constants. Every error returns zero, false and
     `*TypeError` wrapping `ErrInvalidConcept`. Use `errors.Is` and `errors.As`;
     `TypeError.Type` retains the original input and `Underlying` its marker
     result when known. `Method` names an offending or missing method when
@@ -196,12 +195,32 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
     `UnmarshalJSON` accepts a JSON string. Number- and bool-backed concepts used
     as map keys decode only with the jsonv2-backed implementation.
 
-The shared declaration corpus is the test-package types and documented
-`declarationCorpus` table in
-[`concepts/underlying_test.go`](../concepts/underlying_test.go). A future
-`go/types` counterpart must follow this list and reuse those declaration cases.
-No proxy-generation agreement or implementation is established by reflection
-recognition alone.
+The shared declarations and expected outcomes live in
+[`concepts/internal/corpus`](../concepts/internal/corpus/). Both reflect and
+`go/types` tests run the same table, including aliases, generic instantiations,
+exact scalar types, codec signatures and failures. Any disagreement fails a test.
+This does not establish proxy-generation agreement; that remains Arc.Go's
+responsibility.
+
+## Compile-time recognition
+
+Generators can inspect concepts without running application code. Import
+`github.com/cratis/fundamentals.go/concepts/conceptstypes` and pass a fully
+type-checked `types.Type` to `conceptstypes.Underlying`. You own package loading;
+the package uses only the standard library and adds no loader dependency.
+
+The API follows the normative rules above, returning a `Representation` with
+`types.Type` fields and the same `concepts.ScalarKind` constants. Aliases,
+including generic aliases, are resolved with `types.Unalias`. Shared scalars
+are identified by their canonical concepts package path and type name. Errors
+wrap `concepts.ErrInvalidConcept`; `errors.As` exposes
+`*conceptstypes.TypeError` with the shared `concepts.InvalidReason` values.
+
+Although `go/types` can distinguish promoted methods, this recognizer deliberately
+keeps reflect's conservative rule: any anonymous field invalidates a
+concept-bearing struct, even with explicit overrides. See the
+[compiling generator example](../concepts/conceptstypes/example_test.go) for
+source type-checking and UUID-backed concept recognition.
 
 ## Validate actual JSON output
 
