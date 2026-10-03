@@ -328,20 +328,12 @@ func (a *analyzer) interfaces() {
 					continue // Explicit selections resolve convention ambiguity.
 				}
 				concrete, ok := pkg.Scope().Lookup(name[1:]).(*types.TypeName)
-				if !ok || named(concrete.Type()) == nil || isInterface(concrete.Type()) || !closed(concrete.Type()) || a.policy(concrete.Type()).Ignore {
+				if !ok || named(concrete.Type()) == nil || isInterface(concrete.Type()) || a.policy(concrete.Type()).Ignore {
 					continue
 				}
 				contract := ordinaryInterface(obj.Type())
-				if !types.Implements(concrete.Type(), contract) && !types.Implements(types.NewPointer(concrete.Type()), contract) {
-					continue
-				}
-				competitors := a.implementations(contract)
-				if len(competitors) > 1 {
-					d := diagnostic(AmbiguousImplementation, obj, obj.Type(), "multiple named implementation families in supplied packages")
-					d.Related = competitors
-					a.plan.Diagnostics = append(a.plan.Diagnostics, d)
-					continue
-				}
+				// The declaration may be generic. Match exact closed constructor and
+				// existing keys before considering the open family's method set.
 				var keys []types.Type
 				for _, b := range a.plan.Bindings {
 					if sameFamily(b.Service, concrete.Type()) && types.Implements(b.Service, contract) {
@@ -352,6 +344,17 @@ func (a *analyzer) interfaces() {
 					if sameFamily(r.Service, concrete.Type()) && types.Implements(r.Service, contract) {
 						keys = appendUnique(keys, r.Service)
 					}
+				}
+				if len(keys) == 0 && (!closed(concrete.Type()) ||
+					(!types.Implements(concrete.Type(), contract) && !types.Implements(types.NewPointer(concrete.Type()), contract))) {
+					continue
+				}
+				competitors := a.implementations(contract)
+				if len(competitors) > 1 {
+					d := diagnostic(AmbiguousImplementation, obj, obj.Type(), "multiple named implementation families in supplied packages")
+					d.Related = competitors
+					a.plan.Diagnostics = append(a.plan.Diagnostics, d)
+					continue
 				}
 				if len(keys) == 0 {
 					a.add(ConstructorNotFound, concrete, concrete.Type(), "convention implementation has no selected constructor or existing exact key")
@@ -415,20 +418,66 @@ func (a *analyzer) implementations(contract *types.Interface) []types.Object {
 			result = append(result, n.Origin().Obj())
 		}
 	}
-	for _, pkg := range a.pkgs {
-		for _, name := range pkg.Scope().Names() {
-			switch obj := pkg.Scope().Lookup(name).(type) {
-			case *types.TypeName:
-				add(obj.Type())
-			case *types.Func:
-				// Closed generic shapes visible in signatures also belong to the
-				// universe, even when their constructor is unselected or ignored.
-				// Do not infer type arguments for an open declaration.
-				sig := obj.Type().(*types.Signature)
-				for i := 0; i < sig.Results().Len(); i++ {
-					add(sig.Results().At(i).Type())
+	// Declaration types include constructorless/ignored instantiations in
+	// parameters, variables, fields and methods, not just function results.
+	// Walk each exact shape once; recursive declarations must terminate.
+	seen := make(map[types.Type]bool)
+	var visit func(types.Type)
+	visit = func(t types.Type) {
+		if t == nil || seen[t] {
+			return
+		}
+		seen[t] = true
+		if n := named(t); n != nil && slices.Contains(a.pkgs, n.Obj().Pkg()) {
+			add(t)
+		}
+		switch t := t.(type) {
+		case *types.Alias:
+			for i := 0; i < t.TypeArgs().Len(); i++ {
+				visit(t.TypeArgs().At(i))
+			}
+			visit(t.Rhs())
+		case *types.Named:
+			for i := 0; i < t.TypeArgs().Len(); i++ {
+				visit(t.TypeArgs().At(i))
+			}
+			visit(t.Underlying())
+			for i := 0; i < t.NumMethods(); i++ {
+				visit(t.Method(i).Type())
+			}
+		case *types.Pointer:
+			visit(t.Elem())
+		case *types.Slice:
+			visit(t.Elem())
+		case *types.Array:
+			visit(t.Elem())
+		case *types.Map:
+			visit(t.Key())
+			visit(t.Elem())
+		case *types.Chan:
+			visit(t.Elem())
+		case *types.Struct:
+			for i := 0; i < t.NumFields(); i++ {
+				visit(t.Field(i).Type())
+			}
+		case *types.Interface:
+			for i := 0; i < t.NumEmbeddeds(); i++ {
+				visit(t.EmbeddedType(i))
+			}
+			for i := 0; i < t.NumExplicitMethods(); i++ {
+				visit(t.ExplicitMethod(i).Type())
+			}
+		case *types.Signature:
+			for _, tuple := range []*types.Tuple{t.Params(), t.Results()} {
+				for i := 0; i < tuple.Len(); i++ {
+					visit(tuple.At(i).Type())
 				}
 			}
+		}
+	}
+	for _, pkg := range a.pkgs {
+		for _, name := range pkg.Scope().Names() {
+			visit(pkg.Scope().Lookup(name).Type())
 		}
 	}
 	for _, r := range a.cfg.Existing {

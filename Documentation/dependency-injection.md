@@ -169,10 +169,13 @@ container's `Build` still validates the final graph, cycles and captive lifetime
 The [planner example](../dependencyinjection/bindingtypes/corpus_test.go) shows
 type-checking and analysis without running application code.
 
-Products render constructor bindings with `di.Bind`, optionally using
-`BindFunc1` through `BindFunc4` for one through four ordered arguments. There is
-no `BindFunc0`. For larger arities, resolve arguments in order and declare unique
-exact dependency keys. Disposable value results with more than four arguments
+Products render zero-argument constructor bindings with `di.Bind`. For one
+through four ordered arguments, always use `BindFunc1` through `BindFunc4`,
+adapting constructors without context or error results as needed. These typed
+adapters prevent dependency-resolution failures from transferring ownership of
+never-constructed zero values. There is no `BindFunc0`. For larger arities, use
+`di.Bind`, resolve arguments in order and declare unique exact dependency keys.
+Disposable value results with more than four arguments
 are rejected until a safe runtime adapter exists: returning a zero value after
 dependency failure could incorrectly transfer cleanup responsibility. Always
 preserve a non-nil constructor result returned with an error. Render forwarders

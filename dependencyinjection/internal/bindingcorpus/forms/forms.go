@@ -160,3 +160,22 @@ func LargeContextDisposable(*Dependency, *Dependency, *Dependency, *Dependency, 
 
 // SmallDisposable is safe through BindFunc1.
 func SmallDisposable(*Dependency) Disposable { panic("analysis executed constructor") }
+
+type aliasChain = PublicAlias
+
+// AliasChainResult retains the accessible intermediate alias.
+func AliasChainResult() *aliasChain { panic("analysis executed constructor") }
+
+// AliasGenericResult normalizes a closed generic argument spelling.
+func AliasGenericResult() *Box[aliasChain] { panic("analysis executed constructor") }
+
+type hidden interface{ Work() }
+
+// EmbeddedPrivateArgument cannot spell its anonymous interface externally.
+func EmbeddedPrivateArgument(interface{ hidden }) Value { panic("analysis executed constructor") }
+
+// PublicInterface hides an inaccessible embedded declaration.
+type PublicInterface interface{ hidden }
+
+// PublicInterfaceArgument can name the exported interface itself.
+func PublicInterfaceArgument(PublicInterface) Value { panic("analysis executed constructor") }

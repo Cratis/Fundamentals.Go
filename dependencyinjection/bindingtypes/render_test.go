@@ -7,12 +7,14 @@ import (
 	"context"
 	"errors"
 	"go/types"
+	"reflect"
 	"testing"
 
 	di "github.com/cratis/fundamentals.go/dependencyinjection"
 	bt "github.com/cratis/fundamentals.go/dependencyinjection/bindingtypes"
 	"github.com/cratis/fundamentals.go/dependencyinjection/container"
 	"github.com/cratis/fundamentals.go/dependencyinjection/internal/bindingcorpus/render"
+	"github.com/cratis/fundamentals.go/dependencyinjection/internal/bindingcorpus/renderfailure"
 )
 
 // registerRendered is hand-authored product output, not a production emitter.
@@ -45,9 +47,12 @@ func TestHandAuthoredRenderEquivalent(t *testing.T) {
 		t.Fatal(diagnostics)
 	}
 	plan := bt.Analyze([]*types.Package{source.pkg}, bt.Config{Policies: policies, MatchIFoo: true, RequireAllDependencies: true})
-	if len(plan.Bindings) != 4 || len(plan.Diagnostics) != 0 {
-		t.Fatalf("plan: %+v", plan)
-	}
+	assertRenderedPlan(t, plan, []expectedBinding{
+		{Service: "*render.Consumer", Constructor: "render.NewConsumer", Arguments: []string{"render.IFoo", "*render.Singleton"}, Dependencies: []string{"render.IFoo", "*render.Singleton"}, ReturnsError: true},
+		{Service: "*render.Foo", Constructor: "render.NewFoo", Lifetime: "scoped"},
+		{Service: "*render.Singleton", Constructor: "render.NewSingleton", Lifetime: "singleton"},
+		{Service: "render.IFoo", Forward: "*render.Foo", Dependencies: []string{"*render.Foo"}, Lifetime: "scoped", Ownership: "borrowed"},
+	})
 	var registry container.Registry
 	if err := registerRendered(&registry); err != nil {
 		t.Fatal(err)
@@ -139,6 +144,27 @@ func TestHandAuthoredRenderEquivalent(t *testing.T) {
 	}
 }
 
+// Unlike runtime descriptors, these expectations also check constructor identity,
+// ordered/repeated arguments, context/error adaptation and the exact forward key.
+func assertRenderedPlan(t *testing.T, plan bt.Plan, want []expectedBinding, diagnostics ...string) {
+	t.Helper()
+	for i := range want {
+		if want[i].Lifetime == "" {
+			want[i].Lifetime = "transient"
+		}
+		if want[i].Ownership == "" {
+			want[i].Ownership = "owned"
+		}
+		if want[i].Action == "" {
+			want[i].Action = "register"
+		}
+	}
+	got, codes := snapshot(plan)
+	if !reflect.DeepEqual(got, want) || !reflect.DeepEqual(codes, diagnostics) {
+		t.Fatalf("rendering plan differs: %+v / %+v; diagnostics %v / %v", got, want, codes, diagnostics)
+	}
+}
+
 type recordingRegistrar struct{ bindings map[di.Key]di.Binding }
 
 func (r *recordingRegistrar) Register(b di.Binding) error {
@@ -149,17 +175,59 @@ func (r *recordingRegistrar) Register(b di.Binding) error {
 	return nil
 }
 
-func TestRenderedFailedResultPreservesOwnership(t *testing.T) {
-	failure := errors.New("constructor failed")
-	resource := &render.Foo{}
+func TestRenderedDependencyFailureDoesNotDisposeNonexistentValue(t *testing.T) {
+	source := loadCorpus(t)["renderfailure"]
+	fn := source.pkg.Scope().Lookup("NewValue").(*types.Func)
+	plan := bt.Analyze([]*types.Package{source.pkg}, bt.Config{Constructors: []*types.Func{fn}})
+	assertRenderedPlan(t, plan, []expectedBinding{{Service: "renderfailure.Value", Constructor: "renderfailure.NewValue", Arguments: []string{"*renderfailure.Dependency"}, Dependencies: []string{"*renderfailure.Dependency"}, PassContext: true, ReturnsError: true}}, "BT011:information")
+	renderfailure.Calls, renderfailure.Closes = 0, 0
+	failure := errors.New("dependency failed")
 	var registry container.Registry
-	if err := di.BindFunc1(&registry, di.Transient, func(_ context.Context, _ *render.Singleton) (*render.Foo, error) {
-		return resource, failure // Do not replace the non-nil failed result with nil.
+	// Typed adapters distinguish dependency failure from a constructed zero value.
+	if err := di.BindFunc1(&registry, di.Transient, renderfailure.NewValue); err != nil {
+		t.Fatal(err)
+	}
+	if err := di.Bind(&registry, di.Transient, func(context.Context, di.Resolver) (*renderfailure.Dependency, error) { return nil, failure }); err != nil {
+		t.Fatal(err)
+	}
+	provider, err := registry.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	scope, err := provider.NewScope(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = di.Resolve[renderfailure.Value](t.Context(), scope)
+	if !errors.Is(err, failure) {
+		t.Fatalf("dependency error lost: %v", err)
+	}
+	if err := scope.Close(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if err := provider.Close(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if renderfailure.Calls != 0 || renderfailure.Closes != 0 {
+		t.Fatalf("nonexistent value: constructor calls %d, closes %d", renderfailure.Calls, renderfailure.Closes)
+	}
+}
+
+func TestRenderedFailedResultPreservesOwnership(t *testing.T) {
+	source := loadCorpus(t)["renderfailure"]
+	fn := source.pkg.Scope().Lookup("Failed").(*types.Func)
+	plan := bt.Analyze([]*types.Package{source.pkg}, bt.Config{Constructors: []*types.Func{fn}})
+	assertRenderedPlan(t, plan, []expectedBinding{{Service: "*renderfailure.Resource", Constructor: "renderfailure.Failed", Arguments: []string{"*renderfailure.Dependency"}, Dependencies: []string{"*renderfailure.Dependency"}, ReturnsError: true}}, "BT011:information")
+	failure := errors.New("constructor failed")
+	resource := &renderfailure.Resource{}
+	var registry container.Registry
+	if err := di.BindFunc1(&registry, di.Transient, func(_ context.Context, dependency *renderfailure.Dependency) (*renderfailure.Resource, error) {
+		return renderfailure.Failed(dependency) // Preserve the actual failed result.
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if err := di.Bind(&registry, di.Singleton, func(context.Context, di.Resolver) (*render.Singleton, error) {
-		return render.NewSingleton(), nil
+	if err := di.Bind(&registry, di.Singleton, func(context.Context, di.Resolver) (*renderfailure.Dependency, error) {
+		return &renderfailure.Dependency{Resource: resource, Err: failure}, nil
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +244,7 @@ func TestRenderedFailedResultPreservesOwnership(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = di.Resolve[*render.Foo](t.Context(), scope)
+	_, err = di.Resolve[*renderfailure.Resource](t.Context(), scope)
 	if !errors.Is(err, failure) || resource.Closes != 1 {
 		t.Fatalf("failed construction lost error/ownership: %v, closes %d", err, resource.Closes)
 	}

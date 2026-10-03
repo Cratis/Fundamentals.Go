@@ -149,8 +149,11 @@ func spelling(t types.Type, emit *types.Package) types.Type {
 	switch t := t.(type) {
 	case *types.Alias:
 		if !accessibleObject(t.Obj(), emit) {
-			return spelling(types.Unalias(t), emit)
+			return spelling(t.Rhs(), emit)
 		}
+		return instantiatedSpelling(t, t.TypeArgs(), emit)
+	case *types.Named:
+		return instantiatedSpelling(t, t.TypeArgs(), emit)
 	case *types.Pointer:
 		return types.NewPointer(spelling(t.Elem(), emit))
 	case *types.Slice:
@@ -161,8 +164,64 @@ func spelling(t types.Type, emit *types.Package) types.Type {
 		return types.NewMap(spelling(t.Key(), emit), spelling(t.Elem(), emit))
 	case *types.Chan:
 		return types.NewChan(t.Dir(), spelling(t.Elem(), emit))
+	case *types.Signature:
+		if t.TypeParams().Len() == 0 && t.RecvTypeParams().Len() == 0 {
+			return types.NewSignatureType(t.Recv(), nil, nil, spellingTuple(t.Params(), emit), spellingTuple(t.Results(), emit), t.Variadic())
+		}
+	case *types.Struct:
+		fields := make([]*types.Var, t.NumFields())
+		tags := make([]string, t.NumFields())
+		for i := range fields {
+			f := t.Field(i)
+			fields[i] = types.NewField(f.Pos(), f.Pkg(), f.Name(), spelling(f.Type(), emit), f.Embedded())
+			tags[i] = t.Tag(i)
+		}
+		return types.NewStruct(fields, tags)
+	case *types.Interface:
+		methods := make([]*types.Func, t.NumExplicitMethods())
+		for i := range methods {
+			m := t.ExplicitMethod(i)
+			methods[i] = types.NewFunc(m.Pos(), m.Pkg(), m.Name(), spelling(m.Type(), emit).(*types.Signature))
+		}
+		embedded := make([]types.Type, t.NumEmbeddeds())
+		for i := range embedded {
+			embedded[i] = spelling(t.EmbeddedType(i), emit)
+		}
+		return types.NewInterfaceType(methods, embedded).Complete()
 	}
 	return t
+}
+
+func spellingTuple(tuple *types.Tuple, emit *types.Package) *types.Tuple {
+	vars := make([]*types.Var, tuple.Len())
+	for i := range vars {
+		v := tuple.At(i)
+		vars[i] = types.NewVar(v.Pos(), v.Pkg(), v.Name(), spelling(v.Type(), emit))
+	}
+	return types.NewTuple(vars...)
+}
+
+func instantiatedSpelling(t types.Type, args *types.TypeList, emit *types.Package) types.Type {
+	if args.Len() == 0 {
+		return t
+	}
+	arguments := make([]types.Type, args.Len())
+	for i := range arguments {
+		arguments[i] = spelling(args.At(i), emit)
+	}
+	var origin types.Type
+	switch t := t.(type) {
+	case *types.Named:
+		origin = t.Origin()
+	case *types.Alias:
+		origin = t.Origin()
+	}
+	// Rebuild the spelling without altering borrowed types or canonical keys.
+	instance, err := types.Instantiate(nil, origin, arguments, false)
+	if err != nil {
+		return t // Accessibility validation will reject an unusable spelling.
+	}
+	return instance
 }
 
 // Named declarations need only their spelling and type arguments, not private fields.
@@ -211,6 +270,11 @@ func accessible(t types.Type, emit *types.Package) bool {
 	case *types.Interface:
 		if !t.Complete().IsMethodSet() {
 			return false
+		}
+		for i := 0; i < t.NumEmbeddeds(); i++ {
+			if !accessible(t.EmbeddedType(i), emit) {
+				return false
+			}
 		}
 		for i := 0; i < t.NumMethods(); i++ {
 			if !accessibleObject(t.Method(i), emit) || !accessible(t.Method(i).Type(), emit) {
