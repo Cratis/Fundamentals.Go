@@ -46,7 +46,7 @@ go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
 govulncheck ./...
 ```
 
-No source files should appear in `gofmt -l` output. After `go mod tidy`, also check `git status --short -- go.mod go.sum` for untracked manifests. Commit `go.sum` when dependencies require it. Do not commit nested modules, local `replace` directives, or personal `go.work` files: released modules must build without sibling checkouts.
+No source files should appear in `gofmt -l` output. After `go mod tidy`, also check `git status --short -- go.mod go.sum` for untracked manifests. Commit `go.sum` when dependencies require it. Nested modules must be explicitly approved in [`.github/go-modules.json`](.github/go-modules.json); follow the [nested-module layout and release steps](Documentation/releases.md#add-a-nested-module) and run these gates inside each module with `GOWORK=off`. Do not commit `replace` directives or personal `go.work` files: nested modules require a released root version and must build without sibling checkouts.
 
 Pull requests run the Linux matrix; scheduled and manual builds also check macOS and Windows. Workflow lint invokes ShellCheck when available. There are no service-dependent integration tests. CodeQL runs separately in GitHub Actions with autobuild and test-source extraction enabled.
 

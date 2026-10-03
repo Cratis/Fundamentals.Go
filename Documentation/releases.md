@@ -40,9 +40,11 @@ its pkg.go.dev page. Documentation rendering is asynchronous.
 
 There is no separate registry upload or Go publishing credential. GitHub tags
 are Go module versions; the workflow uses its scoped `GITHUB_TOKEN` for GitHub
-writes. Keep one root module and the canonical lowercase module path
+writes. The root module keeps the canonical lowercase module path
 `github.com/cratis/fundamentals.go`. Release source must build without a developer
-workspace, sibling checkout, secrets or local replacements.
+workspace, sibling checkout, secrets or local replacements. Root releases keep
+using the automatic Publish workflow; nested modules use the separate manual
+path below.
 
 Wait for Publish to finish before merging another release-bound PR: GitHub
 concurrency can replace a pending run even when running jobs are not cancelled.
@@ -53,7 +55,128 @@ concurrency can replace a pending run even when running jobs are not cancelled.
 approved v1 launch and refresh the PR policy check. A major release must be
 reviewed and merged by a human. Values above 1 are rejected: Go v2+ requires a
 `/vN` module path, changed imports and a separately reviewed release design.
-This workflow does not publish prereleases or nested modules.
+Neither release workflow publishes prereleases. The ceiling applies to both
+root and nested modules; approving v1 for one module does not approve v1 for
+another. Review every major release separately.
+
+## Add a nested module
+
+Use a separate module when tools or an approved optional integration need
+external dependencies. The root stays standard-library-only. Integration modules
+must first meet the standard-interfaces-and-recipes-first criteria in
+[decision 0001](../decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md).
+
+[`.github/go-modules.json`](../.github/go-modules.json) is the single allow-list.
+Its `nested` array is empty until a nested module is implemented. To add one:
+
+1. Create `tools/go.mod` or `integrations/<name>/go.mod` with module path
+   `github.com/cratis/fundamentals.go/<directory>`. Use lowercase relative
+   directories; modules cannot contain other modules.
+2. Require a **published stable root version**, such as `v0.1.0` once that version
+   is released. Pseudo-versions, workspaces and `replace` directives are not a
+   substitute. If the tool needs new root APIs, release the root first.
+3. Add the exact directory to `nested` in the same change. For example, the
+   following illustrative configuration approves two implemented modules:
+
+   ```json
+   {
+     "module": "github.com/cratis/fundamentals.go",
+     "nested": ["tools", "integrations/example"]
+   }
+   ```
+
+4. Run `python3 .github/scripts/go_modules.py matrix` from the repository root.
+   It rejects unlisted or missing modules, wrong module identities, nonportable
+   paths and every `replace`, including dependency-to-dependency replacements.
+   `python3 .github/scripts/go_modules.py dependencies` additionally downloads
+   each required root version through the public proxy to prove it exists.
+5. Run the contribution guide's Go gates **inside each module**, with `GOWORK=off`.
+   CI derives its matrix from the same allow-list: root plus every nested module
+   gets build, vet, test, race, lint, tidy and govulncheck. The shared Go toolchain
+   matrix applies to all modules; adding a module must not silently raise it.
+
+Root `go test ./...` does not visit nested modules. A module's `go.sum` is its own;
+commit tidy changes there, not in the root. Do not add placeholder modules merely
+to reserve an allow-list entry.
+
+## Release one nested module
+
+Nested publication is deliberately manual and **one module per release PR and
+merge commit**. The pinned `Cratis/release-action` supports `version` and
+`tag-prefix`, but has no path/monorepo input: its predecessor discovery can see
+root versions, and its already-released check is repository-wide by commit.
+The manual preflight therefore calculates the version from only that module's
+stable GitHub Releases and passes an explicit version to the action. The action
+still owns tag and release creation in its success-only post hook.
+
+1. Prepare a dedicated PR to `main`. Give it exactly the title
+   `release(tools): minor`, substituting the allow-listed directory and `patch`,
+   `minor` or `major`. For an integration, use e.g.
+   `release(integrations/example): patch`.
+2. Apply the single intent label **`no-release`**. For this manual path it
+   suppresses *automatic root publication*; the title declares the nested bump.
+   Do not add a root bump label, and do not mix root changes needing publication
+   into this PR. Its body is the nested module's release notes, following the
+   same release-note rules as any other PR. Put review/test details in comments.
+3. Merge only after checks pass. Wait for automatic Publish to finish its
+   intentional root no-op. Keep `main` at that merge commit until the nested
+   release finishes; merge another dedicated PR to release another module.
+4. In **Actions → Publish nested module → Run workflow**, choose `main`, enter
+   the directory, the matching bump and that PR's number. The workflow rejects
+   a PR not merged at this exact commit, incorrect intent, unlisted modules,
+   Dependabot, an exceeded major ceiling or a conflicting release at this SHA.
+   It reruns the Go and Markdown gates before publication.
+5. Confirm the release, actual tag target and proxy indexing jobs succeed.
+   The first minor creates `<directory>/v0.1.0`; the first patch creates
+   `<directory>/v0.0.1`. Later bumps use only this module's stable releases.
+   An existing next-version tag without a release is an error, never overwritten.
+
+The workflows share a non-cancelling publish concurrency group. Do not queue
+several releases: GitHub may replace an older pending run. Rerun failed jobs to
+retry indexing. A full rerun finds the same module release at the same SHA and
+skips creation rather than incrementing again. A different module at that SHA
+fails, so an action no-op cannot masquerade as an independent release.
+
+## Consume a nested module
+
+Git tags include the directory; **Go module versions do not**. Once the
+illustrative `tools/v0.1.0` tag has been released, a consumer uses:
+
+```sh
+GOWORK=off go get github.com/cratis/fundamentals.go/tools@v0.1.0
+GOWORK=off GOPROXY=https://proxy.golang.org \
+  go mod download -json github.com/cratis/fundamentals.go/tools@v0.1.0
+```
+
+For an integration tagged `integrations/example/v0.2.0`, use
+`github.com/cratis/fundamentals.go/integrations/example@v0.2.0`.
+Do **not** query the proxy with `@tools/v0.1.0`: a slash is not a valid Go proxy
+version. The nested workflow verifies the prefixed Git tag against the release
+commit, then indexes/downloads the canonical `module@vX.Y.Z` in a fresh cache,
+without checking out this repository. No nested module is published by this
+workflow change itself.
+
+## Mirror this pattern
+
+Arc.Go and Chronicle.Go can adopt the allow-list, policy scripts, self-tests,
+per-module build matrix and nested publish workflow. Change `module` to the
+repository's canonical lowercase root path and adapt the test fixture identity.
+The root dependency guard in `go_modules.py` is Fundamentals-specific: preserve
+your own core dependency policy rather than copying that restriction blindly.
+Keep the root publisher's existing identity guard specific to its repository.
+A tools module currently using a root pseudo-version must move to a stable,
+publicly retrievable root tag before it can pass these gates.
+
+Run the offline proof with:
+
+```sh
+python3 -B -m unittest discover -s .github/scripts -p 'test_*.py' -v
+```
+
+It creates throwaway Git/module fixtures outside the checkout, exercises the
+same layout/matrix CLI used by CI, and tests independent version planning,
+PR intent, retries, conflicts and major ceilings without publishing. Actual
+public-proxy installation still requires a real authorized release.
 
 ## Recovery
 
