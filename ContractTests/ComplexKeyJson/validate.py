@@ -6,6 +6,20 @@ from pathlib import Path
 
 FIXTURES = Path(__file__).resolve().parents[2] / 'testdata/complex-key-contract'
 PIN = 'd2accc4a79b6bcf2708213c97093ab5ba6c06381'
+# Identity of this historical capture profile, not current package requirements.
+# The C# capture used SDK 10.0.401; the envelope records runtime/STJ, not SDK identity.
+CS_IDENTITY = {
+    'sourceRevision': PIN,
+    'runtime': '.NET 10.0.12',
+    'systemTextJson': '10.0.12+95017c711e6afc1085133d440e42b4bd78155701',
+    'profile': 'CamelCase/default encoder/compact; ComplexKey, EnumerableConceptAs, ConceptAs factories; not Globals',
+}
+JS_IDENTITY = {
+    'sourceRevision': PIN,
+    'node': 'v26.8.1',
+    'typescript': '6.0.3',
+    'profile': 'Exact pinned TS import closure; legacy decorators; own emitted fields; typed ValueMap; no npm package equivalence claim',
+}
 METADATA = [
     {'kind': kind, 'field': 'map', 'type': 'ValueMap', 'genericArguments': args}
     for kind, args in [('string', ['String', 'Number']), ('stringConcept', ['TextKey', 'Number']),
@@ -56,6 +70,28 @@ def outcome(value, stage, lookup=False):
     require(set(value) == keys | extra, 'outcome fields/presence ' + stage)
 
 
+def csharp_original_key_description(kind, key):
+    """Mirror probe.ts csharpOriginalKey + describe, using the independent write key."""
+    def text(value):
+        require(type(value) is str or value is None, 'source key text')
+        return {'state': 'null'} if value is None else {'type': 'string', 'value': value}
+
+    if kind == 'string':
+        return text(key)
+    if kind == 'stringConcept':
+        return {'type': 'TextKey', 'value': text(key['value'])}
+    if kind == 'guid':
+        return {'type': 'Guid', 'value': key['value']}
+    if kind == 'guidConcept':
+        return {'type': 'IdKey', 'value': {'type': 'Guid', 'value': key['value']}}
+    require(kind in ('composite', 'compositeObjectValue'), 'source composite kind')
+    return {
+        'type': 'Composite', 'id': {'type': 'Guid', 'value': key['id']},
+        'name': text(key['name']), 'ownPropertyOrder': ['id', 'name'],
+        'nativeStringify': json.dumps({'id': key['id'], 'name': key['name']}, ensure_ascii=False, separators=(',', ':')),
+    }
+
+
 def validate(data, manifest):
     index = {}
     for name, capture in data.items():
@@ -72,12 +108,13 @@ def validate(data, manifest):
                 require(row['kind'] in manifest['declarations'], 'input kind')
             continue
         require(type(capture.get('schemaVersion')) is int and capture['schemaVersion'] == 1, 'schema version')
-        require(capture.get('sourceRevision') == PIN, 'source revision')
+        identity = JS_IDENTITY if name == 'javascript.json' else CS_IDENTITY
+        for field, expected in identity.items():
+            require(type(capture.get(field)) is str and capture[field] != '', 'runtime identity field ' + field)
+            require(capture[field] == expected, 'historical profile identity ' + field)
         require(type(capture.get('count')) is int and capture['count'] == len(rows), 'typed capture count')
-        require(type(capture.get('profile')) is str and capture['profile'] != '', 'profile')
         if name == 'javascript.json':
             require(json_equal(capture.get('metadata'), METADATA), 'typed field metadata')
-            require(type(capture.get('typescript')) is str and capture['typescript'] != '', 'compiler version')
         else:
             require(type(capture.get('globalStubAccesses')) is int and capture['globalStubAccesses'] == 0, 'zero Globals accesses')
             require(len(capture.get('factoryAdmission', [])) == 11, 'admission inventory')
@@ -136,4 +173,18 @@ def validate(data, manifest):
                     raw = '{"map":' + raw + '}'
                 require(row['origin'] == ('actual-csharp-write' if row['sourceCapture'] == 'csharp.json' else 'actual-js-write'), 'write origin')
             require(row['input'] == raw, 'verbatim cross-runtime input')
+            if name == 'javascript.json':
+                lookup = row['originalKeyLookup']
+                if row['sourceCapture'] == 'inputs.json':
+                    expected_key = None
+                    require(lookup['status'] == 'not-attempted' and lookup['reason'] == 'no-independent-write-key', 'no original stimulus key')
+                else:
+                    expected_key = source['inputKey']
+                    if row['sourceCapture'] == 'csharp.json':
+                        expected_key = csharp_original_key_description(source['kind'], expected_key)
+                    if not row['returnedObject']:
+                        require(lookup['status'] == 'not-attempted' and lookup['reason'] == 'no-returned-object', 'original lookup lifetime')
+                    else:
+                        require(lookup['status'] != 'not-attempted', 'original lookup attempted')
+                require(json_equal(lookup['lookupKey'], expected_key), 'independent original write key')
     return data

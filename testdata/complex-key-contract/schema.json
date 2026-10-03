@@ -22,7 +22,18 @@
   "additionalProperties": false,
   "oneOf": [
     {"required": ["runtime", "systemTextJson", "globalStubAccesses", "factoryAdmission"], "not": {"required": ["node"]}},
-    {"required": ["node", "typescript", "metadata"], "not": {"required": ["runtime"]}}
+    {
+      "required": ["node", "typescript", "metadata"],
+      "not": {"required": ["runtime"]},
+      "properties": {
+        "observations": {
+          "items": {
+            "if": {"required": ["operation"], "properties": {"operation": {"const": "read"}}},
+            "then": {"required": ["runtimeFieldAccess", "originalKeyLookup"]}
+          }
+        }
+      }
+    }
   ],
   "$defs": {
     "kind": {"enum": ["string", "stringConcept", "guid", "guidConcept", "composite", "compositeObjectValue"]},

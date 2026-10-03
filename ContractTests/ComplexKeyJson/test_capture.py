@@ -45,6 +45,58 @@ class Captures(unittest.TestCase):
                 with self.assertRaises((ValueError, KeyError)):
                     validate(damaged, manifest)
 
+    def test_runtime_identity_is_required_typed_and_pinned(self):
+        data = load(ROOT)
+        manifest = json.loads((FIXTURES / 'manifest.json').read_text())
+        validate(data, manifest)
+        fields = {
+            'csharp.json': ['runtime', 'systemTextJson', 'sourceRevision', 'profile'],
+            'csharp-cross.json': ['runtime', 'systemTextJson', 'sourceRevision', 'profile'],
+            'javascript.json': ['node', 'typescript', 'sourceRevision', 'profile'],
+        }
+        for name, runtime_fields in fields.items():
+            for field in runtime_fields:
+                for mutation in ['delete', None, True, 1, '', 'different-profile-or-version']:
+                    with self.subTest(capture=name, field=field, mutation=mutation):
+                        damaged = copy.deepcopy(data)
+                        if mutation == 'delete':
+                            del damaged[name][field]
+                        else:
+                            damaged[name][field] = mutation
+                        with self.assertRaises(ValueError):
+                            validate(damaged, manifest)
+
+    def test_original_query_keys_are_linked_even_when_not_attempted(self):
+        data = load(ROOT)
+        manifest = json.loads((FIXTURES / 'manifest.json').read_text())
+        validate(data, manifest)
+        reads = [(i, r) for i, r in enumerate(data['javascript.json']['observations'])
+                 if r['operation'] == 'read']
+        self.assertEqual(len(reads), 167)
+        self.assertEqual(sum(r['originalKeyLookup']['status'] == 'not-attempted' for _, r in reads), 133)
+        self.assertTrue(any(r['sourceCapture'] == 'csharp.json' and
+                            r['originalKeyLookup']['status'] == 'not-attempted' for _, r in reads))
+        for i, row in reads:
+            with self.subTest(id=row['id'], status=row['originalKeyLookup']['status']):
+                damaged = copy.deepcopy(data)
+                damaged['javascript.json']['observations'][i]['originalKeyLookup']['lookupKey'] = {'state': 'wrong-original-key'}
+                with self.assertRaises(ValueError):
+                    validate(damaged, manifest)
+
+    def test_fixed_query_does_not_supply_original_query_key(self):
+        data = load(ROOT)
+        manifest = json.loads((FIXTURES / 'manifest.json').read_text())
+        row = next(r for r in data['javascript.json']['observations'] if r['id'] == 'self/composite/write-escaped')
+        self.assertFalse(json_equal(row['runtimeFieldAccess']['lookupKey'], row['originalKeyLookup']['lookupKey']))
+        damaged = copy.deepcopy(data)
+        changed = next(r for r in damaged['javascript.json']['observations'] if r['id'] == row['id'])
+        changed['originalKeyLookup']['lookupKey'] = copy.deepcopy(changed['runtimeFieldAccess']['lookupKey'])
+        with self.assertRaises(ValueError):
+            validate(damaged, manifest)
+        # The fixed probe is not independent write-key evidence.
+        row['runtimeFieldAccess']['lookupKey'] = {'type': 'string', 'value': 'another-fixed-probe'}
+        validate(data, manifest)
+
     def test_comparison_is_type_strict(self):
         for actual, expected in [(True, 1), (False, 0), (1.0, 1), ({'x': True}, {'x': 1}), ([True], [1]), ({}, {'x': None})]:
             self.assertFalse(json_equal(actual, expected))

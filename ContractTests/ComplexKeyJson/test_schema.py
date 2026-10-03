@@ -28,6 +28,32 @@ class Schema(unittest.TestCase):
             else:
                 validator.validate(data)
 
+    def test_js_reads_require_both_lookup_objects(self):
+        validator = Draft202012Validator(json.loads((FIXTURES / 'schema.json').read_text()))
+        data = load(FIXTURES)
+        for name in ['csharp.json', 'csharp-cross.json', 'javascript.json']:
+            self.assertTrue(validator.is_valid(data[name]))
+        js = data['javascript.json']
+        reads = [(i, r) for i, r in enumerate(js['observations']) if r['operation'] == 'read']
+        self.assertEqual(len(reads), 167)
+        self.assertEqual(sum(r['originalKeyLookup']['lookupKey'] is None for _, r in reads), 132)
+        self.assertEqual({r['originalKeyLookup']['status'] for _, r in reads}, {'accepted', 'not-attempted'})
+        for field in ['runtimeFieldAccess', 'originalKeyLookup']:
+            for status in ['accepted', 'rejected', 'not-attempted']:
+                candidates = [(i, r) for i, r in reads if r[field]['status'] == status]
+                if field == 'originalKeyLookup' and status == 'rejected':
+                    self.assertEqual(candidates, [])
+                    continue
+                self.assertTrue(candidates, (field, status))
+                i, row = candidates[0]
+                with self.subTest(field=field, status=status, id=row['id']):
+                    damaged = copy.deepcopy(js)
+                    del damaged['observations'][i][field]
+                    self.assertFalse(validator.is_valid(damaged))
+        # Authored stimuli have no independent key; failed linked reads still do.
+        self.assertTrue(any(r['originalKeyLookup']['status'] == 'not-attempted' and
+                            r['originalKeyLookup']['lookupKey'] is not None for _, r in reads))
+
     def test_schema_negative_capture(self):
         validator = Draft202012Validator(json.loads((FIXTURES / 'schema.json').read_text()))
         js = load(FIXTURES)['javascript.json']
