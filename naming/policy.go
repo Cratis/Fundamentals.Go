@@ -7,8 +7,9 @@ import "strings"
 
 // Policy converts property and read-model names without selecting a serializer's
 // default. GetReadModelName takes an explicit dot-separated namespace and model
-// name rather than a CLR Type. Callers apply explicit storage-name overrides
-// before invoking a policy. No policy pluralizes names.
+// name rather than a CLR Type. If an explicit storage-name override exists, use
+// it unchanged without invoking the policy. Otherwise, pluralize the inferred
+// model name if required before calling the policy. No policy pluralizes names.
 // Implementations supplied by this package are immutable and concurrency-safe.
 type Policy interface {
 	GetPropertyName(name string) string

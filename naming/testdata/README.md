@@ -15,8 +15,8 @@ Expectations were **not generated from Go output or captured from a .NET run**.
 plus source-derived boundaries and deliberate Unicode adaptations. The spec's
 `InlineData` arguments are **expected result first, input second**. Its Greek
 input is `ΆλφαΒήταΓάμμα`, not the lowercase expected result. Its supplementary
-Deseret row is intentionally different in Go; the .NET expectation is retained
-as `dotnetCamel`. The null spec is not representable by Go's string API.
+Deseret row preserves the .NET expectation unchanged. The null spec is not
+representable by Go's string API.
 
 Every Pascal expectation is hand-derived from
 `Source/DotNET/Fundamentals/Strings/StringExtensions.cs:16-28`, recorded in
@@ -27,15 +27,20 @@ lines 75-99. The full loop is ported, including its space exception; the acronym
 and non-uppercase guards mean only the first character can change through this
 public entry point. This is not System.Text.Json's ordinary camel-case policy.
 
-`dotnetCamel`/`dotnetPascal` retain a different, source-derived .NET result.
-`deviation` explains the chosen Go result. Hand derivation uses Go's standard
-Unicode simple mappings, not the functions under test:
+`deviation` explains the remaining malformed-text adaptations. Hand derivation
+uses the C# UTF-16 character rules and invariant casing, not the Go functions
+under test:
 
-- Deseret uppercase/lowercase U+10400/U+10428 participate as whole Go runes;
-  .NET's leading UTF-16 surrogate does not case. A supplementary second rune
-  can also change whether the acronym guard triggers (`A𐐀name`).
-- Go maps U+0130 `İ` to `i` and U+0131 `ı` to `I`. .NET invariant casing leaves
-  both unchanged. `ß` stays `ß` in both; no `SS` expansion. `ẞ` lowercases to `ß`.
+- Deseret uppercase/lowercase U+10400/U+10428 are supplementary characters.
+  Neither classification nor casing treats them as a whole code point in the
+  C# naming functions. Go's helpers therefore leave them unchanged and do not
+  classify them as uppercase; `A𐐀name` becomes `a𐐀name`.
+- U+0130 `İ` remains unchanged when lowercasing and U+0131 `ı` remains unchanged
+  when uppercasing, including single-character inputs. These explicit invariant
+  exceptions are pinned by [.NET 10 ChangeCaseInvariant][invariant-casing].
+  U+017F `ſ` is not an exception in that source: it uses ICU's normal uppercase
+  mapping to `S`. Both single-character and leading-long-s fixtures pin that
+  distinction. `ß` stays `ß` in both; no `SS` expansion. `ẞ` lowercases to `ß`.
 - Titlecase `ǅ` is not uppercase, so camel casing leaves it unchanged; Pascal
   casing maps it to `Ǆ`. Kelvin `K` lowercases to `k`.
 - Neither implementation performs normalization: combining accents stay separate.
@@ -77,4 +82,8 @@ a surrogate separator as a UTF-16 code unit.
 a serializer-specific object. `GetReadModelName(Type)` takes explicit namespace
 and name strings instead; Humanizer pluralization, CLR reflection/attributes and
 `NamingPolicyCollectionExtensions` DI registration are deliberately not ported.
-Explicit storage-name overrides must bypass the policy in the consuming product.
+Explicit storage-name overrides must remain unchanged and bypass the policy in
+the consuming product. Otherwise, pluralize the inferred model name if required
+before calling the policy.
+
+[invariant-casing]: https://github.com/dotnet/runtime/blob/v10.0.0/src/native/libs/System.Globalization.Native/pal_casing.c#L65-L109

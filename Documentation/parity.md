@@ -107,16 +107,18 @@ operations in `Serialization/INamingPolicy.cs`, `DefaultNamingPolicy.cs`,
 revision above. Go surface: `naming.PascalCase`, `CamelCase`, `Policy`, `Default`,
 `CamelCasePolicy`, `Namespaced` and `NewNamespaced`. Evidence:
 `naming/golden_test.go`, `policy_test.go`, `example_test.go`, the `FuzzCase` target,
-and 52 case/17 policy expectations in `naming/testdata/*.json`. The
+and 56 case/17 policy expectations in `naming/testdata/*.json`. The
 [fixture provenance](../naming/testdata/README.md) distinguishes copied spec
 expectations from source-derived cases and deliberate Go adaptations.
 
-Casing is **Go-specific** for Unicode: runes participate in classification and
-simple casing, including supplementary letters which C#'s UTF-16 char operations
-leave alone. Go maps Turkish `İ` to `i` and `ı` to `I`; .NET invariant casing
-preserves them. Neither expands `ß` to `SS` or normalizes combining marks. Unicode
-tables can differ by Go toolchain and .NET globalization runtime. Go has no null
-string or unpaired UTF-16 characters. Pascal reconstructs runes, replacing invalid
+Casing uses BMP-aware helpers to match C#'s UTF-16 char operations: supplementary
+letters are neither classified as uppercase nor case-converted. Explicit
+invariant exceptions preserve `İ` when lowercasing and `ı` when uppercasing, as
+in [.NET 10 ChangeCaseInvariant][invariant-casing]. Long s (`ſ`) is not an explicit
+exception there and uppercases to `S`. Neither expands `ß` to `SS` or normalizes
+combining marks. Remaining casing differences are **Go-specific**: Unicode tables
+can differ by Go toolchain and .NET globalization runtime. Go has no null string
+or unpaired UTF-16 characters. Pascal reconstructs runes, replacing invalid
 UTF-8 bytes with U+FFFD; Camel preserves original bytes on early returns and
 replaces invalid bytes throughout its converting path. Separator configuration
 uses a Go rune, allowing supplementary characters; invalid runes become U+FFFD
@@ -125,10 +127,12 @@ instead of preserving a C# surrogate char. See [Naming](naming.md) for examples.
 Policies are **Partial**: model inputs are explicit namespace/name strings, with
 pluralization disabled, not CLR types. Humanizer, `ReadModelNameAttribute`
 discovery, serializer-specific `JsonPropertyNamingPolicy` objects and
-`NamingPolicyCollectionExtensions` registration are not ported. Consumers resolve
-explicit overrides and pluralization themselves; no shared default, serializer,
-field plan or tag precedence is introduced. Namespace segments always camel-case;
-the separator before the model remains a literal `-` even without a namespace.
+`NamingPolicyCollectionExtensions` registration are not ported. If an explicit
+storage-name override exists, consumers use it unchanged without invoking the
+policy. Otherwise, they pluralize the inferred name if required before calling
+the policy. No shared default, serializer, field plan or tag precedence is
+introduced. Namespace segments always camel-case; the separator before the model
+remains a literal `-` even without a namespace.
 
 Read-only consumer comparison for this change (not adoption evidence):
 
@@ -292,7 +296,7 @@ new work are not an approved API or a v0.1.0 requirement.
 | Json bare enums and enum concepts: `Json/EnumConverter.cs`, `EnumConverterFactory.cs`, `ConceptAsJsonConverter.cs` | Json A1/C2; both default converter profiles; Arc proxy/API contracts and Chronicle event values | Not implemented | Proposed focused enum wire-contract decision and fixtures ([#17][issue-17]); later than v0.1.0 | Numeric output is not enough: bare numeric input requires a defined int32 value, string parsing is more permissive, and concepts differ. Product binders/schema/enum declarations stay local; no enum registry API is approved here. |
 | Json complex keys: `Json/ComplexKeyDictionaryJsonConverterFactory.cs`; distinct utility `DictionaryJsonConverter.cs` | Json A1/C2; both serializer profiles; Arc OpenAPI/proxy ValueMap and Chronicle schema integration | Not implemented | Proposed embedded-JSON key contract and interoperability fixtures ([#18][issue-18]); later than v0.1.0 | Standard text map keys are not embedded JSON keys. Keep map traversal, field plans, schema documents and TS ValueMap generation in products; evaluate only a narrow reusable key codec, not a shared serializer. |
 | Remaining Json adapters: `Json/TypeJsonConverter.cs`, `UriJsonConverter.cs`, `TypeWithObjectPropertiesJsonConverter.cs`, `TypeWithObjectPropertiesJsonConverterFactory.cs`, `EnumerableModelWithIdToConceptOrPrimitiveEnumerableConverterFactory.cs`, `EnumerableModelWithIdToConceptOrPrimitiveEnumerableConverter.cs` | Json A1/C2; Type/URI/legacy `_id` converters are registered; no direct sidecar utility use established | Not implemented | Out of scope: CLR type activation, general object mapping and legacy model-to-ID projections; [#5][issue-5] boundary | Product-owned allowlisted codecs only if a wire contract needs them. URI remains scalar text. Never copy the legacy empty `Write` as a successful codec. |
-| Strings: `Strings/StringExtensions.cs`; `Serialization/AcronymFriendlyJsonCamelCaseNamingPolicy.cs` | Strings A9/C0; direct Arc names; indirect Chronicle policy use, plus Infrastructure | Go-specific | Ported casing rules → [#21][issue-21]; `naming.PascalCase`, `CamelCase` | Preserve `URLValue`/`IPAddress`/`ID` wholesale. Rune/UTF-16, invariant casing, Unicode tables, null and malformed-text differences are recorded in Naming evidence above; golden fixtures and fuzzing exercise the contract. Product defaults and field plans remain local. |
+| Strings: `Strings/StringExtensions.cs`; `Serialization/AcronymFriendlyJsonCamelCaseNamingPolicy.cs` | Strings A9/C0; direct Arc names; indirect Chronicle policy use, plus Infrastructure | Go-specific | Ported casing rules → [#21][issue-21]; `naming.PascalCase`, `CamelCase` | Preserve `URLValue`/`IPAddress`/`ID` wholesale. BMP-aware UTF-16 classification and invariant exceptions match C#; remaining Unicode-table, null and malformed-text differences are recorded in Naming evidence above; golden fixtures and fuzzing exercise the contract. Product defaults and field plans remain local. |
 | Serialization naming: `Serialization/INamingPolicy.cs`, `NamingPolicy.cs`, `DefaultNamingPolicy.cs`, `CamelCaseNamingPolicy.cs`, `NamespacedNamingPolicy.cs`, `NamingPolicyCollectionExtensions.cs` | Serialization A11/C48; Arc MongoDB; Chronicle schemas, read models, reducers and projections | Partial | Ported pure non-pluralizing policies → [#21][issue-21]; `naming.Policy`, `Default`, `CamelCasePolicy`, `Namespaced`, `NewNamespaced` | `naming/policy_test.go` and `testdata/policy.json` cover explicit string names and literal final `-`. CLR metadata, Humanizer, serializer objects and DI registration are omitted; rune separator differences are documented above. Explicit storage overrides, paths, tags and defaults stay product-owned. |
 | ReadModels: `ReadModels/ReadModelNameAttribute.cs`, `Serialization/NamingPolicy.cs` | A0/C0 direct; both indirectly through `GetReadModelName` as sampled above | Not implemented | Go-idiom replacement: explicit storage-name registration; optional string-based naming policies [#21][issue-21] | An explicit name bypasses pluralization, prefixing and casing. It is not Arc query identity or Chronicle event-type identity; no attribute package moves here. |
 | Serialization polymorphism: `Serialization/DerivedTypeAttribute.cs`, `DerivedTypeId.cs`, `DerivedTypes.cs`, `IDerivedTypes.cs`, `DerivedTypeJsonConverter.cs`, `DerivedTypeJsonConverterFactory.cs` | Serialization A11/C48; Arc JSON/proxies/MongoDB, Chronicle JSON/schema and projected children | Not implemented | Deferred → existing registry proposal [#5][deferred-proposals] | Candidate shared immutable ID/target metadata only. Product serializers and generated metadata remain local. C# IDs are globally unique, including across different targets; missing/unknown discriminators differ. No assembly scanning or shared general serializer. |
@@ -586,5 +590,6 @@ implementation claims.
 [issue-17]: https://github.com/Cratis/Fundamentals.Go/issues/17
 [issue-18]: https://github.com/Cratis/Fundamentals.Go/issues/18
 [issue-21]: https://github.com/Cratis/Fundamentals.Go/issues/21
+[invariant-casing]: https://github.com/dotnet/runtime/blob/v10.0.0/src/native/libs/System.Globalization.Native/pal_casing.c#L65-L109
 [deferred-proposals]: https://github.com/Cratis/Fundamentals.Go/issues/5#issuecomment-5960868484
 [di-decision]: https://github.com/Cratis/Fundamentals.Go/issues/9#issuecomment-5961365677

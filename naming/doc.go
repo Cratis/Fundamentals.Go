@@ -7,13 +7,14 @@
 // have no mutable shared state and are safe to copy and use concurrently.
 //
 // Casing follows Strings/StringExtensions.cs at Fundamentals revision
-// d2accc4a79b6bcf2708213c97093ab5ba6c06381, using unicode.IsUpper, unicode.ToLower
-// and unicode.ToUpper on runes in place of UTF-16 chars and invariant casing.
-// Supplementary letters therefore participate in casing and acronym detection,
-// unlike C# char-based operations. Go maps Turkish İ to i and ı to I; .NET's
-// invariant casing preserves those characters. Neither simple mapping expands
-// ß to SS. Results depend on the Go toolchain's Unicode tables rather than the
-// .NET runtime's globalization tables; neither API normalizes combining marks.
+// d2accc4a79b6bcf2708213c97093ab5ba6c06381. Classification and casing use Go's
+// Unicode tables for BMP runes only, matching C#'s UTF-16 char operations:
+// supplementary letters are neither uppercase nor case-converted. Invariant
+// lowercasing preserves İ and uppercasing preserves ı, as in .NET. Long s (ſ)
+// uppercases to S; it is not one of .NET's explicit invariant exceptions. Neither
+// mapping expands ß to SS. Results depend on the Go toolchain's Unicode tables
+// rather than the .NET runtime's globalization tables; neither API normalizes
+// combining marks.
 //
 // Go strings cannot distinguish null from empty or preserve unpaired UTF-16
 // surrogates as characters. PascalCase reconstructs runes, replacing invalid
@@ -22,10 +23,12 @@
 //
 // Policy uses explicit namespace/name strings instead of CLR Type and omits
 // Humanizer pluralization, ReadModelNameAttribute discovery, JsonNamingPolicy
-// objects and IServiceCollection registration. Consumers resolve explicit name
-// overrides and pluralization before calling a policy. Namespaced accepts a Go
-// rune separator, including supplementary characters; invalid runes become
-// U+FFFD, whereas C# accepts any single UTF-16 char, including a surrogate.
+// objects and IServiceCollection registration. If an explicit storage-name
+// override exists, use it unchanged without invoking the policy. Otherwise,
+// pluralize the inferred model name if required before calling the policy.
+// Namespaced accepts a Go rune separator, including supplementary characters;
+// invalid runes become U+FFFD, whereas C# accepts any single UTF-16 char,
+// including a surrogate.
 // See the [naming guide] and golden fixture provenance for compatibility limits.
 //
 // [naming guide]: https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/naming.md

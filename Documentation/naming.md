@@ -29,8 +29,9 @@ The `Policy` interface exposes `GetPropertyName(name string) string` and
 `GetReadModelName(namespace, name string) string`. Supply an explicit dot-separated
 namespace and model name; the package does not infer them from Go types. Each
 consumer still owns its default, tag precedence and explicit storage-name
-overrides. Apply an override **instead of** invoking a policy. No policy
-pluralizes names: pass an already pluralized name if your product needs one.
+overrides. If an explicit storage-name override exists, use it unchanged without
+invoking the policy. Otherwise, pluralize the inferred model name if required
+before calling the policy. No policy pluralizes names.
 
 ## Convert individual names
 
@@ -51,11 +52,12 @@ func main() {
 }
 ```
 
-`CamelCase` leaves the whole string unchanged when it is empty, its first rune is
-not uppercase, or its first two runes are uppercase. Otherwise it uses the
-`FixCamelCasing` loop copied by the C# extension. `PascalCase` uppercases only
-the first rune. Neither splits words, strips underscores, trims spaces or
-normalizes accents. This is **not** ordinary `System.Text.Json.JsonNamingPolicy.CamelCase`,
+`CamelCase` leaves the whole string unchanged when it is empty, its first UTF-16
+character is not uppercase, or its first two characters are uppercase. Otherwise
+it uses the `FixCamelCasing` loop copied by the C# extension. `PascalCase`
+uppercases the first rune only if it is in the BMP; supplementary runes remain
+unchanged. Neither splits words, strips underscores, trims spaces or normalizes
+accents. This is **not** ordinary `System.Text.Json.JsonNamingPolicy.CamelCase`,
 which turns `URLValue` into `urlValue` and `ID` into `id`.
 
 ## Configure namespaced storage names
@@ -95,31 +97,37 @@ model/property names unchanged. A constructed NUL separator is supported.
 Authority is C# Fundamentals at `d2accc4a79b6bcf2708213c97093ab5ba6c06381`:
 `Strings/StringExtensions.cs` and the naming policies under `Serialization`.
 The [golden fixture provenance](../naming/testdata/README.md) records exact sources
-and expectations, including deliberate Go adaptations:
+and expectations, including deliberate Go adaptations.
 
-- Go uses `unicode.IsUpper`, `unicode.ToLower` and `unicode.ToUpper` on runes.
-  C# uses UTF-16 code units for classification/camel casing and uppercases only
-  the first code-unit string for Pascal casing. Supplementary letters therefore
-  case in Go and can affect the two-uppercase guard. `𐐀name` becomes `𐐨name`
-  in Go, but stays unchanged in C#; `A𐐀name` stays unchanged in Go but becomes
-  `a𐐀name` in C#. Pascal casing changes `𐐨name` only in Go.
-- Go maps Turkish `İ` to `i` and `ı` to `I`; .NET invariant casing preserves
-  them. Neither simple mapping expands `ß` to `SS`. Casing tables depend on the
-  Go toolchain versus the .NET runtime/globalization backend; arbitrary Unicode
-  names are not promised byte-for-byte cross-runtime equivalence.
+Classification and casing use BMP-aware helpers to match C# UTF-16 `char`
+behavior. Supplementary letters are never uppercase or case-converted:
+`𐐀name` and `𐐨name` stay unchanged; `A𐐀name` becomes `a𐐀name`.
+The helpers also preserve Turkish `İ` when lowercasing and `ı` when uppercasing,
+matching [.NET's explicit invariant exceptions][invariant-casing]. Long s (`ſ`)
+is not an exception in that source and uppercases to `S`. Neither simple mapping
+expands `ß` to `SS` or normalizes combining marks.
+
+Remaining representation differences and omissions:
+
+- Casing tables depend on the Go toolchain versus the .NET runtime/globalization
+  backend; arbitrary Unicode names are not promised byte-for-byte cross-runtime
+  equivalence.
 - Go has no null string or unpaired UTF-16 character representation. Pascal
   casing reconstructs runes and replaces invalid UTF-8 bytes with U+FFFD. Camel
   casing preserves original bytes on early returns, but its converting path
   replaces invalid bytes throughout the string.
 - A separator is a Go rune, not a C# `char`: supplementary separators work in
   Go; invalid runes (including surrogate values) become U+FFFD. C# can retain
-  a surrogate code unit. Neither function performs Unicode normalization.
+  a surrogate code unit.
 - There is no Humanizer pluralization, CLR `Type`/`ReadModelNameAttribute`
   inspection, `JsonNamingPolicy` object or `IServiceCollection` registration.
   The string-based model API corresponds to C# with pluralization disabled.
-  Pass explicit metadata and handle overrides/pluralization in your product.
+  Pass explicit metadata; use an override unchanged without invoking a policy,
+  or pluralize the inferred name if required before calling the policy.
 
 Prefer explicit wire/storage names for cross-runtime Unicode boundaries or
 already-persisted data. Adopting this package is not authorization to migrate
 names. The [parity map](parity.md) distinguishes shared behavior from consumer
 adoption; executable usage examples live in `naming/example_test.go`.
+
+[invariant-casing]: https://github.com/dotnet/runtime/blob/v10.0.0/src/native/libs/System.Globalization.Native/pal_casing.c#L65-L109

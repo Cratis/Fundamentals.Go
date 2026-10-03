@@ -15,7 +15,7 @@ import (
 
 type caseFixture struct {
 	Input, InputHex, Camel, CamelHex, Pascal, Source string
-	DotnetCamel, DotnetPascal, Deviation             string
+	Deviation                                        string
 }
 
 type caseFixtures struct {
@@ -57,7 +57,7 @@ func checkSource(t testing.TB, source string) {
 
 func TestCaseGolden(t *testing.T) {
 	fixtures := loadFixture[caseFixtures](t, "testdata/case.json")
-	if fixtures.Revision != "d2accc4a79b6bcf2708213c97093ab5ba6c06381" || len(fixtures.Cases) != 52 {
+	if fixtures.Revision != "d2accc4a79b6bcf2708213c97093ab5ba6c06381" || len(fixtures.Cases) != 56 {
 		t.Fatalf("unexpected authority or fixture count: %s, %d", fixtures.Revision, len(fixtures.Cases))
 	}
 	checkSource(t, fixtures.PascalSource)
@@ -65,7 +65,7 @@ func TestCaseGolden(t *testing.T) {
 		input := fixtureText(t, fixture.Input, fixture.InputHex)
 		t.Run(input, func(t *testing.T) {
 			checkSource(t, fixture.Source)
-			if (fixture.DotnetCamel != "" || fixture.DotnetPascal != "" || fixture.InputHex != "") && fixture.Deviation == "" {
+			if fixture.InputHex != "" && fixture.Deviation == "" {
 				t.Fatal("undocumented Unicode deviation")
 			}
 			wantCamel := fixtureText(t, fixture.Camel, fixture.CamelHex)
