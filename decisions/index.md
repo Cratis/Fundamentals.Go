@@ -7,4 +7,4 @@ These records capture durable choices, not product documentation. `stage: none` 
 
 | ID | Title | Status | Stage | Decided | Decider |
 | --- | --- | --- | --- | --- | --- |
-| [0001-keep-the-core-standard-library-only-with-recipes-first](0001-keep-the-core-standard-library-only-with-recipes-first.md) | Keep the core standard-library-only and integrate through standard interfaces and recipes before optional modules | proposed | none | | |
+| [0001-keep-the-core-standard-library-only-with-recipes-first](0001-keep-the-core-standard-library-only-with-recipes-first.md) | Keep the core standard-library-only and integrate through standard interfaces and recipes before optional modules | accepted | implemented | 2026-10-02 | Sindre Alstad Wilting |

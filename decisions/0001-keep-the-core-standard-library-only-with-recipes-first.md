@@ -1,10 +1,12 @@
 ---
 id: 0001-keep-the-core-standard-library-only-with-recipes-first
 title: Keep the core standard-library-only and integrate through standard interfaces and recipes before optional modules
-status: proposed
-stage: none
+status: accepted
+stage: implemented
 class: strategy
 reversibility: costly
+decided: 2026-10-02
+decider: Sindre Alstad Wilting
 applies-to:
   - go.mod
   - "**/*.go"
@@ -14,6 +16,14 @@ applies-to:
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
+
+> **2026-10-02 — acceptance.** Sindre Alstad Wilting, the maintainer, delegated
+> this choice to the Fundamentals.Go AI session, asking for decisions based on
+> research and what is best for developers. The session accepted it on that
+> authority after Arc.Go and Chronicle.Go agreed. The maintainer remains the
+> accountable decider. The stage is `implemented` because the root module
+> already meets the verification criteria below; `verified` follows the first
+> release.
 
 ## Context
 
