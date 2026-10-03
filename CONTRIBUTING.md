@@ -115,6 +115,13 @@ before deleting fixtures. Regressions deliver real SIGINT during communication a
 verify supervisor cleanup and an unrelated process's survival. Arbitrary callbacks
 that deliberately detach without bounded supervisor cleanup are not supported.
 This helper is test-local and does not replace managed hook or Pi cancellation.
+Fake-Go tests use controlled supervisors, not shared scheduler capacity. Set
+`QUALITY_GATES_REAL_SUPERVISOR=1` to additionally exercise installed `pi-phase`.
+Run that probe without an outer scheduler slot: nested admission needs capacity.
+It allows the configured 30-second queue plus five seconds for startup, then
+begins cancellation only after the Go child signals readiness. Premature exit
+reports status and raw diagnostics; queue exhaustion leaves cancellation
+unverified and fails the opted-in probe rather than being counted as a pass.
 
 Fixtures use LF writes and compare working directories in Bash's physical path
 format, avoiding native Windows CRLF scripts and drive-letter versus Git Bash

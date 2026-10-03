@@ -71,6 +71,10 @@ def layout(root):
         expected_path = config["module"] + ("" if directory == "." else "/" + directory)
         if module["Module"]["Path"] != expected_path:
             raise ValueError(f"{directory}: expected module {expected_path}")
+        # Go's parser covers single-line and block syntax. Ignoring any directory
+        # would let ./... package coverage gates silently skip source and tests.
+        if module.get("Ignore"):
+            raise ValueError(f"{directory}: ignore directives are forbidden to preserve package coverage")
         unpublished = directory != "." and not policies[directory]
         if module.get("Replace") and not unpublished:
             raise ValueError(f"{directory}: replace directives are forbidden")

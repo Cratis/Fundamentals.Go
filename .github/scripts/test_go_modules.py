@@ -157,6 +157,86 @@ class ModuleLayout(unittest.TestCase):
                 self.nested(extra=directive)
                 self.matrix("replace directives are forbidden")
 
+    def go(self, directory, *args):
+        return subprocess.run(["go", *args], cwd=self.root / directory,
+                              capture_output=True, text=True, timeout=60,
+                              env={**os.environ, "GOWORK": "off", "GOTOOLCHAIN": "local"})
+
+    def test_ignore_is_rejected_in_root_published_and_unpublished_modules(self):
+        directives = [
+            "ignore ./hidden\n",
+            "ignore (\n // Multiple paths, including a quoted path.\n \"./hidden\"\n assets\n)\n",
+            "ignore nonexistent\n",
+        ]
+        for directory, publish in [(".", True), ("tools", True), ("recipes", False)]:
+            self.configure([] if directory == "." else [{"dir": directory, "publish": publish}])
+            if directory != ".":
+                self.nested(directory)
+            manifest = self.root / directory / "go.mod"
+            original = manifest.read_text()
+            for directive in directives:
+                with self.subTest(directory=directory, directive=directive):
+                    manifest.write_text(original + directive)
+                    parsed = self.go(directory, "mod", "edit", "-json")
+                    self.assertEqual(parsed.returncode, 0, parsed.stderr)
+                    self.assertTrue(json.loads(parsed.stdout)["Ignore"])
+                    self.matrix(f"{directory}: ignore directives are forbidden")
+                    # Both CI entry points share the same fail-closed validation.
+                    with self.assertRaisesRegex(ValueError, "ignore directives are forbidden"):
+                        layout(self.root.resolve())
+                    self.assertEqual(manifest.read_text(), original + directive)
+            manifest.write_text(original)
+            if directory != ".":
+                manifest.unlink()
+
+    def test_ignore_text_in_comments_is_not_a_directive(self):
+        self.write("go.mod", f"module {MODULE}\ngo 1.26.0\n// ignore ./hidden\n")
+        self.assertEqual(self.matrix(), {"module": ["."]})
+
+    def test_ignore_hides_real_source_and_failing_tests_from_recursive_gates(self):
+        for directory, publish in [(".", True), ("tools", True), ("recipes", False)]:
+            with self.subTest(directory=directory):
+                self.configure([] if directory == "." else [{"dir": directory, "publish": publish}])
+                if directory != ".":
+                    self.nested(directory)
+                prefix = "" if directory == "." else directory + "/"
+                self.write(prefix + "visible/source.go", "package visible\n")
+                self.write(prefix + "hidden/source.go",
+                           "package hidden\n\nfunc SourcePackage() bool { return true }\n")
+                self.write(prefix + "hidden/source_test.go",
+                           'package hidden\n\nimport "testing"\n\n'
+                           'func TestSourcePackage(t *testing.T) {\n'
+                           '\tif SourcePackage() { t.Fatal("ignored source test executed") }\n}\n')
+                module_path = MODULE + ("" if directory == "." else "/" + directory)
+                manifest = self.root / directory / "go.mod"
+                original = manifest.read_text()
+                # Discovery uses only fixture-owned, standard-library source. Avoid
+                # downloading the published root to disambiguate its nested path;
+                # restore the valid dependency manifest before policy validation.
+                discovery = original.replace(f"require {MODULE} v0.1.0\n", "")
+                manifest.write_text(discovery)
+                listed = self.go(directory, "list", "./...")
+                self.assertEqual(listed.returncode, 0, listed.stderr)
+                self.assertEqual(set(listed.stdout.splitlines()),
+                                 {module_path + "/hidden", module_path + "/visible"})
+                tested = self.go(directory, "test", "-count=1", "-timeout=20s", "./...")
+                self.assertNotEqual(tested.returncode, 0, tested.stdout + tested.stderr)
+                self.assertIn("ignored source test executed", tested.stdout)
+
+                manifest.write_text(discovery + "ignore ./hidden\n")
+                listed = self.go(directory, "list", "./...")
+                self.assertEqual(listed.returncode, 0, listed.stderr)
+                self.assertEqual(listed.stdout.splitlines(), [module_path + "/visible"])
+                tested = self.go(directory, "test", "-count=1", "-timeout=20s", "./...")
+                self.assertEqual(tested.returncode, 0, tested.stdout + tested.stderr)
+                self.assertNotIn(module_path + "/hidden", tested.stdout)
+                print(f"OMISSION PROOF ({directory}): ./... omits hidden source and its failing test", flush=True)
+                manifest.write_text(original + "ignore ./hidden\n")
+                self.matrix(f"{directory}: ignore directives are forbidden")
+                manifest.write_text(original)
+                if directory != ".":
+                    manifest.unlink()
+
     def test_pseudo_version_is_not_a_released_root(self):
         self.configure(["tools"])
         self.nested(version="v0.0.0-20261003005349-c8bd4b7d0830")

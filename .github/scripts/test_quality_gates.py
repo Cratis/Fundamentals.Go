@@ -21,6 +21,29 @@ ROOT = Path(__file__).resolve().parents[2]
 HOOK = ROOT / ".cratis/ai/hooks/scripts/cratis-quality-gate.sh"
 ROOT_GATES = {"backend-build-debug", "backend-build-release", "backend-specs"}
 RECIPE_GATES = {"frontend-compile", "frontend-compile-specs", "frontend-specs"}
+NON_REAPING_EXIT = hasattr(os, "waitid") and hasattr(os, "WNOWAIT")
+# quality-phase.sh allows 30s admission, independently of execution. Five
+# additional seconds cover hook dispatch/exit; cleanup has its own 3s grace.
+SUPERVISOR_STARTUP_TIMEOUT = 35
+
+
+class SupervisorStartupError(AssertionError):
+    """Admission/startup did not yield a child; cancellation remains unverified."""
+
+
+def wait_for_start(process, event, *, timeout=SUPERVISOR_STARTUP_TIMEOUT, now=time.monotonic):
+    """Observe startup or exit without reaping the owned process-group anchor."""
+    deadline = now() + timeout
+    while True:
+        exited = os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+        if exited is not None:
+            status = exited.si_status if exited.si_code == os.CLD_EXITED else -exited.si_status
+            raise SupervisorStartupError(f"wrapper exited before Go started (exit {status}); cancellation unverified")
+        if event.exists():
+            return
+        if now() >= deadline:
+            raise SupervisorStartupError(f"Go startup deadline ({timeout:g}s) expired; cancellation unverified")
+        time.sleep(0.01)
 
 
 class OwnedInterruption(BaseException):
@@ -81,7 +104,8 @@ def stop_owned(process, grace=3):
         try:
             send(signal.SIGKILL)
         finally:
-            process.communicate(timeout=grace)
+            output = process.communicate(timeout=grace)
+    return output
 
 
 def run_owned(command, *, timeout=120, started=None, grace=3, **kwargs):
@@ -113,7 +137,10 @@ def run_owned(command, *, timeout=120, started=None, grace=3, **kwargs):
         # are removed. Restore both handlers after the owned leader is reaped.
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
-        stop_owned(process, grace)
+        output = stop_owned(process, grace)
+        if isinstance(error, SupervisorStartupError):
+            stdout, stderr = output or ("", "")
+            raise SupervisorStartupError(f"{error}\nstdout:\n{stdout}\nstderr:\n{stderr}") from error
         if isinstance(error, OwnedInterruption):
             if error.args[0] == signal.SIGINT:
                 raise KeyboardInterrupt() from None
@@ -150,6 +177,9 @@ class QualityGateRoutingTests(unittest.TestCase):
         self.calls = self.repo / ".ai-work/go-calls"
         self.fake_tool("go", '#!/bin/sh\nprintf "%s|%s|%s|%s\\n" "$PWD" "$GOWORK" "$GOTOOLCHAIN" "$*" >> "$GO_CALLS"\nexit "${FAKE_GO_EXIT:-0}"\n')
         self.fake_tool("yarn", "#!/bin/sh\nexit 99\n")
+        # Fake-Go routing must not consume shared scheduler slots. Installed
+        # supervisor behavior is exercised separately by the explicit probe.
+        self.fake_tool("pi-phase", '#!/bin/sh\nwhile [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n')
         self.env = os.environ.copy()
         for key in ("CRATIS_HOOKS_SKIP_GATE", "CRATIS_HOOKS_GATE_DRYRUN", "CRATIS_HOOKS_GATES"):
             self.env.pop(key, None)
@@ -302,8 +332,123 @@ class QualityGateRoutingTests(unittest.TestCase):
         ]
         self.assertEqual(self.calls.read_text().splitlines(), expected)
 
-    @unittest.skipUnless(os.name == "posix" and shutil.which("pi-phase"), "requires POSIX and configured pi-phase supervisor")
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT, "requires POSIX non-reaping exit observation")
+    def test_failed_supervisor_reports_exit_and_stderr_before_startup_deadline(self):
+        self.fake_tool("pi-phase", '#!/bin/sh\nprintf "controlled admission failure\\n" >&2\nexit 37\n')
+        # An enormous logical deadline is safe here: the outer test phase is
+        # bounded. This must finish on exit, not wait for the marker deadline.
+        with self.assertRaisesRegex(SupervisorStartupError, r"(?s)exited before Go started.*exit 2.*exit 37.*controlled admission failure"):
+            self.exercise_supervisor(startup_timeout=60)
+        self.assertFalse((self.repo / ".ai-work/child.pid").exists())
+
+    def controlled_supervisor(self, outcome):
+        supervisor = self.put(".ai-work/supervisor.py", '''import os, signal, subprocess, sys, time
+from pathlib import Path
+root = Path(os.environ["CLAUDE_PROJECT_DIR"]) / ".ai-work"
+child = None
+stopping = False
+def interrupted(signum, frame):
+    global stopping
+    stopping = True
+def stop():
+    if child is not None and child.returncode is None:
+        os.killpg(child.pid, signal.SIGTERM)
+        child.wait(timeout=2)
+    (root / "joined").write_text("joined")
+    sys.exit(0)
+signal.signal(signal.SIGTERM, interrupted)
+(root / "supervisor.pid").write_text(str(os.getpid()))
+(root / "queued").touch()
+print("controlled supervisor queued", flush=True)
+while not (root / "admit").exists():
+    if stopping:
+        stop()
+    time.sleep(0.01)
+if stopping:
+    stop()
+if sys.argv[1] == "queue-timeout":
+    print("queue timeout (30s); command not started", flush=True)
+    sys.exit(75)
+command = sys.argv[sys.argv.index("--") + 1:]
+child = subprocess.Popen(command, start_new_session=True)
+while child.poll() is None:
+    if stopping:
+        stop()
+    time.sleep(0.01)
+sys.exit(child.returncode)
+''')
+        self.fake_tool("pi-phase", f'#!/bin/sh\nexec "{sys.executable}" "{supervisor}" "{outcome}" "$@"\n')
+
+    def admit_controlled_supervisor(self, process):
+        root = self.repo / ".ai-work"
+        wait_for_start(process, root / "queued", timeout=5)
+        self.assertFalse((root / "child.pid").exists(), "child started before admission")
+        (root / "admit").touch()
+
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT, "requires POSIX non-reaping exit observation")
+    def test_queued_supervisor_starts_after_old_deadline_and_joins_child(self):
+        self.controlled_supervisor("start")
+        observations = []
+
+        def queued(process):
+            wait_for_start(process, self.repo / ".ai-work/queued", timeout=5)
+            self.assertFalse((self.repo / ".ai-work/child.pid").exists())
+
+        def clock():
+            observations.append(True)
+            # Advance only the startup observation clock, not subprocess or
+            # cleanup deadlines. Admission is released by a file handshake.
+            if len(observations) > 1:
+                (self.repo / ".ai-work/admit").touch()
+            return time.monotonic() + (11 if len(observations) > 1 else 0)
+
+        self.exercise_supervisor(before_start=queued, now=clock)
+        self.assertGreater(len(observations), 1)
+        self.assertEqual((self.repo / ".ai-work/joined").read_text(), "joined")
+        self.assertFalse(OwnedProcessTests().live(int((self.repo / ".ai-work/supervisor.pid").read_text())))
+
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT, "requires POSIX non-reaping exit observation")
+    def test_queue_exhaustion_is_unverified_not_a_cancellation_pass(self):
+        self.controlled_supervisor("queue-timeout")
+        with self.assertRaisesRegex(SupervisorStartupError, r"(?s)exit 2.*cancellation unverified.*exit 75.*queue timeout.*command not started"):
+            self.exercise_supervisor(before_start=self.admit_controlled_supervisor)
+        self.assertFalse((self.repo / ".ai-work/child.pid").exists())
+
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT, "requires POSIX non-reaping exit observation")
+    def test_started_command_failure_is_not_queue_exhaustion(self):
+        self.controlled_supervisor("start")
+        with self.assertRaisesRegex(SupervisorStartupError, r"(?s)exit 2.*exit 37.*controlled Go failure"):
+            self.exercise_supervisor(before_start=self.admit_controlled_supervisor, go_failure=True)
+        self.assertFalse((self.repo / ".ai-work/child.pid").exists())
+
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT, "requires POSIX non-reaping exit observation")
+    def test_still_queued_at_startup_deadline_is_stopped_without_a_child(self):
+        self.controlled_supervisor("start")
+        observations = []
+
+        def queued(process):
+            wait_for_start(process, self.repo / ".ai-work/queued", timeout=5)
+
+        def clock():
+            observations.append(True)
+            return time.monotonic() + (36 if len(observations) > 1 else 0)
+
+        with self.assertRaisesRegex(SupervisorStartupError, r"(?s)startup deadline.*cancellation unverified.*controlled supervisor queued"):
+            self.exercise_supervisor(before_start=queued, now=clock)
+        self.assertFalse((self.repo / ".ai-work/child.pid").exists())
+        self.assertEqual((self.repo / ".ai-work/joined").read_text(), "joined")
+        self.assertFalse(OwnedProcessTests().live(int((self.repo / ".ai-work/supervisor.pid").read_text())))
+
+    @unittest.skipUnless(os.environ.get("QUALITY_GATES_REAL_SUPERVISOR") == "1",
+                         "opt-in installed supervisor probe; cancellation not verified by this test")
+    @unittest.skipUnless(os.name == "posix" and NON_REAPING_EXIT and shutil.which("pi-phase"),
+                         "requires POSIX non-reaping exit observation and configured pi-phase")
     def test_configured_supervisor_joins_separately_grouped_go_child_before_deletion(self):
+        (self.tools / "pi-phase").unlink()
+        self.exercise_supervisor()
+
+    def exercise_supervisor(self, *, before_start=None, now=time.monotonic,
+                            startup_timeout=SUPERVISOR_STARTUP_TIMEOUT, go_failure=False):
         event = self.repo / ".ai-work/child.pid"
         stopped = self.repo / ".ai-work/stopped"
         child = self.put(".ai-work/hanging-go.py", '''import os, signal, sys, time
@@ -320,6 +465,8 @@ while not (root / "release").exists():
 stop(None, None)
 ''')
         self.fake_tool("go", f'#!/bin/sh\nexec "{sys.executable}" "{child}"\n')
+        if go_failure:
+            self.fake_tool("go", '#!/bin/sh\nprintf "controlled Go failure\\n" >&2\nexit 37\n')
         self.put("concepts/changed.go", "package concepts\n")
         witness = subprocess.Popen([sys.executable, "-u", "-c",
                                     'import sys; print("ready", flush=True); print(sys.stdin.readline().strip(), flush=True)'],
@@ -336,19 +483,25 @@ stop(None, None)
                 process.stdin.close()
                 process.stdin = None
                 owned.append(process)
-                deadline = time.monotonic() + 10
-                while not event.exists():
-                    self.assertLess(time.monotonic(), deadline, "configured wrapper did not start Go")
-                    time.sleep(0.01)
+                if before_start:
+                    before_start(process)
+                wait_for_start(process, event, timeout=startup_timeout, now=now)
                 pid = int(event.read_text())
                 self.assertNotEqual(os.getpgid(pid), process.pid)
                 self.assertNotEqual(os.getpgid(pid), os.getpgid(witness.pid))
 
-            with self.assertRaises(subprocess.TimeoutExpired):
-                run_owned(["bash", str(HOOK)], cwd=self.repo, env=self.env,
-                          started=started, timeout=0.05)
+            try:
+                with self.assertRaises(subprocess.TimeoutExpired):
+                    run_owned(["bash", str(HOOK)], cwd=self.repo, env=self.env,
+                              started=started, timeout=0.05)
+            except SupervisorStartupError as error:
+                # The managed hook redirects phase output. A wrapper still
+                # queued when cancelled may never copy it to hook stderr.
+                logs = self.repo / ".ai-work/cratis-hooks/nosession/gate-logs"
+                raw = "".join(f"--- {path.name} ---\n{path.read_text()}" for path in sorted(logs.glob("*.log")))
+                raise SupervisorStartupError(f"{error}\nraw phase logs:\n{raw}") from error
             child_pid = int(event.read_text())
-            print(f"configured pi-phase cleanup: child live={checks.live(child_pid)}; "
+            print(f"supervisor cleanup: child live={checks.live(child_pid)}; "
                   f"termination event={stopped.exists()}; leader reaped={owned[0].returncode is not None}",
                   flush=True)
             self.assertEqual(stopped.read_text(), "terminated")
@@ -368,7 +521,17 @@ stop(None, None)
                 while checks.live(child_pid) and time.monotonic() < deadline:
                     time.sleep(0.01)
                 self.assertFalse(checks.live(child_pid), "reproducer failed to stop")
-            stop_owned(witness)
+            # Even failed startup leaves the unrelated process alive. Join it
+            # before removing the fixture, including assertion-failure paths.
+            try:
+                if witness.returncode is None:
+                    stdout, stderr = witness.communicate(input="unrelated survives\n", timeout=3)
+                    self.assertEqual(witness.returncode, 0, stderr)
+                    self.assertEqual(stdout, "unrelated survives\n")
+                for process in owned:
+                    self.assertIsNotNone(process.returncode, "owned hook was not reaped")
+            finally:
+                stop_owned(witness)
 
     @unittest.skipUnless(os.environ.get("QUALITY_GATES_REAL_GO") == "1", "opt-in actual root and recipes checks")
     def test_actual_native_go_checks_in_an_isolated_source_copy(self):
@@ -392,6 +555,7 @@ stop(None, None)
         with (self.repo / "doc.go").open("a") as changed:
             changed.write("\n// Isolated routing test change.\n")
         (self.tools / "go").unlink()
+        (self.tools / "pi-phase").unlink()
         self.assert_plan(ROOT_GATES | RECIPE_GATES)
         result = self.run_gate(dry=False)
         self.assertEqual(result.returncode, 0, result.stderr)
