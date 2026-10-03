@@ -6,8 +6,8 @@ description: Type-check source, normalize lifetime directives and analyze exact 
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-If you maintain a generator, `dependencyinjection/bindingtypes` in **v0.2.0**
-lets you share constructor-selection rules without sharing an emitter. It
+If you maintain a generator, `dependencyinjection/bindingtypes`, introduced in
+**v0.2.0**, lets you share constructor-selection rules without sharing an emitter. It
 accepts type-checked packages and returns a deterministic plan. It does **not**
 load packages, execute constructors, register services, write files or provide
 a generator CLI. Use [plain constructors or typed bindings](dependency-injection.md)
@@ -15,8 +15,9 @@ when you do not need generation.
 
 ## Type-check, read directives and analyze
 
-Use Go 1.26 or later with `github.com/cratis/fundamentals.go@v0.2.0`. Save this
-complete program as `main.go` and run `go run .`. It is derived from the
+Use Go 1.26 or later with `github.com/cratis/fundamentals.go@v0.3.0`
+(see [release status](releases.md)). Save this complete program as
+`main.go` and run `go run .`. It is derived from the
 [executable planner example](../dependencyinjection/bindingtypes/documentation_examples_test.go).
 
 ```go

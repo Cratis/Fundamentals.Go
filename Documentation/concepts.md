@@ -13,7 +13,7 @@ serializers and schema builders can discover the exact scalar representation.
 
 For a complete first program, start with the [JSON round-trip tutorial](getting-started.md).
 For scalar signatures, ranges, zero values and SQL support, use the
-[scalar reference](scalars.md). This page covers the released v0.2.0 concept contract.
+[scalar reference](scalars.md). This page covers the v0.3.0 concept contract.
 
 ## Author a UUID-backed concept
 
@@ -88,6 +88,20 @@ order. Read them as text or convert explicitly before scanning; `Scan` never
 silently reorders bytes. The forwarding pattern is compiled and tested in
 [`concepts/uuid_sql_test.go`](../concepts/uuid_sql_test.go) using `AuthorID` from
 the examples.
+
+### Convert legacy GUID input explicitly
+
+The forwarding methods above remain strict. For a separate compatibility-conversion
+boundary, `concepts.ParseDotNetGUID(text)` accepts the pinned .NET 10.0.12
+`Guid.Parse(string)` profile and returns a UUID you can convert to `AuthorID`
+after checking the error. This API is available beginning with **v0.3.0**.
+See [explicit .NET GUID conversion](scalars.md#explicit-net-guid-conversion)
+for legacy truncation, zero-prefix and conditional-NUL behavior and input limits.
+
+Do not use compatibility conversion as canonical-input validation or correlation
+ID admission, and do not substitute it into these text/JSON/SQL forwarders
+implicitly. Consumer binding policy and standard JSON map-key handling stay
+unchanged.
 
 ## Author a calendar-backed concept
 

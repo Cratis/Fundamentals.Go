@@ -67,14 +67,18 @@ proof that an API exists. Agree on the contract before consumers adopt it.
 - Push verified, coherent work to `develop` freely under the maintainer's
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
-- Fundamentals.Go **v0.2.0 is released at commit `532d2181c610f67730133f61e768a943379da571`**. Consumers use
-  published tags for released APIs and may pin **pushed** develop commits using
+- The v0.2.0 baseline was released at `532d2181c610f67730133f61e768a943379da571`.
+  This documentation targets **v0.3.0**. Check the public release list and proxy
+  for publication; the release workflow assigns the commit and tag. Consumers
+  use published tags for released APIs and may pin **pushed** develop commits using
   Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
   use local replacements as evidence that a consumer can resolve the module.
 - Collect release-bound changes in a release PR from `develop` to `main` with
   the appropriate intent label. The v0.2.0 release is complete; do not describe
-  released packages as future work. Enum contract captures on `develop` are
-  evidence only, not released enum codecs or new runtime APIs.
+  its packages as future work. The release-bound v0.3.0 adds explicit
+  `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12 without changing
+  strict UUID defaults. Enum and complex-key JSON corpora are source-distributed
+  evidence, not Go enum or complex-key implementations, runtime or schema support.
 - Confirm public proxy retrieval after publication, then tell the consumer
   sessions the version and commit. The configured release workflow, not a manual
   competing tag, produces the release after the authorized merge.
@@ -125,7 +129,9 @@ CI uses Go 1.26.x and 1.27.x, golangci-lint v2.14.0, actionlint v1.7.12 and
 govulncheck v1.8.0. PR builds run Linux; scheduled/manual builds also run macOS
 and Windows. CodeQL, release intent, release notes and work-record checks run
 on GitHub. [CONTRIBUTING](../CONTRIBUTING.md) and `.github/workflows/` define the
-full gates; managed AI stop hooks alone do not check Go.
+full gates. The repository-owned quality-gate override makes managed AI stop
+hooks check root and recipes build, vet, and tests by default; it does not replace
+the full CI matrix, race, lint, module hygiene or vulnerability checks.
 
 ## AI guidance and ownership
 

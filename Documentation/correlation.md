@@ -8,13 +8,14 @@ description: Attach, propagate and deliberately clear an operation ID while pres
 
 To connect logs from the same operation, attach its correlation ID to the
 operation's existing context and pass the returned context onward. The
-`correlation` package in **v0.2.0** stores metadata only: it does not parse
+`correlation` package, introduced in **v0.2.0**, stores metadata only: it does not parse
 headers, generate IDs, start work or configure logging.
 
 ## Attach and propagate an ID
 
 Use Go 1.26 or later and install
-`github.com/cratis/fundamentals.go@v0.2.0` in your module. Save this complete
+`github.com/cratis/fundamentals.go@v0.3.0` in your module
+(see [release status](releases.md)). Save this complete
 program as `main.go`, then run `go run .`. The
 [executable propagation example](../documentation_examples_test.go) is its source.
 
