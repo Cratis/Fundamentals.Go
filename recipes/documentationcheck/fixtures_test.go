@@ -58,6 +58,8 @@ func TestBrokenLinks(t *testing.T) {
 		{"invalid percent", "[bad](target%GG.md)", "invalid URL"},
 		{"local query", "[bad](target.md?mode=x)", "unsupported local URL"},
 		{"backticks across paragraphs", "`start\n\n[bad](missing.md)\n\nend`", "local target does not exist"},
+		{"link after unmatched bracket", "A [\n\n[bad](missing.md)", "local target does not exist"},
+		{"heading link after unmatched bracket", "A [\n\n## [bad](missing.md)", "local target does not exist"},
 		{"inline comment invents no space", "## A<!--x-->B\n[bad](#a-b)", "missing heading anchor"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -66,6 +68,55 @@ func TestBrokenLinks(t *testing.T) {
 				t.Fatalf("error = %v, want slash-normalized source and %q", err, tc.want)
 			}
 		})
+	}
+}
+
+func TestMarkdownBlockBoundaries(t *testing.T) {
+	for _, body := range []string{
+		"[\n\n]\n",
+		"A [\n\nB](missing.md)",
+		"A [\n\n## B](missing.md)\n",
+		"## A [\n\nB](missing.md)\n",
+		"## A [\n## B](missing.md)\n",
+		"A ![\n\nB](missing.png)\n",
+	} {
+		t.Run(body, func(t *testing.T) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					t.Fatalf("parseMarkdown panicked: %v", recovered)
+				}
+			}()
+			doc, err := parseMarkdown([]byte(body), false)
+			if err != nil || len(doc.links) != 0 {
+				t.Fatalf("prose created links: %v, error = %v", doc.links, err)
+			}
+		})
+	}
+}
+
+func TestIncompleteReferenceLabels(t *testing.T) {
+	for _, body := range []string{
+		"See [name][unfinished\n",
+		"See [name][",
+		"See [name][unfinished\\]\n",
+		"See [name][nested[label]]\n",
+		"See [name][unfinished\n\nlabel]\n",
+		"See [name][" + strings.Repeat("a", 1000) + "]\n",
+		"See ![name][unfinished\n",
+		"See \\[name][unfinished\n",
+		"See `[name][unfinished`\n",
+	} {
+		t.Run(body, func(t *testing.T) {
+			doc, err := parseMarkdown([]byte(body), false)
+			if err != nil || len(doc.links) != 0 {
+				t.Fatalf("prose created links: %v, error = %v", doc.links, err)
+			}
+		})
+	}
+	// An incomplete explicit label can still follow a valid shortcut reference.
+	doc, err := parseMarkdown([]byte("See [name][unfinished\n\n[name]: target.md\n"), false)
+	if err != nil || len(doc.links) != 1 || doc.links[0].target != "target.md" {
+		t.Fatalf("shortcut links = %v, error = %v", doc.links, err)
 	}
 }
 

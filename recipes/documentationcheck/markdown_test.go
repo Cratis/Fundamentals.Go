@@ -40,20 +40,35 @@ func (a *referenceAudit) SetParserOption(config *parser.Config) {
 func (a *referenceAudit) Parse(parent ast.Node, reader text.Reader, context parser.Context) ast.Node {
 	line, segment := reader.PeekLine()
 	if bytes.HasPrefix(line, []byte("][")) {
-		context = &referenceContext{Context: context, audit: a, line: bytes.Count(reader.Source()[:segment.Start], []byte("\n")) + 1}
+		context = &referenceContext{
+			Context: context, audit: a, reader: reader, shortcutStart: segment.Start + 1,
+			line: bytes.Count(reader.Source()[:segment.Start], []byte("\n")) + 1,
+		}
 	}
 	return a.InlineParser.Parse(parent, reader, context)
 }
 
+// Goldmark's link parser also closes unmatched brackets and delimiter state at
+// every block boundary. Embedding InlineParser alone does not expose this hook.
+func (a *referenceAudit) CloseBlock(parent ast.Node, reader text.Reader, context parser.Context) {
+	a.InlineParser.(parser.CloseBlocker).CloseBlock(parent, reader, context)
+}
+
 type referenceContext struct {
 	parser.Context
-	audit *referenceAudit
-	line  int
+	audit         *referenceAudit
+	reader        text.Reader
+	shortcutStart int
+	line          int
 }
 
 func (c *referenceContext) Reference(label string) (parser.Reference, bool) {
 	ref, ok := c.Context.Reference(label)
-	if !ok {
+	// Goldmark consumes a completed full/collapsed label before its lookup, but
+	// resets to just after the first ']' before trying a shortcut fallback.
+	// Observe that position rather than treating an unfinished label as a link.
+	_, position := c.reader.Position()
+	if !ok && position.Start != c.shortcutStart {
 		c.audit.missing = append(c.audit.missing, link{target: label, line: c.line})
 	}
 	return ref, ok
