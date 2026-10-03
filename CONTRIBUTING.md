@@ -78,6 +78,35 @@ Pull requests run the Linux matrix; scheduled and manual builds also check macOS
 
 Managed Cratis AI rules and harness adapters are installed through `cratis ai install` and updated through `cratis ai update`. Shared improvements belong in [Cratis AI](https://github.com/Cratis/AI); local Go rules and skills stay outside the managed manifest. Read [project context](Documentation/project-context.md) for ownership and the documented hook patch exceptions.
 
+The automatic project override in `.cratis/ai/quality-gates.project.json` limits
+frontend gates to a root Node application with `package.json`, `yarn.lock`, and
+the requested scripts; none exists here. It excludes the opt-in contract probes
+and never discovers managed harness packages. The managed runner can patch
+existing gate IDs but cannot append native Go gates. Select the repository-owned
+Go configuration explicitly when running the hook (or export this variable in
+your harness environment):
+
+```sh
+export CRATIS_HOOKS_GATES="$PWD/.cratis/quality-gates.go.json"
+CRATIS_HOOKS_GATE_DRYRUN=1 bash .cratis/ai/hooks/scripts/cratis-quality-gate.sh </dev/null
+bash .cratis/ai/hooks/scripts/cratis-quality-gate.sh </dev/null
+python3 -B -m unittest discover -s scripts -p 'test_quality_gates.py' -v
+```
+
+Native gates run `go build ./...`, `go vet ./...`, and
+`go test -count=1 -timeout=2m ./...` as separate phases with `GOWORK=off` and
+`GOTOOLCHAIN=local`. Root source, manifests, fixtures, and documentation snippets
+select both approved modules because recipes consume the root; recipes-only
+changes select recipes. Managed trees, work records, and build outputs do not
+select gates. `scripts/quality-phase.sh` uses `pi-phase` from `PATH` when available
+(120-second execution and 30-second queue limits), otherwise executes Go directly;
+bound the overall hook invocation in either case. Clean or irrelevant working
+trees are no-ops, not evidence that checks ran. This hook is not the full CI gate
+listed above and does not run .NET or JavaScript contract probes. Set
+`QUALITY_GATES_REAL_GO=1` for the routing regression suite to additionally run
+native checks on an isolated copy of the current source, without changing your
+working tree.
+
 Plans, scratch files, and work records belong only in the ignored `.ai-work/` directory and are never committed. Durable follow-ups belong in GitHub issues.
 
 ## Security

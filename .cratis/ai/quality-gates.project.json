@@ -1,0 +1,45 @@
+{
+  "$comment": "Repository-owned prerequisites: there is no root Node application. Contract probes are opt-in, not frontend applications. Do not discover managed harness packages.",
+  "gates": [
+    {
+      "id": "frontend-lint",
+      "excludeChanged": ["ContractTests/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "workingDirectory": ".",
+      "requires": {
+        "commands": ["yarn"],
+        "paths": ["package.json", "yarn.lock"],
+        "packageScripts": ["lint:ci"]
+      }
+    },
+    {
+      "id": "frontend-compile",
+      "excludeChanged": ["ContractTests/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "workingDirectory": ".",
+      "requires": {
+        "commands": ["yarn"],
+        "paths": ["package.json", "yarn.lock"],
+        "packageScripts": ["g:compile"]
+      }
+    },
+    {
+      "id": "frontend-compile-specs",
+      "excludeChanged": ["ContractTests/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "workingDirectory": ".",
+      "requires": {
+        "commands": ["yarn"],
+        "paths": ["package.json", "yarn.lock"],
+        "packageScripts": ["g:compile:specs"]
+      }
+    },
+    {
+      "id": "frontend-specs",
+      "excludeChanged": ["ContractTests/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "workingDirectory": ".",
+      "requires": {
+        "commands": ["yarn"],
+        "paths": ["package.json", "yarn.lock"],
+        "packageScripts": ["test"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "$comment": [
+    "Repository-owned native gates. Select with CRATIS_HOOKS_GATES: the managed runner only patches existing IDs and cannot append these gates through quality-gates.project.json.",
+    "Root changes also check recipes because its allow-listed replacement consumes the root. Recipes-only changes do not rebuild the root.",
+    "Build, vet and tests only: this is not the complete CI matrix, formatting/lint, module hygiene, vulnerability analysis, or opt-in .NET/JavaScript contract-probe execution."
+  ],
+  "enabled": true,
+  "failFast": true,
+  "maxOutputLines": 60,
+  "gates": [
+    {
+      "id": "go-root-build",
+      "description": "Compile root Go packages",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "build"]
+    },
+    {
+      "id": "go-root-vet",
+      "description": "Vet root Go packages",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "vet"]
+    },
+    {
+      "id": "go-root-tests",
+      "description": "Test root Go packages and fixtures",
+      "changed": ["**/*.go", "go.mod", "go.sum", "**/testdata/**", "Documentation/**/*.md"],
+      "excludeChanged": ["recipes/**", ".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": ".",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "scripts/quality-phase.sh", "test"]
+    },
+    {
+      "id": "go-recipes-build",
+      "description": "Compile unpublished Go recipes against the root",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "build"]
+    },
+    {
+      "id": "go-recipes-vet",
+      "description": "Vet unpublished Go recipes",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "vet"]
+    },
+    {
+      "id": "go-recipes-tests",
+      "description": "Test unpublished Go recipes and authored documentation snippets",
+      "changed": ["**/*.go", "go.mod", "go.sum", "recipes/go.mod", "recipes/go.sum", "**/testdata/**", "Documentation/**/*.md", "Documentation/**/*.yml", "README.md", "CONTRIBUTING.md"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "**/bin/**", "**/obj/**", "**/dist/**", "**/node_modules/**"],
+      "workingDirectory": "recipes",
+      "requires": {"commands": ["bash", "go"], "paths": ["go.mod", "recipes/go.mod", "scripts/quality-phase.sh"]},
+      "command": ["bash", "../scripts/quality-phase.sh", "test"]
+    },
+    {
+      "id": "frontend-lint",
+      "description": "Lint a root Node application, when present",
+      "changed": ["**/*.ts", "**/*.tsx"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "ContractTests/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "command": ["yarn", "lint:ci"]
+    },
+    {
+      "id": "frontend-compile",
+      "description": "Compile a root Node application, when present",
+      "changed": ["**/*.ts", "**/*.tsx"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "ContractTests/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "command": ["yarn", "g:compile"]
+    },
+    {
+      "id": "frontend-compile-specs",
+      "description": "Compile root Node application specs, when present",
+      "changed": ["**/*.ts", "**/*.tsx"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "ContractTests/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "command": ["yarn", "g:compile:specs"]
+    },
+    {
+      "id": "frontend-specs",
+      "description": "Test a root Node application, when present",
+      "changed": ["**/*.ts", "**/*.tsx"],
+      "excludeChanged": [".cratis/**", ".pi/**", ".claude/**", ".agents/**", ".ai-work/**", "ContractTests/**", "**/node_modules/**", "**/wwwroot/**", "**/dist/**", "**/obj/**", "**/bin/**"],
+      "command": ["yarn", "test"]
+    }
+  ]
+}
