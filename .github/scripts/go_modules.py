@@ -74,6 +74,15 @@ def layout(root):
         unpublished = directory != "." and not policies[directory]
         if module.get("Replace") and not unpublished:
             raise ValueError(f"{directory}: replace directives are forbidden")
+        if unpublished:
+            # Keep replacement syntax portable; Path resolves forward slashes on Windows.
+            local_root = "/".join(".." for _ in directory.split("/"))
+            for replacement in module.get("Replace") or []:
+                old, new = replacement["Old"], replacement["New"]
+                if (old["Path"] != config["module"] or old.get("Version")
+                        or new.get("Version") or new["Path"] not in {local_root, local_root + "/"}
+                        or (manifest.parent / new["Path"]).resolve() != root):
+                    raise ValueError(f"{directory}: unpublished modules may only replace the unversioned root module with the relative repository root")
         requirements = module.get("Require") or []
         if directory == ".":
             if requirements:

@@ -75,6 +75,67 @@ class ModuleLayout(unittest.TestCase):
         _, dependencies = layout(self.root.resolve())
         self.assertEqual(dependencies, [MODULE + "@v0.1.0"])
 
+    def test_current_recipes_manifest_is_accepted(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        manifest = SCRIPT.parents[2] / "recipes/go.mod"
+        self.write("recipes/go.mod", manifest.read_text())
+        self.assertEqual(self.matrix(), {"module": [".", "recipes"]})
+        _, dependencies = layout(self.root.resolve())
+        self.assertEqual(dependencies, [])
+
+    def test_nested_unpublished_replacement_resolves_to_repository_root(self):
+        directory = "examples/recipes"
+        self.configure([{"dir": directory, "publish": False}])
+        for target in ["../..", "../../"]:
+            with self.subTest(target=target):
+                self.nested(directory, version="v0.0.0", extra=f"replace (\n {MODULE} => {target}\n)\n")
+                self.assertEqual(self.matrix(), {"module": [".", directory]})
+
+    def test_unpublished_module_without_replacements_is_accepted(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        self.nested("recipes", version="v0.0.0")
+        self.assertEqual(self.matrix(), {"module": [".", "recipes"]})
+
+    def test_unpublished_replacements_must_be_unversioned_local_root_only(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        directives = [
+            "replace example.com/third-party => ../\n",
+            "replace example.com/third-party => example.com/fork v1.0.0\n",
+            f"replace {MODULE} => example.com/fork v1.0.0\n",
+            f"replace {MODULE} => {MODULE} v0.1.0\n",
+            f"replace {MODULE} v0.0.0 => ../\n",
+            f"replace {MODULE} => ../\nreplace example.com/third-party => ../\n",
+        ]
+        for directive in directives:
+            with self.subTest(directive=directive):
+                self.nested("recipes", version="v0.0.0", extra=directive)
+                self.matrix("relative repository root")
+
+    def test_unpublished_replacement_rejects_wrong_outside_and_nonportable_paths(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        for target in ["./", "../missing", "../../", "../recipes/../",
+                       str(self.root.resolve()), str(self.root.resolve().parent),
+                       "C:/checkout", "//server/share"]:
+            with self.subTest(target=target):
+                self.nested("recipes", version="v0.0.0",
+                            extra=f"replace {MODULE} => {json.dumps(target)}\n")
+                self.matrix("relative repository root")
+
+    def test_unpublished_replacement_rejects_backslash_paths_on_every_platform(self):
+        self.configure([{"dir": "recipes", "publish": False}])
+        target = json.dumps("..\\")
+        self.nested("recipes", version="v0.0.0", extra=f"replace {MODULE} => {target}\n")
+        # Go rejects Windows directory syntax before our policy on other platforms.
+        self.matrix("relative repository root" if os.name == "nt" else "Windows path")
+
+    def test_nested_unpublished_replacement_rejects_wrong_parent_depth(self):
+        directory = "examples/recipes"
+        self.configure([{"dir": directory, "publish": False}])
+        for target in ["../", "../../../"]:
+            with self.subTest(target=target):
+                self.nested(directory, version="v0.0.0", extra=f"replace {MODULE} => {target}\n")
+                self.matrix("relative repository root")
+
     def test_publication_policy_is_explicit_and_boolean(self):
         for entry in [{"dir": "recipes"}, {"dir": "recipes", "publish": "false"},
                       {"dir": "recipes", "publish": 0},

@@ -119,8 +119,9 @@ to reserve an allow-list entry.
 The `recipes` module is CI-tested source, not a versioned dependency for consumers.
 Its explicit `publish: false` entry includes it in every Go gate, with `GOWORK=off`,
 but makes the nested release preflight refuse it, including retry attempts.
-Only unpublished modules are exempt from the `replace` ban and released-root
-requirement. The root always remains standard-library-only and replacement-free.
+Unpublished modules are exempt from the released-root requirement but may replace
+only the unversioned canonical root module with its relative path to the repository
+root. The root always remains standard-library-only and replacement-free.
 
 Recipes require the root at the placeholder `v0.0.0` and replace it with `../`,
 so each run tests the checked-out library, not a previously released version.
