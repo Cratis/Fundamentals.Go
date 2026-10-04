@@ -154,7 +154,8 @@ jobs:
     needs: [release, verify-release]
     if: needs.release.outputs.tag != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # 120s setup + 275s bounded producers + 25s preparation/runner headroom.
+    timeout-minutes: 7
     permissions:
       contents: read
     env:
@@ -174,6 +175,7 @@ jobs:
       # Deliberately no repository checkout: resolve the public tagged module,
       # not a local main module or a developer workspace replacement.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        timeout-minutes: 2
         with:
           # Compile consumption at the root module's supported minimum.
           go-version: '1.26.x'

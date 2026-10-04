@@ -175,7 +175,8 @@ assert result['Version'] == os.environ['RELEASE_TAG']
     def test_job_is_read_only_no_checkout_public_minimum_and_fail_closed(self):
         self.assertIn("    needs: [release, verify-release]\n", INDEX)
         self.assertIn("    if: needs.release.outputs.tag != ''\n", INDEX)
-        self.assertIn("    timeout-minutes: 5\n", INDEX)
+        self.assertIn("    timeout-minutes: 7\n", INDEX)
+        self.assertIn("        timeout-minutes: 2\n", INDEX)
         self.assertIn("    permissions:\n      contents: read\n", INDEX)
         self.assertNotIn("actions/checkout", INDEX)
         self.assertIn("go-version: '1.26.x'", INDEX)
