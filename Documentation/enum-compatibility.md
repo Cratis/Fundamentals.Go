@@ -38,10 +38,9 @@ integer-string outputs are in the [fixture set](../testdata/enum-contract/README
 Direct converter diagnostics are not wire acceptance: serializer null bypass and
 exception wrapping differ.
 
-This source commit is not a published package pin. Chronicle.Go's older
-[consumer request #64](https://github.com/Cratis/Chronicle.Go/issues/64) names
-Fundamentals **7.19.6**; these observations do **not** establish equivalence to
-that package or its configured serializer profile.
+This source commit is not a published package pin. The separate
+[packaged Chronicle profile](#packaged-chronicle-profile) below records Fundamentals
+**7.19.6**; the source observations do **not** establish package equivalence.
 
 The golden is historical, not a statement about current C# packages. A separate
 .NET 10.0.12 source-profile comparison of
@@ -54,7 +53,7 @@ committed golden below still describes the original pin.
 
 The newer flags rule checks numeric inputs against the OR of declared bits.
 Strings and writes remain separate paths: an unknown bit can still parse from a
-numeric string and be written. A separately captured wide-flags supplement also
+numeric string and be written. A separate 42-observation wide-flags supplement
 observed numeric-read initialization overflow when a declared UInt32/Int64 flag
 exceeds Int32. Those observations do not establish support for every backing
 type, JIT profile or application schema.
@@ -126,17 +125,75 @@ not make an alternate backing type interoperable.
 
 ## No universal round trip
 
-Bare reads and writes are asymmetric. Reading `"9"` succeeds and emits `9`, but
-reading that numeric output fails membership. Writing flags value 5 emits `5`,
-which bare read rejects unless 5 is an exact declared member. There is no automatic
-allowed-bit-mask rule. Test read acceptance and write output independently rather
-than requiring every accepted read or constructible value to round-trip.
+At the historical `d2accc4` source pin, bare reads and writes are asymmetric.
+Reading `"9"` succeeds and emits `9`, but reading that numeric output fails
+membership. Writing flags value 5 emits `5`, which bare read rejects unless 5 is
+an exact declared member. That pin has no automatic allowed-bit-mask rule;
+the newer `e8ac1ec` source behavior differs as described above. Test read acceptance
+and write output independently, not as a universal round-trip requirement.
 
 JsonSerializer accepts a null concept without calling its converter; a direct
 concept converter call with null throws ArgumentNullException. Nullable bare null
 is likewise a serializer-wrapper observation. Missing properties, null omission,
 defaults and collection elements depend on a containing product profile and are
 outside this scalar capture.
+
+## Packaged Chronicle profile
+
+The [public owner checkpoint](https://github.com/Cratis/Fundamentals.Go/issues/17#issuecomment-5979266122)
+accepts the separately captured profile at Chronicle.Go
+`747c1eb3a015a583b4fd2ffa51b6c6ab3a185087`:
+[profile.json][package-profile], [provenance.json][package-provenance],
+[capture harness][package-harness] and [capture scope][package-readme]. As recorded,
+it executes packaged Chronicle **19.29.4** / Fundamentals **7.19.6** on
+.NET/System.Text.Json **10.0.12**, through actual `EventSerializer` and both
+`JsonSchemaGenerator.Generate` / `GenerateForReadModel` APIs. These are reviewed
+owner-captured observations, not a package execution repeated by Fundamentals.Go.
+Each naming policy records **586 reads, 130 independent writes, 208 Expando
+direction-pairs and 54 schemas**; none is a Go codec or kernel-admission test.
+
+The six historical enum declarations match. Comparing root scalar inputs with
+`Scalar<T>` property cases maps **73 bare reads and 28 independent writes per
+policy**, with agreement after normalizing acceptance, exception/inner categories,
+exact integers and numeric property output. This excludes messages, whole-object
+bytes, concepts, direct diagnostics and standalone nullable cases; it is **not**
+a 236-case consumer pass or general source/package equivalence. Package `AllBits`
+declares None/A/B/C/AB/All; the newer source supplement declares only None/A/All.
+Do not transfer conclusions between those declarations by type name.
+
+Options also differ from the two-factory historical harness. Client/event options
+include `EnumConverterFactory`; schema options install only the enumerable-concept
+and concept factories. Event property matching is case-insensitive; client/schema
+matching is not. Client/event writes omit nulls; schema options record `Never`.
+`DefaultNamingPolicy` preserves property names; `CamelCaseNamingPolicy` uses
+`AcronymFriendlyJsonCamelCaseNamingPolicy`. Neither renames enum members.
+The profile records complete converter order and settings separately.
+
+Locate the following cases in `profile.json` by naming policy, declared type,
+operation, schema API when present, and ID—not by array index. Outcomes below
+hold for both naming policies; Expando cases use both schema APIs.
+
+| Operation and case identity | Recorded outcome |
+| --- | --- |
+| `EventSerializer.Deserialize`, `Scalar<Bits>`, `token:5` / `token:7` | Reject numeric inputs, unlike newer `e8ac1ec` source reads. |
+| Same type/operation, `token:"A, C"`, `token:"a, c"`, `token:"5"`, `token:"8"` | Accept 5, 5, 5, 8; separately recorded reserialization writes those integers. |
+| `EventSerializer.Serialize`, `Scalar<Bits>`, `numeric:5` / `numeric:7` / `numeric:8` | Independent writes emit 5, 7, 8; numeric read acceptance does not follow. |
+| `ExpandoObjectConverter.ToExpandoObject/ToJsonObject`, `Scalar<Bits>`, `token:5` | JSON-to-CLR preserves 5; subsequent `toJson` emits `"None"`. |
+| Same operation, `NullableScalar<Int32Sample>`, `token:9` | JSON-to-CLR preserves 9; `toJson` omits the property. |
+| Same operation, `ArrayValue<Bits>`, `token:[3,5,7,8,-1]` | JSON-to-CLR preserves the integers; `toJson` emits `["AB",null,null,null,null]`. |
+
+For `ConceptDefaultControl`, `Generate` records only `{"default":null}` for
+`Value` (camel policy: `value`). `GenerateForReadModel` records integer type,
+`enum`, aligned `x-enumNames` and `default:null`, with no nullable type union or
+null enum member. That shape proves neither null admission nor general Go enum
+support. Expando conversion is in-memory schema conversion, not Mongo/BSON or
+kernel persistence: scalar fallback, nullable omission and array null elements
+are distinct, not a rule that every unknown value becomes null.
+
+[package-profile]: https://github.com/Cratis/Chronicle.Go/blob/747c1eb3a015a583b4fd2ffa51b6c6ab3a185087/serialization/testdata/enum/profile.json
+[package-provenance]: https://github.com/Cratis/Chronicle.Go/blob/747c1eb3a015a583b4fd2ffa51b6c6ab3a185087/serialization/testdata/enum/provenance.json
+[package-harness]: https://github.com/Cratis/Chronicle.Go/blob/747c1eb3a015a583b4fd2ffa51b6c6ab3a185087/serialization/testdata/enum/capture/Program.cs
+[package-readme]: https://github.com/Cratis/Chronicle.Go/blob/747c1eb3a015a583b4fd2ffa51b6c6ab3a185087/serialization/testdata/enum/README.md
 
 ## Consumer ownership and remaining evidence
 
@@ -157,8 +214,9 @@ The `concepts.Concept[T]` and `Underlying` scalar allowlist remain unchanged.
 An existing Int32 scalar concept with product-owned validation does not establish
 general enum-concept recognition. There is no shared enum registry or serializer API.
 
-[#17](https://github.com/Cratis/Fundamentals.Go/issues/17) remains open until consumer
-JSON/schema profile evidence identifies real admitted declarations and exercises
-these observations through the actual Arc binding/proxy and Chronicle event/schema
-boundaries. Neither stdlib fixture validation nor the .NET probe proves Go codec
-parity. See the [parity map](parity.md) for implementation status.
+[#17](https://github.com/Cratis/Fundamentals.Go/issues/17) remains open. The reviewed
+Chronicle package capture supplies bounded event/schema evidence, not an admitted
+Go enum profile. Arc binding/proxy, backend/frontend agreement and Chronicle
+kernel/Mongo/BSON admission remain product-owned and unverified here. Neither
+fixture validation nor these .NET captures prove Go codec parity. See the
+[parity map](parity.md) for implementation status.
