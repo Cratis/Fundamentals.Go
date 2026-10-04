@@ -46,7 +46,8 @@ func (a *analyzer) normalize() bool {
 	})
 	a.cfg.Existing = slices.Clone(a.cfg.Existing)
 	slices.SortFunc(a.cfg.Existing, func(x, y Registration) int {
-		return cmp.Or(cmp.Compare(identity(x.Service), identity(y.Service)), cmp.Compare(x.Lifetime, y.Lifetime))
+		return cmp.Or(cmp.Compare(identity(x.Service), identity(y.Service)), cmp.Compare(x.Lifetime, y.Lifetime),
+			cmp.Compare(types.TypeString(x.Service, nil), types.TypeString(y.Service, nil)))
 	})
 	if len(a.pkgs) == 0 {
 		a.add(InvalidInput, nil, nil, "supply at least one complete package")

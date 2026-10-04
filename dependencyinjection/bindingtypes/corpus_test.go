@@ -365,6 +365,34 @@ func TestDeclarationCorpus(t *testing.T) {
 	}
 }
 
+func TestExistingAliasDiagnosticIsOrderIndependent(t *testing.T) {
+	source := checkSource(t, "example/p", `package p; type Foo struct{}; type Alias = Foo`)
+	foo := bt.Registration{Service: source.pkg.Scope().Lookup("Foo").Type(), Lifetime: di.Singleton}
+	alias := bt.Registration{Service: source.pkg.Scope().Lookup("Alias").Type(), Lifetime: di.Singleton}
+	var plans []bt.Plan
+	for _, existing := range [][]bt.Registration{{foo, alias}, {alias, foo}} {
+		original := slices.Clone(existing)
+		plan := bt.Analyze([]*types.Package{source.pkg}, bt.Config{
+			EmitPackage:  source.pkg,
+			Constructors: []*types.Func{},
+			Existing:     existing,
+		})
+		if !reflect.DeepEqual(existing, original) {
+			t.Fatal("analysis changed the caller's existing registration order")
+		}
+		requireCode(t, plan, bt.DuplicateBinding)
+		if len(plan.Diagnostics) != 1 || plan.Diagnostics[0].Type == nil {
+			t.Fatalf("expected one duplicate diagnostic with a type, got %+v", plan)
+		}
+		plans = append(plans, plan)
+	}
+	first, second := plans[0].Diagnostics[0].Type.String(), plans[1].Diagnostics[0].Type.String()
+	if first != second || !reflect.DeepEqual(plans[0], plans[1]) {
+		t.Fatalf("input order changed duplicate diagnostic: Type.String() = %q / %q\nplans = %+v / %+v", first, second, plans[0], plans[1])
+	}
+	t.Logf("both registration orders return one BT010 error, nil bindings and Type.String() = %q", first)
+}
+
 func TestDirectiveCorpus(t *testing.T) {
 	packages := loadCorpus(t)
 	valid := packages["directives"]
