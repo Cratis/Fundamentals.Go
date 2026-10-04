@@ -157,7 +157,7 @@ func TestCleanupCancellationDoesNotRetrySharedFactoryFailure(t *testing.T) {
 							t.Fatal("failed result escaped cleanup", got.value)
 						}
 						assertSharedFailure(t, got.err, factoryFailure, cleanupCause)
-						assertFactoryDiagnostic(t, got.err, di.KeyFor[*resource](), di.KeyFor[*resource]())
+						_ = assertFactoryDiagnostic(t, got.err, di.KeyFor[*resource](), di.KeyFor[*resource]())
 					}
 					if ownerResult.err != waiterResult.err || calls != 1 || failedClosed != 1 {
 						t.Fatalf("failure not shared: owner=%v waiter=%v calls=%d cleanup=%d", ownerResult.err, waiterResult.err, calls, failedClosed)
@@ -222,7 +222,7 @@ func TestDependencyCleanupCancellationDoesNotRetrySharedParentFailure(t *testing
 					}
 					assertSharedFailure(t, got.err, factoryFailure, cleanupCause)
 					parent := assertFactoryDiagnostic(t, got.err, di.KeyFor[*item](), di.KeyFor[*item]())
-					assertFactoryDiagnostic(t, parent.Cause, di.KeyFor[*resource](), di.KeyFor[*item](), di.KeyFor[*resource]())
+					_ = assertFactoryDiagnostic(t, parent.Cause, di.KeyFor[*resource](), di.KeyFor[*item](), di.KeyFor[*resource]())
 				}
 				if ownerResult.err != waiterResult.err || dependencyCalls != 1 || parentCalls != 0 || failedClosed != 1 {
 					t.Fatalf("dependency failure not shared: dependency=%d parent=%d cleanup=%d", dependencyCalls, parentCalls, failedClosed)
@@ -250,9 +250,10 @@ func TestConstructionCancellationStillRetriesWithFailedValueCleanup(t *testing.T
 				entered, release := make(chan struct{}), make(chan struct{})
 				calls, failedClosed := 0, 0
 				factoryFailure := error(context.Canceled)
-				if mode == "wrapped deadline with live context" {
+				switch mode {
+				case "wrapped deadline with live context":
 					factoryFailure = context.DeadlineExceeded
-				} else if mode == "canceled creator with ordinary failure" {
+				case "canceled creator with ordinary failure":
 					factoryFailure = errors.New("ordinary factory failure")
 				}
 				cleanupFailure := errors.New("cleanup failure")
@@ -353,7 +354,7 @@ func TestDependencyCleanupMarkerDoesNotSuppressCancellationSibling(t *testing.T)
 		}
 		assertSharedFailure(t, ownerResult.err, factoryFailure, cleanupCause)
 		parent := assertFactoryDiagnostic(t, ownerResult.err, di.KeyFor[*item](), di.KeyFor[*item]())
-		assertFactoryDiagnostic(t, parent.Cause, di.KeyFor[*resource](), di.KeyFor[*item](), di.KeyFor[*resource]())
+		_ = assertFactoryDiagnostic(t, parent.Cause, di.KeyFor[*resource](), di.KeyFor[*item](), di.KeyFor[*resource]())
 		assertLiveContext(t, ctx)
 		if waiterResult.err != nil || waiterResult.value == nil || dependencyCalls != 2 || parentCalls != 2 || failedClosed != 1 {
 			t.Fatalf("cancellation sibling suppressed: value=%v err=%v dependency=%d parent=%d cleanup=%d", waiterResult.value, waiterResult.err, dependencyCalls, parentCalls, failedClosed)
