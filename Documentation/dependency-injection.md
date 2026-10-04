@@ -212,7 +212,10 @@ no sibling replacements; these shared planner tests do not certify a renderer.
 
 Failed attempts are not cached. Current waiters share ordinary failure. A live
 waiter retries an attempt canceled by its creator; canceling a waiter never
-cancels the creator's work.
+cancels the creator's work. Cancellation or deadline errors from failed-value
+cleanup alone do not trigger a waiter retry, even when a dependency propagates
+them. Factory and cleanup causes remain inspectable with `errors.Is` and
+`errors.As`. A later explicit resolution can try again.
 
 | Helper | Ownership |
 | --- | --- |

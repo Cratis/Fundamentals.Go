@@ -66,7 +66,7 @@ func (s *scope) resolve(ctx context.Context, key di.Key, path []di.Key, root boo
 			if err := wait(ctx, existing.done); err != nil {
 				return nil, err
 			}
-			if errors.Is(existing.err, context.Canceled) || errors.Is(existing.err, context.DeadlineExceeded) {
+			if constructionCanceled(existing.err) {
 				if err := ctx.Err(); err != nil {
 					return nil, err
 				}
@@ -93,6 +93,43 @@ func (s *scope) resolve(ctx context.Context, key di.Key, path []di.Key, root boo
 
 const failedValueCleanupTimeout = 30 * time.Second
 
+// failedValueCleanupError preserves cleanup diagnostics without treating them as
+// construction cancellation, including when a dependency propagates the error.
+type failedValueCleanupError struct{ err error }
+
+func (e *failedValueCleanupError) Error() string { return e.err.Error() }
+func (e *failedValueCleanupError) Unwrap() error { return e.err }
+
+// constructionCanceled follows error trees like errors.Is, but prunes only
+// failed-value cleanup branches. Genuine cancellation in a sibling still counts.
+func constructionCanceled(err error) bool {
+	if err == nil {
+		return false
+	}
+	if _, cleanup := err.(*failedValueCleanupError); cleanup {
+		return false
+	}
+	if err == context.Canceled || err == context.DeadlineExceeded {
+		return true
+	}
+	if matcher, ok := err.(interface{ Is(error) bool }); ok {
+		if matcher.Is(context.Canceled) || matcher.Is(context.DeadlineExceeded) {
+			return true
+		}
+	}
+	switch wrapped := err.(type) {
+	case interface{ Unwrap() error }:
+		return constructionCanceled(wrapped.Unwrap())
+	case interface{ Unwrap() []error }:
+		for _, child := range wrapped.Unwrap() {
+			if constructionCanceled(child) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (s *scope) construct(ctx context.Context, key di.Key, b binding, path []di.Key, root bool, owner *owner) (any, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
@@ -113,8 +150,11 @@ func (s *scope) construct(ctx context.Context, key di.Key, b binding, path []di.
 			// A canceled creator must not hand an already-canceled context to
 			// its failed value's cleanup. Cleanup stays synchronous and bounded.
 			cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), failedValueCleanupTimeout)
-			err = errors.Join(err, closeValue(cleanupCtx, ownedValue{key: key, value: value}))
+			cleanupErr := closeValue(cleanupCtx, ownedValue{key: key, value: value})
 			cancel()
+			if cleanupErr != nil {
+				err = errors.Join(err, &failedValueCleanupError{err: cleanupErr})
+			}
 		}
 		return nil, err
 	}
