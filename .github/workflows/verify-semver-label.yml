@@ -7,10 +7,10 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
-concurrency:
-  group: release-intent-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+# Scheduling order is not event freshness. Required metadata checks must finish
+# independently; even cancel-in-progress: false can replace pending runs.
 
 jobs:
   verify:
@@ -22,17 +22,25 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+      pull-requests: read
     steps:
       - name: Require an approved v1 launch and block accidental v2
         env:
           GH_TOKEN: ${{ github.token }}
-          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           MAX_MAJOR: ${{ vars.GO_RELEASE_MAJOR_CEILING || '0' }}
         run: |
+          set -euo pipefail
           case "$MAX_MAJOR" in
             0|1) ;;
             *) echo 'GO_RELEASE_MAJOR_CEILING must be 0 or 1' >&2; exit 1 ;;
           esac
+          pr=$(timeout 20s gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
+          LABELS=$(jq -cse '
+            if length == 1 and (.[0] | type == "object" and (.labels | type == "array")
+              and all(.labels[]; type == "object" and (.name | type == "string")))
+            then [.[0].labels[].name] else error("Invalid pull request labels") end
+          ' <<< "$pr")
           if ! jq -e 'index("major") != null' <<< "$LABELS" > /dev/null; then
             exit 0
           fi
