@@ -154,7 +154,8 @@ jobs:
     needs: [release, verify-release]
     if: needs.release.outputs.tag != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # 120s setup + 275s bounded producers + 25s preparation/runner headroom.
+    timeout-minutes: 7
     permissions:
       contents: read
     env:
@@ -168,15 +169,25 @@ jobs:
       GO111MODULE: 'on'
       GOWORK: 'off'
       GOTOOLCHAIN: local
+      GOENV: 'off'
+      GOFLAGS: ''
     steps:
       # Deliberately no repository checkout: resolve the public tagged module,
       # not a local main module or a developer workspace replacement.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        timeout-minutes: 2
         with:
-          go-version: '1.27.x'
+          # Compile consumption at the root module's supported minimum.
+          go-version: '1.26.x'
           cache: false
       - name: Isolate the public module cache
-        run: printf 'GOMODCACHE=%s/published-module-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+        shell: bash
+        run: |
+          set -euo pipefail
+          profile=$(mktemp -d "$RUNNER_TEMP/published-module.XXXXXX")
+          mkdir "$profile/build-cache" "$profile/tmp"
+          printf 'GOMODCACHE=%s/module-cache\nGOCACHE=%s/build-cache\nGOTMPDIR=%s/tmp\nTMPDIR=%s/tmp\n' \
+            "$profile" "$profile" "$profile" "$profile" >> "$GITHUB_ENV"
       - name: Fetch the released version through the public Go proxy
         shell: bash
         run: |
@@ -197,6 +208,104 @@ jobs:
             '.Path == $module and .Version == $version' "$RUNNER_TEMP/module.json"
       - name: Download and checksum the published module archive
         run: timeout 60s go mod download -json "$MODULE_PATH@$RELEASE_TAG"
+      - name: Prepare a fresh external consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Restrict inputs before writing Go syntax. The release job supplies
+          # canonical identity and a trusted stable root tag, including reruns.
+          test "$MODULE_PATH" = github.com/cratis/fundamentals.go
+          [[ "$RELEASE_TAG" =~ ^v(0|1)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          consumer=$(mktemp -d "$RUNNER_TEMP/module-consumer.XXXXXX")
+          printf 'CONSUMER_DIR=%s\n' "$consumer" >> "$GITHUB_ENV"
+          printf 'module published-consumer.invalid/smoke\n\ngo 1.26\n\nrequire %s %s\n' \
+            "$MODULE_PATH" "$RELEASE_TAG" > "$consumer/go.mod"
+          # APIs present since v0.1.0; no dependency on later release features.
+          cat > "$consumer/moduleconsumer.go" <<'GO'
+          package main
+
+          import (
+            "context"
+            "errors"
+            "fmt"
+            "os"
+
+            "github.com/cratis/fundamentals.go/concepts"
+            "github.com/cratis/fundamentals.go/correlation"
+            di "github.com/cratis/fundamentals.go/dependencyinjection"
+            "github.com/cratis/fundamentals.go/dependencyinjection/container"
+          )
+
+          type message string
+
+          func smoke() error {
+            const canonical = "00112233-4455-6677-8899-aabbccddeeff"
+            id, err := concepts.ParseUUID("00112233-4455-6677-8899-AABBCCDDEEFF")
+            if err != nil {
+              return fmt.Errorf("parse UUID: %w", err)
+            }
+            want := concepts.UUID{0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
+            if id != want || id.String() != canonical {
+              return fmt.Errorf("UUID canonical text or RFC byte order mismatch: %s", id)
+            }
+            for _, invalid := range []string{"00112233445566778899aabbccddeeff", "{" + canonical + "}", " " + canonical, "00112233-4455-6677-8899-aabbccddeefg"} {
+              if _, err := concepts.ParseUUID(invalid); err == nil {
+                return fmt.Errorf("strict UUID parser accepted %q", invalid)
+              }
+            }
+            parent := context.Background()
+            ctx := correlation.WithID(parent, id)
+            if correlation.FromContext(ctx) != id || correlation.FromContext(parent) != (concepts.UUID{}) {
+              return errors.New("correlation context did not preserve ID or isolate parent")
+            }
+            var registry container.Registry
+            if err := di.BindValue(&registry, message("published module")); err != nil {
+              return fmt.Errorf("bind value: %w", err)
+            }
+            provider, err := registry.Build()
+            if err != nil {
+              return fmt.Errorf("build registry: %w", err)
+            }
+            scope, err := provider.NewScope(ctx)
+            if err != nil {
+              return errors.Join(err, provider.Close(ctx))
+            }
+            value, resolveErr := di.Resolve[message](ctx, scope)
+            if resolveErr == nil && value != message("published module") {
+              resolveErr = fmt.Errorf("resolved value mismatch: %q", value)
+            }
+            return errors.Join(resolveErr, scope.Close(ctx), provider.Close(ctx))
+          }
+
+          func main() {
+            if err := smoke(); err != nil {
+              fmt.Fprintln(os.Stderr, err)
+              os.Exit(1)
+            }
+            fmt.Println("Published module consumer smoke passed")
+          }
+          GO
+          gofmt -w "$consumer/moduleconsumer.go"
+      - name: Compile the published package tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$CONSUMER_DIR"
+          # Build includes source-distributed fixtures, but does not run tests.
+          timeout 45s go build -mod=mod "$MODULE_PATH/..."
+      - name: Compile the external consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$CONSUMER_DIR"
+          timeout 30s go build -mod=readonly -o "$CONSUMER_DIR/module-consumer" ./moduleconsumer.go
+      - name: Run the external consumer smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 10s "$CONSUMER_DIR/module-consumer"
+          # Preserve the profile and consumer on failure for runner diagnostics;
+          # runner lifecycle owns temporary files, never blanket-delete paths.
       - name: Request the versioned Go documentation page
         shell: bash
         run: |
