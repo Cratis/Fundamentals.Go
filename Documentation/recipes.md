@@ -170,6 +170,74 @@ in sorted order. Ordinary unmarked types and non-type exports are omitted.
 proves a marker without scalar codecs is rejected.
 
 Loading never executes the fixture. Workspace lookup, toolchain downloads,
-module fetching and manifest writes are disabled for this offline inspection;
-run `go mod download` first to prepare dependencies. `conceptstypes` itself still
-owns no package loader and adds no dependency to the standard-library-only root.
+module fetching, external package drivers and manifest writes are disabled for
+this offline inspection; run `go mod download` first to prepare dependencies.
+`conceptstypes` itself still owns no package loader and adds no dependency to the
+standard-library-only root.
+
+To plan constructors across packages, use the
+[compiled constructor-planning example](https://github.com/Cratis/Fundamentals.Go/blob/main/recipes/packagesloading/bindings_example_test.go).
+Its private `planConstructorBindings` helper connects `go/packages` to the released
+`bindingtypes.ReadDirectives` and `bindingtypes.Analyze` APIs. The helper is a pattern
+to copy, not a new exported API or an installable, supported integration module.
+The unpublished recipes module uses its local-root replacement; your product owns
+its loader and composition decisions.
+
+The helper follows this order:
+
+1. Load all requested root patterns **once** with `packages.LoadAllSyntax`, source
+   comments, tests disabled and the same offline environment as `Inspect`.
+   Separate loads do not share a coherent `go/types` identity universe.
+2. Reject producer errors, package errors throughout the dependency graph,
+   ill-typed packages, incomplete root source metadata and zero matches. These
+   operational failures return an `error` and an empty plan, not partial bindings.
+3. Sort roots by import path and ID, read directives from each root's matching
+   syntax and type information, then merge policies.
+4. Select the exact `EmitPackage` import path uniquely among those roots; a missing
+   or ambiguous destination is an operational error. An imported dependency is not
+   an emission root. Error-severity directive diagnostics stop planning before
+   `Analyze`; they return a diagnostics-only plan with a nil operational error.
+5. Call `Analyze` with the loaded emission package and roots only. Nil
+   `Constructors` discovers exact package-level `NewX` declarations. Imports share
+   type identities but do not become constructor-discovery roots.
+6. Inspect diagnostic **severity**, not just whether diagnostics exist. Any error
+   makes bindings nil. `BT011` information preserves bindings but leaves an external
+   dependency obligation; scalar configuration without registration is `BT012`,
+   an error. Products must satisfy obligations before emitting or activating code.
+
+This excerpt from `Example_constructorBindings` assumes the private helper and
+fixture-path constant in that source file, with `context`, `fmt` and
+`bindingtypes` imported. Both operational and structural failures stop the example
+visibly before it prints success output:
+
+```go
+plan, err := planConstructorBindings(context.Background(), ".", bindingsFixturePath+"/service",
+    "./testdata/bindings/repository", "./testdata/bindings/service")
+if err != nil {
+    panic(err)
+}
+for _, diagnostic := range plan.Diagnostics {
+    if diagnostic.Severity == bindingtypes.Error {
+        panic(fmt.Sprintf("%s: %s", diagnostic.Code, diagnostic.Message))
+    }
+}
+```
+
+From the checkout, run the output-checked example:
+
+```sh
+cd recipes
+GOWORK=off GOTOOLCHAIN=local go test -run '^Example_constructorBindings$' -v ./packagesloading
+```
+
+It reports two owned constructor registrations: singleton `NewStore` with no
+arguments and scoped `NewService` with two ordered store arguments, one unique
+exact dependency and an error return. Constructor bodies panic if called; loading
+and planning never activate them. Plan ordering is deterministic service-identity
+ordering, not a topological activation schedule, and this recipe emits no source.
+
+The helper propagates context into loading and checks cancellation before planning
+and returning. `Analyze` is synchronous; these checks do not preempt it.
+`EmitPackage` controls declaration accessibility, not proof of importability,
+`main`/`internal` restrictions, freedom from import cycles or publishability.
+Products must preflight and compile their actual generated outputs.

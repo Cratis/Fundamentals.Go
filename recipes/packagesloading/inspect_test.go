@@ -66,6 +66,11 @@ func TestExternalPackageDriversNeverExecute(t *testing.T) {
 			ctx, cancel := context.WithTimeout(t.Context(), 15*time.Second)
 			defer cancel()
 			got, err := packagesloading.Inspect(ctx, ".", "./testdata/model")
+			plan, planErr := planConstructorBindings(ctx, ".", bindingsFixturePath+"/service",
+				"./testdata/bindings/repository", "./testdata/bindings/service")
+			if planErr != nil || len(plan.Bindings) != 2 || len(plan.Diagnostics) != 0 {
+				t.Errorf("constructor planning = %s, %v; want two bindings without diagnostics", normalizedConstructorPlan(plan), planErr)
+			}
 			if _, markerErr := os.Stat(marker); !errors.Is(markerErr, os.ErrNotExist) {
 				t.Errorf("external driver must not execute; marker stat = %v", markerErr)
 			}

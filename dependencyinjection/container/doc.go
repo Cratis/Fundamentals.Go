@@ -24,8 +24,10 @@
 // # Resolution and isolation
 //
 // Singleton and Scoped cache successful attempts only. Ordinary failure reaches
-// current waiters; a live waiter retries creator cancellation. Waiter cancellation
-// never cancels construction. Factories get resolver-only views restricted to
+// current waiters; a live waiter retries creator cancellation. Cancellation from
+// failed-value cleanup alone remains inspectable but does not trigger a retry,
+// even when propagated through a dependency. Waiter cancellation never cancels
+// construction. Factories get resolver-only views restricted to
 // declared direct edges. Views reject overlapping calls, expire on callback
 // return, and join already admitted child calls. Never retain or close them.
 // Context guards capture metadata at NewScope and check every scoped resolution,
