@@ -37,6 +37,17 @@ jobs:
           cache: false
       - name: Test module and release policy scripts without publishing
         run: python3 -B -m unittest discover -s .github/scripts -p 'test_*.py' -v
+      # Separate processes keep directory-local compare imports and duplicate
+      # test_compare module names isolated. These tests never recapture runtimes.
+      - name: Test offline enum capture comparisons
+        timeout-minutes: 1
+        run: python3 -B -m unittest discover -s ContractTests/EnumJson -p 'test_*.py' -v
+      - name: Test offline GUID capture validation
+        timeout-minutes: 1
+        run: python3 -B -m unittest discover -s ContractTests/GuidParsing -p 'test_*.py' -v
+      - name: Test offline complex-key capture validation and comparisons
+        timeout-minutes: 1
+        run: python3 -B -m unittest discover -s ContractTests/ComplexKeyJson -p 'test_*.py' -v
       - name: Enforce module allow-list and portable paths
         id: modules
         run: |

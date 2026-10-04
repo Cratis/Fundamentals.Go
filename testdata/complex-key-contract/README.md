@@ -77,8 +77,10 @@ describes inputs. Exact dataset invariants live in the manifest and validators.
 
 The [opt-in reproducer](../../ContractTests/ComplexKeyJson/README.md) rebuilds and
 executes the original sources, validates captures and compares without overwriting
-fixtures. Python assertions and optional installed `jsonschema` checks are extra
-reproduction checks, not root dependencies. .NET and Node are not needed in Go CI.
+fixtures. The Go Build workflow also runs offline Python assertions and comparison
+regressions against committed evidence, without recapturing runtimes. Only actual
+schema-engine checks skip when the optional `jsonschema` library is unavailable.
+Go CLI tests need no Python; these offline regressions need neither .NET nor Node.
 
 For consumer tests, copy this small directory including `LICENSE`, schema,
 manifest and provenance from a **pinned, publicly available Fundamentals.Go source
