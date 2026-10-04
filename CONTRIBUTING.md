@@ -39,13 +39,24 @@ actionlint -color
 markdownlint-cli2 '*.md' 'Documentation/**/*.md' '.github/ISSUE_TEMPLATE/*.md' '.github/pull_request_template.md' '!AGENTS.md' '!CLAUDE.md'
 ```
 
-Also run the module-policy checks once from the root:
+Also run the module-policy and offline contract-validator checks once from the root,
+as separate commands matching the Go Build workflow:
 
 ```sh
 python3 -B -m unittest discover -s .github/scripts -p 'test_*.py' -v
+python3 -B -m unittest discover -s ContractTests/EnumJson -p 'test_*.py' -v
+python3 -B -m unittest discover -s ContractTests/GuidParsing -p 'test_*.py' -v
+python3 -B -m unittest discover -s ContractTests/ComplexKeyJson -p 'test_*.py' -v
 python3 .github/scripts/go_modules.py matrix
 python3 .github/scripts/go_modules.py dependencies
 ```
+
+The contract-validator suites use Python's standard library and committed evidence;
+they do not run .NET, Node or TypeScript capture/build steps. Separate discovery
+processes isolate directory-local imports and duplicate test module names. Only
+actual JSON Schema-engine tests require an already installed `jsonschema` library;
+when absent, they report explicit skips, not schema passes. Ordinary comparison and
+linkage tests always run. Go CLI tests still need no Python.
 
 Race detection requires a supported platform and a C compiler. Run govulncheck with Go 1.27 in each module:
 

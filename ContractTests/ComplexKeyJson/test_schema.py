@@ -1,6 +1,10 @@
 # Copyright (c) Cratis. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
-"""Optional installed jsonschema check; normal Go CI needs neither Python nor runtimes."""
+"""Offline comparisons always run; schema checks skip without installed jsonschema.
+
+Go CLI tests need no Python; the workflow also runs these Python regressions.
+Neither requires .NET or Node recapture.
+"""
 import copy
 import json
 import unittest

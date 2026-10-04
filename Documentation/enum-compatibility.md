@@ -43,13 +43,26 @@ This source commit is not a published package pin. Chronicle.Go's older
 Fundamentals **7.19.6**; these observations do **not** establish equivalence to
 that package or its configured serializer profile.
 
-The golden is historical, not a statement about current C# packages. A later
-[source change](https://github.com/Cratis/Fundamentals/commit/e8ac1ecca23fa95063f6d4e65b052819b4b565a5)
-accepts numeric combinations of declared flags; that change was inspected, not
-recaptured here. The separate non-Int32 enum-concept write failure is tracked in
-[Fundamentals #1150](https://github.com/Cratis/Fundamentals/issues/1150). Neither
-update changes the pinned observations below. Capture another profile separately
-rather than silently replacing the golden.
+The golden is historical, not a statement about current C# packages. A separate
+.NET 10.0.12 source-profile comparison of
+[revision e8ac1ec](https://github.com/Cratis/Fundamentals/commit/e8ac1ecca23fa95063f6d4e65b052819b4b565a5)
+reproduced the original 236 records byte-for-byte, then exercised the same inputs
+against the newer relevant converter closure. Only bare `Bits` numeric reads
+`5` and `7` changed from rejection to acceptance; 234 records were unchanged.
+This comparison is not a published-package or kernel-admission claim, and the
+committed golden below still describes the original pin.
+
+The newer flags rule checks numeric inputs against the OR of declared bits.
+Strings and writes remain separate paths: an unknown bit can still parse from a
+numeric string and be written. A separately captured wide-flags supplement also
+observed numeric-read initialization overflow when a declared UInt32/Int64 flag
+exceeds Int32. Those observations do not establish support for every backing
+type, JIT profile or application schema.
+
+The distinct non-Int32 enum-concept write failure remains tracked in
+[Fundamentals #1150](https://github.com/Cratis/Fundamentals/issues/1150). Keep
+profiles and consumer admission decisions separate rather than silently replacing
+the historical golden.
 
 ## Int32 acceptance matrix
 

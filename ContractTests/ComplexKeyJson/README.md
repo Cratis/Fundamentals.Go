@@ -4,8 +4,12 @@
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
 This opt-in harness executes pinned original serializers. It is not a Go codec,
-an installed Fundamentals package or a consumer profile. Normal Go CI reads only
-[committed evidence](../../testdata/complex-key-contract/README.md).
+an installed Fundamentals package or a consumer profile. Go CLI tests read only
+[committed evidence](../../testdata/complex-key-contract/README.md), without Python.
+The Go Build workflow also runs offline Python comparison and capture regressions
+in its module-policy job; it never executes .NET, Node or TypeScript recapture.
+Only schema-engine tests skip when `jsonschema` is unavailable; ordinary comparison
+and linkage tests always run.
 
 ## Prerequisites and extraction
 
