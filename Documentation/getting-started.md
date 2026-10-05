@@ -33,7 +33,7 @@ letters. You now have a module pinned to the version this tutorial uses.
 ## Define the ID and round-trip an author
 
 Save this complete program as `main.go`. It comes from the executable
-[domain round-trip example](../documentation_examples_test.go).
+[domain round-trip example](https://github.com/Cratis/Fundamentals.Go/blob/main/documentation_examples_test.go).
 
 ```go
 package main

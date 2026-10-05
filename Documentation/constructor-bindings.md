@@ -18,7 +18,7 @@ when you do not need generation.
 Use Go 1.26 or later with `github.com/cratis/fundamentals.go@v0.3.2`
 (see [release status](releases.md)). Save this complete program as
 `main.go` and run `go run .`. It is derived from the
-[executable planner example](../dependencyinjection/bindingtypes/documentation_examples_test.go).
+[executable planner example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/bindingtypes/documentation_examples_test.go).
 
 ```go
 package main
@@ -172,7 +172,7 @@ result returned alongside an error so owned cleanup can run.
 
 Forward interfaces with `di.BindBorrowed`, resolving the exact concrete key and
 preserving its lifetime. The concrete binding owns cleanup; forwarding must not
-create a second owner. The [render-equivalence tests](../dependencyinjection/bindingtypes/render_test.go)
+create a second owner. The [render-equivalence tests](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/bindingtypes/render_test.go)
 exercise this contract, not a public emitter. Products must compile and execute
 their own generated output. Runtime `container.Registry.Build` remains responsible
 for the final graph, cycles and captive lifetimes.

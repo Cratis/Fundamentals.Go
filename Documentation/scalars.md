@@ -98,8 +98,8 @@ separate, narrower boundary, not this parser's target.
 
 Scanning is linear in input length, with no arbitrary compatibility length cap;
 X permits long leading zeros. Limit untrusted payloads at your application
-boundary. The [capture provenance and schema](../concepts/testdata/guid_parse.README.md)
-and [executable example](../concepts/uuid_dotnet_test.go) define the pinned profile;
+boundary. The [capture provenance and schema](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/testdata/guid_parse.README.md)
+and [executable example](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/uuid_dotnet_test.go) define the pinned profile;
 null strings, malformed UTF-16 and other .NET versions are not Go equivalence
 claims.
 
@@ -193,8 +193,8 @@ precision. In particular, no JavaScript `Number` precision guarantee follows
 from `Ticks()`, integer-backed concepts or [enum contract evidence](enum-compatibility.md).
 Keep exact integers out of float64-based conversion paths.
 
-[Executable scalar examples](../concepts/example_test.go),
-[boundary tests](../concepts/boundaries_test.go) and
-[SQL tests](../concepts/uuid_sql_test.go) cover these contracts. The
+[Executable scalar examples](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/example_test.go),
+[boundary tests](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/boundaries_test.go) and
+[SQL tests](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/uuid_sql_test.go) cover these contracts. The
 [parity map](parity.md) records narrower parsing acceptance than C# and the
 source authority; it does not claim full .NET scalar API parity.
