@@ -262,7 +262,9 @@ delete a published tag. Correct a bad release with a new version and, where
 appropriate, a Go `retract` directive.
 
 Public-proxy installation and pkg.go.dev visibility can be verified only after
-a release exists. Central documentation publication requires registering this
-repository in Cratis/Documentation and setting `DOCUMENTATION_ENABLED=true`
-with access to `PAT_DOCUMENTATION`; keep dispatch disabled until then. It is
-independent of Go module indexing.
+a release exists. Central documentation publication is enabled: this
+repository is registered in Cratis/Documentation, and with
+`DOCUMENTATION_ENABLED=true` a change under `Documentation/**` on `main`
+dispatches a site build that publishes these pages at
+[cratis.io/fundamentals/go](https://www.cratis.io/fundamentals/go/). The
+dispatch uses `PAT_DOCUMENTATION` and is independent of Go module indexing.
