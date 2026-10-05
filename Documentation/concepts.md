@@ -13,7 +13,7 @@ serializers and schema builders can discover the exact scalar representation.
 
 For a complete first program, start with the [JSON round-trip tutorial](getting-started.md).
 For scalar signatures, ranges, zero values and SQL support, use the
-[scalar reference](scalars.md). This page covers the v0.3.0 concept contract.
+[scalar reference](scalars.md). This page covers the v0.3.2 concept contract.
 
 ## Author a UUID-backed concept
 

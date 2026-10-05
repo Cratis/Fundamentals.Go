@@ -1,6 +1,6 @@
 ---
 title: Fundamentals for Go
-description: Start with typed domain values in Fundamentals.Go v0.3.0, then find scalar, correlation, naming and optional dependency-injection contracts.
+description: Start with typed domain values in Fundamentals.Go v0.3.2, then find scalar, correlation, naming and optional dependency-injection contracts.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
@@ -16,10 +16,10 @@ You need Go 1.26 or later, not a server, DI container or C# background.
 
 ## Packages
 
-This documentation targets the root module **v0.3.0; the API remains experimental**.
+This documentation targets the root module **v0.3.2; the API remains experimental**.
 It uses only the standard library. Minor v0 releases may change APIs with migration
 notes. Install the lowercase module path
-`github.com/cratis/fundamentals.go@v0.3.0`; see [release status](releases.md).
+`github.com/cratis/fundamentals.go@v0.3.2`; see [release status](releases.md).
 Beginning with v0.3.0, `concepts.ParseDotNetGUID` adds explicit .NET 10.0.12
 compatibility conversion without changing strict UUID defaults.
 

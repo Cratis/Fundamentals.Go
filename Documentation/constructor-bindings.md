@@ -15,7 +15,7 @@ when you do not need generation.
 
 ## Type-check, read directives and analyze
 
-Use Go 1.26 or later with `github.com/cratis/fundamentals.go@v0.3.0`
+Use Go 1.26 or later with `github.com/cratis/fundamentals.go@v0.3.2`
 (see [release status](releases.md)). Save this complete program as
 `main.go` and run `go run .`. It is derived from the
 [executable planner example](../dependencyinjection/bindingtypes/documentation_examples_test.go).

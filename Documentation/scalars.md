@@ -106,7 +106,7 @@ claims.
 ### SQL and nullable columns
 
 UUID is the **only** shared scalar implementing `database/sql.Scanner` and
-`database/sql/driver.Valuer` in v0.3.0. `Scan` accepts:
+`database/sql/driver.Valuer` in v0.3.2. `Scan` accepts:
 
 - A `string` in the strict dashed text format.
 - A `[]byte` of exactly 16 bytes, copied as RFC-order binary data.
