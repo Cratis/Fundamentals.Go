@@ -9,6 +9,27 @@ import (
 	"github.com/cratis/fundamentals.go/naming"
 )
 
+func Example_individualNames() {
+	fmt.Println(naming.CamelCase("Person"))
+	fmt.Println(naming.CamelCase("URLValue"))
+	fmt.Println(naming.CamelCase("ABCdef"))
+	fmt.Println(naming.PascalCase("person_name"))
+	// Output:
+	// person
+	// URLValue
+	// ABCdef
+	// Person_name
+}
+
+func Example_namespacedStorage() {
+	policy := naming.NewNamespaced(1, '/', "app:", true)
+	fmt.Println(policy.GetReadModelName("Cratis.ReadModels.People", "Person"))
+	fmt.Println(policy.GetPropertyName("Person"))
+	// Output:
+	// app:readModels/people-person
+	// person
+}
+
 func ExampleCamelCase() {
 	fmt.Println(naming.CamelCase("Person"))
 	fmt.Println(naming.CamelCase("URLValue"))
