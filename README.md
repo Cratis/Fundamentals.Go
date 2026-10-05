@@ -9,7 +9,7 @@ The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamenta
 
 ## Status
 
-**This documentation targets v0.3.0; the API remains experimental.** See [release status](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/releases.md) for publication details. Start with [a UUID-backed domain value and a JSON round trip](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/getting-started.md). You need only Go: no server, container or C# knowledge.
+**This documentation targets v0.3.2; the API remains experimental.** See [release status](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/releases.md) for publication details. Start with [a UUID-backed domain value and a JSON round trip](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/getting-started.md). You need only Go: no server, container or C# knowledge.
 
 - [Scalars and concepts](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/scalars.md): `concepts` supplies UUID, DateOnly, TimeOnly, TimeSpan, explicit domain codecs, `Underlying` and `CheckJSON`; `concepts/conceptstypes` adds compile-time recognition.
 - [Correlation context](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/correlation.md) and [naming policies](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/naming.md): shared metadata and explicit casing, without choosing product policies.
@@ -22,10 +22,10 @@ Releases remain **v0.x** while the API is experimental; a minor version may cont
 
 ## Installation
 
-Requires Go **1.26 or later**. Install the v0.3.0 compatibility release:
+Requires Go **1.26 or later**. Install v0.3.2:
 
 ```sh
-go get github.com/cratis/fundamentals.go@v0.3.0
+go get github.com/cratis/fundamentals.go@v0.3.2
 ```
 
 Use the lowercase module path exactly as shown. CI checks Go 1.26 and 1.27 with `GOWORK=off` and `GOTOOLCHAIN=local`.

@@ -6,19 +6,30 @@ description: Release intent, module publication, sequencing and recovery for Fun
 <!-- Copyright (c) Cratis. All rights reserved. -->
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
-This page describes the **v0.3.0 compatibility release**. Earlier releases are
-v0.2.0 at commit `532d218` and v0.1.0 at `e50913e`. Consult the
-[release list](https://github.com/Cratis/Fundamentals.Go/releases) for published
-tags. The release workflow assigns each release commit and tag after the
-authorized merge; verify publication rather than inferring it from this page.
+This documentation targets **v0.3.2**, published at commit `7279ee0`.
+Consult the [release list](https://github.com/Cratis/Fundamentals.Go/releases)
+for published tags. The release workflow assigns each release commit and tag
+after the authorized merge; verify publication rather than inferring it from
+a merge alone.
 
-v0.3.0 adds opt-in `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12
+[v0.3.2](https://github.com/Cratis/Fundamentals.Go/releases/tag/v0.3.2) stabilizes
+constructor-planning diagnostics for duplicate aliased existing registrations
+when registration order changes. Duplicate registrations still fail.
+[v0.3.1](https://github.com/Cratis/Fundamentals.Go/releases/tag/v0.3.1), at
+`50688c6`, fixes concurrent resolution so cancellation from failed-result cleanup
+alone does not retry ordinary construction failures. Genuine construction
+cancellation still permits retry, and cleanup errors remain inspectable. It also
+adds a compiled package-loading/constructor-planning recipe to the unpublished
+recipes module.
+
+v0.3.0, at `71bb21e`, introduced opt-in `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12
 ([#28](https://github.com/Cratis/Fundamentals.Go/issues/28)), with strict UUID
-defaults unchanged. It includes source-distributed enum and complex-key JSON
+defaults unchanged. It also introduced source-distributed enum and complex-key JSON
 contract evidence ([#17](https://github.com/Cratis/Fundamentals.Go/issues/17),
 [#18](https://github.com/Cratis/Fundamentals.Go/issues/18)), not Go enum or
 complex-key implementations, runtime or schema support. The root remains
-standard-library-only; ecosystem recipes remain unpublished.
+standard-library-only; ecosystem recipes remain unpublished. Earlier releases
+include v0.2.0 at `532d218` and v0.1.0 at `e50913e`.
 
 Experimental releases remain v0.x until an approved stable launch. New public
 capabilities use `minor` intent; a minor version may contain breaking changes,
@@ -88,7 +99,7 @@ Each `nested` entry has an explicit `dir` and boolean `publish` policy.
 1. Create `tools/go.mod` or `integrations/<name>/go.mod` with module path
    `github.com/cratis/fundamentals.go/<directory>`. Use lowercase relative
    directories; modules cannot contain other modules.
-2. Require a **published stable root version**, such as the released `v0.2.0`.
+2. Require a **published stable root version**, such as the released `v0.3.2`.
    Pseudo-versions, workspaces and `replace` directives are not a substitute. If the tool needs new root APIs, release the root first.
 3. Add the exact directory to `nested` in the same change. For example, the
    following illustrative configuration includes two publishable modules and

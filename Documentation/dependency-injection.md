@@ -32,7 +32,14 @@ func main() {
 }
 ```
 
-This prints `Quarterly report`. Plain constructors keep dependency and ownership
+Run `go run .` to print:
+
+```text
+Quarterly report
+```
+
+The [plain-constructor example](../dependencyinjection/example_test.go)
+checks this program and output. Plain constructors keep dependency and ownership
 decisions visible. For custom integration, implement `di.Resolver` for exact-key
 lookup and `di.ScopeFactory` to open and close your own scopes. The
 [manual resolver and scope factory examples](../dependencyinjection/example_test.go)
@@ -98,8 +105,14 @@ func main() {
 }
 ```
 
-Run the program with `go run .`; it prints `Quarterly report`. A compiling version of the same
-wiring is in the [container examples](../dependencyinjection/container/example_test.go).
+Run the program with `go run .`:
+
+```text
+Quarterly report
+```
+
+The [container example](../dependencyinjection/container/example_test.go)
+checks this complete program and output.
 
 `Build` runs no factories, guards or closers. It rejects missing declared edges,
 cycles and singleton paths that reach scoped services, including through

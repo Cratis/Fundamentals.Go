@@ -68,14 +68,14 @@ proof that an API exists. Agree on the contract before consumers adopt it.
   standing authorization; no repeated push approval is needed. Complete local
   gates first and batch related changes into coherent checkpoints.
 - The v0.2.0 baseline was released at `532d2181c610f67730133f61e768a943379da571`.
-  This documentation targets **v0.3.0**. Check the public release list and proxy
+  This documentation targets **v0.3.2**. Check the public release list and proxy
   for publication; the release workflow assigns the commit and tag. Consumers
   use published tags for released APIs and may pin **pushed** develop commits using
   Go pseudo-versions for unreleased APIs. Share the full commit SHA on #3; never
   use local replacements as evidence that a consumer can resolve the module.
 - Collect release-bound changes in a release PR from `develop` to `main` with
   the appropriate intent label. The v0.2.0 release is complete; do not describe
-  its packages as future work. The release-bound v0.3.0 adds explicit
+  its packages as future work. The published v0.3.0 introduced explicit
   `concepts.ParseDotNetGUID` conversion targeting .NET 10.0.12 without changing
   strict UUID defaults. Enum and complex-key JSON corpora are source-distributed
   evidence, not Go enum or complex-key implementations, runtime or schema support.

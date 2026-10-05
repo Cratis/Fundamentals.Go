@@ -16,7 +16,7 @@ Leave credentials, personal data, customer data, and production logs out of the 
 
 ## Supported versions
 
-This project is in early development, with no stable release or tagged Go module yet. Reports against the current `main` branch are welcome. Once experimental v0.x releases exist, include the affected module version; no long-term support commitment is made.
+Fundamentals.Go publishes tagged experimental v0.x modules; the current release is v0.3.2. There is no stable v1 release or long-term support commitment. Include the affected module version when reporting a vulnerability. Reports against the current `main` branch are also welcome.
 
 ## Scope
 

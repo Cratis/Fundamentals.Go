@@ -1,6 +1,6 @@
 ---
 title: Keep domain identity in a JSON round trip
-description: Install Fundamentals.Go v0.3.0 and round-trip a UUID-backed author ID using plain Go and encoding/json.
+description: Install Fundamentals.Go v0.3.2 and round-trip a UUID-backed author ID using plain Go and encoding/json.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
@@ -11,7 +11,7 @@ program. In this tutorial you define an `AuthorID`, encode an author as JSON,
 and decode it without losing either the value or its Go type. No container,
 server or C# knowledge is required.
 
-This tutorial targets Fundamentals.Go **v0.3.0, an experimental v0.x release**.
+This tutorial targets Fundamentals.Go **v0.3.2, an experimental v0.x release**.
 Minor releases may change APIs with migration notes. This example uses only the
 standard-library-only root module.
 
@@ -24,7 +24,7 @@ see [release status](releases.md):
 mkdir author-example
 cd author-example
 go mod init example.com/author-example
-go get github.com/cratis/fundamentals.go@v0.3.0
+go get github.com/cratis/fundamentals.go@v0.3.2
 ```
 
 Use the lowercase import path even though the GitHub repository name has capital

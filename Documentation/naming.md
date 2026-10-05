@@ -52,6 +52,15 @@ func main() {
 }
 ```
 
+Run `go run .` to print:
+
+```text
+person
+URLValue
+ABCdef
+Person_name
+```
+
 `CamelCase` leaves the whole string unchanged when it is empty, its first UTF-16
 character is not uppercase, or its first two characters are uppercase. Otherwise
 it uses the `FixCamelCasing` loop copied by the C# extension. `PascalCase`
@@ -78,6 +87,16 @@ func main() {
     fmt.Println(policy.GetPropertyName("Person")) // person
 }
 ```
+
+Run `go run .` to print:
+
+```text
+app:readModels/people-person
+person
+```
+
+Both programs and their output are checked against the
+[naming examples](../naming/example_test.go).
 
 The constructor takes segments to skip, a namespace-segment separator, a verbatim
 prefix and whether to camel-case properties and model names. Negative skipping

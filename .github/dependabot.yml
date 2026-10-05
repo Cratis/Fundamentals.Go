@@ -12,6 +12,21 @@ updates:
     groups:
       go-non-major:
         update-types: [minor, patch]
+  - package-ecosystem: gomod
+    directory: /recipes
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:31'
+      timezone: Etc/UTC
+    labels: [dependencies, no-release]
+    open-pull-requests-limit: 5
+    groups:
+      go-non-major:
+        update-types: [minor, patch]
+    ignore:
+      # Recipes test this checkout through v0.0.0 and the local-root replace.
+      - dependency-name: github.com/cratis/fundamentals.go
   - package-ecosystem: github-actions
     directory: /
     schedule:

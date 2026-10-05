@@ -14,10 +14,10 @@ headers, generate IDs, start work or configure logging.
 ## Attach and propagate an ID
 
 Use Go 1.26 or later and install
-`github.com/cratis/fundamentals.go@v0.3.0` in your module
+`github.com/cratis/fundamentals.go@v0.3.2` in your module
 (see [release status](releases.md)). Save this complete
 program as `main.go`, then run `go run .`. The
-[executable propagation example](../documentation_examples_test.go) is its source.
+[executable propagation example](../documentation_correlation_test.go) is its source.
 
 ```go
 package main

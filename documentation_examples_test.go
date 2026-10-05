@@ -4,12 +4,10 @@
 package fundamentals_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/cratis/fundamentals.go/concepts"
-	"github.com/cratis/fundamentals.go/correlation"
 )
 
 // AuthorID identifies an author without making arbitrary UUIDs interchangeable.
@@ -27,6 +25,8 @@ func (id *AuthorID) UnmarshalJSON(data []byte) error {
 	return (*concepts.UUID)(id).UnmarshalJSON(data)
 }
 
+// Keep this getting-started file to one Example and no Test functions: go/doc's
+// whole-file mode preserves the blank Concept forwarding assertion above.
 func Example_domainRoundTrip() {
 	id, err := concepts.ParseUUID("00112233-4455-6677-8899-AABBCCDDEEFF")
 	if err != nil {
@@ -50,26 +50,4 @@ func Example_domainRoundTrip() {
 	// Output:
 	// {"id":"00112233-4455-6677-8899-aabbccddeeff","name":"Ada"}
 	// same author: true
-}
-
-func Example_correlationPropagation() {
-	id, err := concepts.ParseUUID("00112233-4455-6677-8899-aabbccddeeff")
-	if err != nil {
-		panic(err)
-	}
-	operation, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	ctx := correlation.WithID(operation, id)
-	// Pass ctx to the next operation; the parent remains unchanged.
-	fmt.Println("save author:", correlation.FromContext(ctx))
-	fmt.Println("parent unset:", correlation.FromContext(operation).IsZero())
-	cleared := correlation.WithID(ctx, correlation.ID{})
-	fmt.Println("child unset:", correlation.FromContext(cleared).IsZero())
-	cancel()
-	fmt.Println("canceled:", cleared.Err() == context.Canceled)
-	// Output:
-	// save author: 00112233-4455-6677-8899-aabbccddeeff
-	// parent unset: true
-	// child unset: true
-	// canceled: true
 }
