@@ -2,7 +2,7 @@
 id: 0001-keep-the-core-standard-library-only-with-recipes-first
 title: Keep the core standard-library-only and integrate through standard interfaces and recipes before optional modules
 status: accepted
-stage: implemented
+stage: verified
 class: strategy
 reversibility: costly
 decided: 2026-10-02
@@ -29,6 +29,21 @@ applies-to:
 > unpublished `recipes/` module. Its explicit `publish: false` policy permits a
 > local root replacement; the released-root requirement below continues to apply
 > to publishable nested modules. The root remains standard-library-only.
+>
+> **2026-10-04 — verification clarification.** The current criteria below make
+> the 2026-10-03 unpublished-recipes exception explicit; the original criteria
+> remain as dated history. A `tools` module is a conditional future possibility,
+> not an existing module: the shared recognition and constructor-planning
+> packages use the standard library in the root. No tools or integration module
+> is currently published.
+>
+> **2026-10-04 — verified.** The root is published at v0.3.2. With `GOWORK=off`,
+> `go list -m all` returned only the root; `go list -deps ./concepts ./correlation`
+> contained no DI package; and the module-layout and dependency checks accepted
+> exactly the root and unpublished recipes. This verifies this decision's
+> lean-core criteria, not independent nested-module publication. The first real
+> publishable nested-module proof remains tracked by
+> [#16](https://github.com/Cratis/Fundamentals.Go/issues/16).
 
 ## Context
 
@@ -95,6 +110,23 @@ same rules in their own repositories; the `tools` module, which is governed by
 [#16](https://github.com/Cratis/Fundamentals.Go/issues/16).
 
 ## Verification
+
+These criteria incorporate the dated unpublished-recipes clarification above.
+
+- **Done when:** the root `go.mod` has no `require` directives;
+  `concepts` and `correlation` do not import `dependencyinjection`; every nested
+  module is listed in the module allow-list; and every **publishable** nested
+  module depends on a tagged root version without replacements. Explicitly
+  unpublished recipes may use only the allow-listed local-root replacement.
+- **Verify by:** `go list -m all` printing only the root module with
+  `GOWORK=off`, `go list -deps ./concepts ./correlation` containing no
+  `dependencyinjection` package, and both `python3 .github/scripts/go_modules.py
+  matrix` and `python3 .github/scripts/go_modules.py dependencies` succeeding.
+  A zero publishable-module count is not evidence of nested publication.
+
+### Original verification criteria (2026-10-02)
+
+Retained as history; read with the current clarification above.
 
 - **Done when:** the root `go.mod` has no `require` directives;
   `concepts` and `correlation` do not import `dependencyinjection`; and every
