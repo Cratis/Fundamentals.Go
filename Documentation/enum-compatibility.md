@@ -214,7 +214,10 @@ The `concepts.Concept[T]` and `Underlying` scalar allowlist remain unchanged.
 An existing Int32 scalar concept with product-owned validation does not establish
 general enum-concept recognition. There is no shared enum registry or serializer API.
 
-[#17](https://github.com/Cratis/Fundamentals.Go/issues/17) remains open. The reviewed
+[#17](https://github.com/Cratis/Fundamentals.Go/issues/17) delivered the historical
+and packaged-profile evidence; consumer adoption is tracked in
+[Chronicle.Go#64](https://github.com/Cratis/Chronicle.Go/issues/64) and
+[Arc.Go#32](https://github.com/Cratis/Arc.Go/issues/32). The reviewed
 Chronicle package capture supplies bounded event/schema evidence, not an admitted
 Go enum profile. Arc binding/proxy, backend/frontend agreement and Chronicle
 kernel/Mongo/BSON admission remain product-owned and unverified here. Neither
