@@ -96,7 +96,7 @@ person
 ```
 
 Both programs and their output are checked against the
-[naming examples](../naming/example_test.go).
+[naming examples](https://github.com/Cratis/Fundamentals.Go/blob/main/naming/example_test.go).
 
 The constructor takes segments to skip, a namespace-segment separator, a verbatim
 prefix and whether to camel-case properties and model names. Negative skipping
@@ -115,7 +115,7 @@ model/property names unchanged. A constructed NUL separator is supported.
 
 Authority is C# Fundamentals at `d2accc4a79b6bcf2708213c97093ab5ba6c06381`:
 `Strings/StringExtensions.cs` and the naming policies under `Serialization`.
-The [golden fixture provenance](../naming/testdata/README.md) records exact sources
+The [golden fixture provenance](https://github.com/Cratis/Fundamentals.Go/blob/main/naming/testdata/README.md) records exact sources
 and expectations, including deliberate Go adaptations.
 
 Classification and casing use BMP-aware helpers to match C# UTF-16 `char`

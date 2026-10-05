@@ -52,7 +52,7 @@ PRs use `no-release`; a dependency change requiring publication needs a delibera
 release-bound maintainer change.
 
 The merged PR body becomes the GitHub Release notes verbatim. Follow the
-[contribution guide](../CONTRIBUTING.md) and PR template; keep verification and
+[contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main/CONTRIBUTING.md) and PR template; keep verification and
 review notes in a PR comment. A `no-release` setup PR neither publishes a version
 nor automatically closes its referenced issue.
 
@@ -90,9 +90,9 @@ another. Review every major release separately.
 Use a separate module when tools or an approved optional integration need
 external dependencies. The root stays standard-library-only. Integration modules
 must first meet the standard-interfaces-and-recipes-first criteria in
-[decision 0001](../decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md).
+[decision 0001](https://github.com/Cratis/Fundamentals.Go/blob/main/decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md).
 
-[`.github/go-modules.json`](../.github/go-modules.json) is the single allow-list.
+[`.github/go-modules.json`](https://github.com/Cratis/Fundamentals.Go/blob/main/.github/go-modules.json) is the single allow-list.
 Each `nested` entry has an explicit `dir` and boolean `publish` policy.
 `recipes` is unpublished; the following steps apply to publishable modules:
 

@@ -57,7 +57,7 @@ either; no generic ID or generator is needed.
 The compile-time assertion checks the marker's exact return type; it does not
 check codecs. Run `Underlying` to validate the complete declaration, and test
 round trips for actual values. Compiling examples live in
-[`concepts/example_test.go`](../concepts/example_test.go).
+[`concepts/example_test.go`](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/example_test.go).
 
 For concepts stored in SQL databases, optionally add these forwarding methods
 to `AuthorID` and import `database/sql/driver` in the same file:
@@ -79,7 +79,7 @@ errors without changing the target. These optional methods do not affect
 SQL Server `uniqueidentifier` raw bytes use .NET mixed-endian order, not RFC
 order. Read them as text or convert explicitly before scanning; `Scan` never
 silently reorders bytes. The forwarding pattern is compiled and tested in
-[`concepts/uuid_sql_test.go`](../concepts/uuid_sql_test.go) using `AuthorID` from
+[`concepts/uuid_sql_test.go`](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/uuid_sql_test.go) using `AuthorID` from
 the examples.
 
 ### Validate before assigning
@@ -109,7 +109,7 @@ func (id *RequiredAuthorID) UnmarshalText(data []byte) error {
 The all-zero UUID parses successfully but fails this application's rule without
 changing the original ID. Use the same temporary/validate/assign sequence for
 validating JSON and SQL decoders; validating after direct delegation is too late.
-The [compiled example and regressions](../concepts/example_test.go) keep
+The [compiled example and regressions](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/example_test.go) keep
 passthrough `AuthorID` and validating `RequiredAuthorID` separate.
 
 A defined array type does not enforce constructor privacy or invariants: literals,
@@ -242,7 +242,7 @@ when you need explicit concept discovery. Unmarked primitives are not concepts.
     as map keys decode only with the jsonv2-backed implementation.
 
 The shared declarations and expected outcomes live in
-[`concepts/internal/corpus`](../concepts/internal/corpus/). Both reflect and
+[`concepts/internal/corpus`](https://github.com/Cratis/Fundamentals.Go/tree/main/concepts/internal/corpus). Both reflect and
 `go/types` tests run the same table, including aliases, generic instantiations,
 exact scalar types, codec signatures and failures. Any disagreement fails a test.
 This does not establish proxy-generation agreement; that remains Arc.Go's
@@ -284,7 +284,7 @@ owns the consumer's schema, property naming, validation or wire policies.
 Although `go/types` can distinguish promoted methods, this recognizer deliberately
 keeps reflect's conservative rule: any anonymous field invalidates a
 concept-bearing struct, even with explicit overrides. See the
-[compiling generator example](../concepts/conceptstypes/example_test.go) for
+[compiling generator example](https://github.com/Cratis/Fundamentals.Go/blob/main/concepts/conceptstypes/example_test.go) for
 source type-checking and UUID-backed concept recognition.
 
 ## Validate actual JSON output

@@ -44,7 +44,7 @@ a separate **unpublished** module and do not add dependencies to the root.
 This is a foundation, not an HTTP host, event store, universal serializer or
 application framework. Ordinary constructors remain the first choice; no other
 capability requires the optional container. The
-[accepted integration decision](../decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md)
+[accepted integration decision](https://github.com/Cratis/Fundamentals.Go/blob/main/decisions/0001-keep-the-core-standard-library-only-with-recipes-first.md)
 keeps standard interfaces and recipes ahead of additional integration modules.
 
 The [parity map](parity.md) distinguishes implemented contracts, deliberate Go
@@ -56,8 +56,9 @@ complex-key codecs, runtime or schema support.
 
 ## Contribute or publish
 
-The [contribution guide](../CONTRIBUTING.md) covers both modules' local checks.
+The [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main/CONTRIBUTING.md) covers both modules' local checks.
 [Release policy](releases.md) covers immutable tags, proxy indexing and recovery;
-[project context](project-context.md) describes the contributor workflow.
+[project context](https://github.com/Cratis/Fundamentals.Go/blob/main/Documentation/project-context.md)
+describes the contributor workflow.
 Fundamentals must not import its consumers, Arc.Go or Chronicle.Go. Consumer
 adoption and compatibility must be verified in those products independently.

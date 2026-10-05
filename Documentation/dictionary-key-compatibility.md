@@ -28,12 +28,12 @@ Authority is Fundamentals source commit
 - [ValueMap equality](https://github.com/Cratis/Fundamentals/blob/d2accc4a79b6bcf2708213c97093ab5ba6c06381/Source/JavaScript/ValueMap.ts)
   compares identity first, then native `JSON.stringify` for object keys.
 
-The [fixture inventory](../testdata/complex-key-contract/README.md) contains **132
+The [fixture inventory](https://github.com/Cratis/Fundamentals.Go/blob/main/testdata/complex-key-contract/README.md) contains **132
 stimuli**, **151 C#**, **186 JS** and **16 C# cross-runtime** observations, six
 explicit kind declarations, 11 factory-admission types and exact case IDs.
-[Provenance](../testdata/complex-key-contract/provenance.md) records source hashes,
+[Provenance](https://github.com/Cratis/Fundamentals.Go/blob/main/testdata/complex-key-contract/provenance.md) records source hashes,
 runtime identities and extraction limits. The optional
-[reproducer](../ContractTests/ComplexKeyJson/README.md) executes original sources;
+[reproducer](https://github.com/Cratis/Fundamentals.Go/blob/main/ContractTests/ComplexKeyJson/README.md) executes original sources;
 ordinary Go tests validate evidence with only the standard library.
 
 C# uses case-sensitive camelCase properties, the default encoder and ComplexKey,

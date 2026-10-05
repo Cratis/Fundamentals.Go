@@ -38,11 +38,11 @@ Run `go run .` to print:
 Quarterly report
 ```
 
-The [plain-constructor example](../dependencyinjection/example_test.go)
+The [plain-constructor example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/example_test.go)
 checks this program and output. Plain constructors keep dependency and ownership
 decisions visible. For custom integration, implement `di.Resolver` for exact-key
 lookup and `di.ScopeFactory` to open and close your own scopes. The
-[manual resolver and scope factory examples](../dependencyinjection/example_test.go)
+[manual resolver and scope factory examples](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/example_test.go)
 show this path without importing the container.
 
 Import the contracts as `di` from
@@ -111,7 +111,7 @@ Run the program with `go run .`:
 Quarterly report
 ```
 
-The [container example](../dependencyinjection/container/example_test.go)
+The [container example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/container/example_test.go)
 checks this complete program and output.
 
 `Build` runs no factories, guards or closers. It rejects missing declared edges,
@@ -139,7 +139,7 @@ diagnostic recovery, follow [Plan constructor bindings](constructor-bindings.md)
 The rules below remain the composition and ownership contract.
 
 Put lifetime directives on type doc comments, not constructors. This excerpt
-from the [render fixture](../dependencyinjection/internal/bindingcorpus/render/render.go)
+from the [render fixture](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/internal/bindingcorpus/render/render.go)
 requests one resource per scope:
 
 ```go
@@ -182,7 +182,7 @@ dependencies produce informational `MissingDependency` obligations, or errors
 with `RequireAllDependencies`. Scalar configuration requires an explicit provider
 or `Existing` declaration and otherwise produces `MissingConfiguration`. The
 container's `Build` still validates the final graph, cycles and captive lifetimes.
-The [planner example](../dependencyinjection/bindingtypes/corpus_test.go) shows
+The [planner example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/bindingtypes/corpus_test.go) shows
 type-checking and analysis without running application code.
 
 Products render zero-argument constructor bindings with `di.Bind`. For one
@@ -196,7 +196,7 @@ are rejected until a safe runtime adapter exists: returning a zero value after
 dependency failure could incorrectly transfer cleanup responsibility. Always
 preserve a non-nil constructor result returned with an error. Render forwarders
 with `di.BindBorrowed`, resolving their exact concrete key. The
-[hand-authored render-equivalence tests](../dependencyinjection/bindingtypes/render_test.go)
+[hand-authored render-equivalence tests](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/bindingtypes/render_test.go)
 exercise caching, forwarding, close-once behavior and failed-result cleanup.
 
 Duplicates remain strict. `KeepExisting` skips only keys explicitly listed in
@@ -209,7 +209,7 @@ Applying unchanged generated wiring twice is not idempotent; refresh `Existing`
 and replan to skip registered keys. If two product generators run in one app,
 one owns the service registrations and the other lists those keys in `Existing`.
 
-The checked-in [source corpus and expectation manifest](../dependencyinjection/internal/bindingcorpus/cases.json)
+The checked-in [source corpus and expectation manifest](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/internal/bindingcorpus/cases.json)
 is available to product renderer tests from their pinned Fundamentals module.
 Consume fixture files, not the Go `internal` package. Each product must compile
 and run its own output in an independent consumer module with `GOWORK=off` and
@@ -250,7 +250,7 @@ err := di.BindBorrowedFunc1(&registry, di.Scoped,
 
 Register `*SQLStore` as owned and handle `err`. Resolving either key shares the
 scoped object, and it closes once. The
-[interface forwarding example](../dependencyinjection/container/example_test.go)
+[interface forwarding example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/container/example_test.go)
 demonstrates this identity and cleanup. Do not bind the same instance as owned
 under two keys: there is no pointer-identity disposal deduplication. Transient
 forwarding still creates a fresh concrete instance per resolution.
@@ -265,7 +265,7 @@ Bind client-lifetime artifacts as `Singleton`. At client startup, open a
 short-lived scope, resolve the Singleton-bound artifact, and close the scope
 immediately. The instance and its root-owned dependencies remain usable until
 `Provider.Close`; closing the startup scope does not dispose them. The
-[client-lifetime Singleton example](../dependencyinjection/container/example_test.go)
+[client-lifetime Singleton example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/container/example_test.go)
 shows this pattern. Your application coordinates client Close and Provider.Close
 ordering; do not use a retained scope to prescribe that ordering.
 
@@ -382,7 +382,7 @@ and return build failures as errors, rather than calling `t.Fatal` in the builde
   disposal, guards, dependency graphs or ownership. Fixtures are externally owned;
   register any adapter teardown with `t.Cleanup`.
 
-The [adapter conformance example](../dependencyinjection/ditest/suites_test.go)
+The [adapter conformance example](https://github.com/Cratis/Fundamentals.Go/blob/main/dependencyinjection/ditest/suites_test.go)
 shows how to translate configuration and run both provider suites. Opaque typed
 bindings prevent incompatible factory results without unsafe code; successful
 provider lookups check result types, while resolver fixtures explicitly exercise

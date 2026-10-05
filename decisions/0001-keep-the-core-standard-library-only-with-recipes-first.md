@@ -41,9 +41,10 @@ applies-to:
 > `go list -m all` returned only the root; `go list -deps ./concepts ./correlation`
 > contained no DI package; and the module-layout and dependency checks accepted
 > exactly the root and unpublished recipes. This verifies this decision's
-> lean-core criteria, not independent nested-module publication. The first real
-> publishable nested-module proof remains tracked by
-> [#16](https://github.com/Cratis/Fundamentals.Go/issues/16).
+> lean-core criteria, not independent nested-module publication. The nested
+> release workflow is delivered
+> ([#16](https://github.com/Cratis/Fundamentals.Go/issues/16)); its live proof is
+> the index-module job of the first real publishable nested-module release.
 
 ## Context
 
@@ -105,9 +106,11 @@ breaks consumers.
 The rule holds from v0.1.0 for the life of the v0 series and is revisited before
 an approved v1. In scope: this repository's root module, documentation and any
 future nested modules. Out of scope: Arc.Go and Chronicle.Go, which record the
-same rules in their own repositories; the `tools` module, which is governed by
-[#14](https://github.com/Cratis/Fundamentals.Go/issues/14) and
-[#16](https://github.com/Cratis/Fundamentals.Go/issues/16).
+same rules in their own repositories; any future `tools` module, which would
+follow the nested-module release policy delivered under
+[#16](https://github.com/Cratis/Fundamentals.Go/issues/16). Constructor planning
+from [#14](https://github.com/Cratis/Fundamentals.Go/issues/14) shipped in the
+root at v0.2.0.
 
 ## Verification
 
