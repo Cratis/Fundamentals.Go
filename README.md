@@ -4,6 +4,7 @@
 [![Build](https://github.com/Cratis/Fundamentals.Go/actions/workflows/build.yml/badge.svg)](https://github.com/Cratis/Fundamentals.Go/actions/workflows/build.yml)
 [![Release](https://github.com/Cratis/Fundamentals.Go/actions/workflows/publish.yml/badge.svg)](https://github.com/Cratis/Fundamentals.Go/actions/workflows/publish.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Cratis/Fundamentals.Go/blob/main/LICENSE)
+[![Discord](https://img.shields.io/discord/1182595891576717413?label=Discord&logo=discord&color=7289da)](https://discord.gg/kt4AMpV8WV)
 
 The Go counterpart of [Cratis Fundamentals](https://github.com/Cratis/Fundamentals): shared domain-value primitives for Arc.Go and Chronicle.Go. Instead of each framework defining incompatible values and codecs, Fundamentals.Go provides one small, standard-library-only foundation. It must never import either framework.
 
@@ -49,6 +50,7 @@ See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main
 
 ## Community and security
 
+- [Questions and help on Discord](https://discord.gg/kt4AMpV8WV) — ask questions and get help from the Cratis team and other developers
 - [Cratis](https://www.cratis.io/) and the [Cratis repositories](https://github.com/Cratis)
 - [Private vulnerability reporting](https://github.com/Cratis/Fundamentals.Go/blob/main/SECURITY.md)
 
