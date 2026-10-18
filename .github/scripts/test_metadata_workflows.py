@@ -86,14 +86,9 @@ class MetadataWorkflows(unittest.TestCase):
 
     def test_callers_keep_required_identities_and_read_only_contract(self):
         callers = [
-            ("verify-release-notes.yml", "Verify Release Notes",
-             "    types: [opened, edited, reopened, synchronize, labeled, unlabeled, ready_for_review]\n",
-             "  release-notes:\n    uses: Cratis/Workflows/.github/workflows/verify-release-notes.yml@main\n"
-             "    with:\n      runs-on: ${{ vars.RUNNER_GATE || 'ubuntu-latest' }}\n", 1),
             ("verify-semver-label.yml", "Verify Semver Label",
              "    branches: [main]\n"
              "    types: [opened, reopened, synchronize, labeled, unlabeled, edited, ready_for_review]\n",
-             "  verify:\n    uses: Cratis/Workflows/.github/workflows/verify-release-intent.yml@main\n\n"
              "  go-major-policy:\n    name: Go major-release policy\n    runs-on: ubuntu-latest\n"
              "    timeout-minutes: 5\n    permissions:\n      contents: read\n      pull-requests: read\n"
              "    steps:\n      - name: Require an approved v1 launch and block accidental v2\n"
@@ -111,6 +106,13 @@ class MetadataWorkflows(unittest.TestCase):
                 self.assertNotRegex(source, r"(?m)^\s*[\w-]+: write$")
                 self.assertIn("\njobs:\n" + jobs, source)
                 self.assertNotIn("actions/checkout", source)
+        caller = (WORKFLOWS / "verify-pull-request-policy.yml").read_text()
+        self.assertTrue(caller.startswith("name: Verify Pull Request Policy\n\non:\n  pull_request:\n"
+                                          "    types: [opened, edited, reopened, synchronize, labeled, unlabeled, ready_for_review]\n"))
+        self.assertNotRegex(caller, r"(?m)^\s*concurrency:")
+        self.assertIn("    uses: Cratis/Workflows/.github/workflows/verify-pull-request-policy.yml@main\n", caller)
+        self.assertIn("      release-intent: true\n", caller)
+        self.assertNotIn("actions/checkout", caller)
         self.assertTrue(POLICY.startswith("set -euo pipefail\n"))
         self.assertNotIn("${{", POLICY)
         self.assertEqual(POLICY.count("timeout 20s gh api"), 1)
