@@ -59,8 +59,8 @@ else:
         self.git("remote", "add", "origin", "https://github.com/Cratis/Fundamentals.Go.git")
         workflows = self.root / ".github/workflows"
         workflows.mkdir(parents=True)
-        (workflows / "verify-release-notes.yml").write_text(
-            (ROOT / ".github/workflows/verify-release-notes.yml").read_text())
+        (workflows / "verify-pull-request-policy.yml").write_text(
+            (ROOT / ".github/workflows/verify-pull-request-policy.yml").read_text())
         self.git("add", ".github")
         self.git("commit", "-qm", "base")
         self.git("update-ref", "refs/remotes/origin/main", "HEAD")

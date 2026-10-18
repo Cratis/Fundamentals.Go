@@ -13,9 +13,6 @@ permissions:
 # independently; even cancel-in-progress: false can replace pending runs.
 
 jobs:
-  verify:
-    uses: Cratis/Workflows/.github/workflows/verify-release-intent.yml@main
-
   go-major-policy:
     name: Go major-release policy
     runs-on: ubuntu-latest
