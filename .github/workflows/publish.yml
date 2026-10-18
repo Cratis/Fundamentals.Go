@@ -8,11 +8,11 @@ on:
 permissions:
   contents: read
 
-# GitHub can replace an older PENDING run even with cancellation disabled.
-# Operational requirement: let Publish complete before the next release-bound merge.
+# Keep every pending release in order: release-action releases one merged pull request per run, and the
+# default concurrency keeps only one pending run and cancels the others (Cratis/Workflows#162).
 concurrency:
   group: go-publish-${{ github.repository }}
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   verify:

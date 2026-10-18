@@ -24,7 +24,7 @@ permissions:
 # Shared with root Publish: never race two release-action post hooks.
 concurrency:
   group: go-publish-${{ github.repository }}
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   ref:
