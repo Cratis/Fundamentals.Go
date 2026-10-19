@@ -11,16 +11,16 @@ require (
 	go.uber.org/dig v1.19.0
 	go.uber.org/fx v1.24.0
 	go.yaml.in/yaml/v3 v3.0.5
-	golang.org/x/tools v0.51.0
+	golang.org/x/tools v0.52.0
 )
 
 require (
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/mod v0.42.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
 )
 
 replace github.com/cratis/fundamentals.go => ../
