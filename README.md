@@ -51,6 +51,7 @@ See the [contribution guide](https://github.com/Cratis/Fundamentals.Go/blob/main
 ## Community and security
 
 - [Questions and help on Discord](https://discord.gg/kt4AMpV8WV) — ask questions and get help from the Cratis team and other developers
+- [Documentation](https://www.cratis.io/fundamentals/go/)
 - [Cratis](https://www.cratis.io/) and the [Cratis repositories](https://github.com/Cratis)
 - [Private vulnerability reporting](https://github.com/Cratis/Fundamentals.Go/blob/main/SECURITY.md)
 
