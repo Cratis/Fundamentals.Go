@@ -82,7 +82,7 @@ jobs:
       - name: Prepare the nested release
         id: release
         if: steps.plan.outputs.publish == 'true'
-        uses: Cratis/release-action@63dd1239df24ac5da1a41378a4eee7f92ecc0796 # v1.4.1
+        uses: Cratis/release-action@8e6d2757062f7f86a7dadcae1ba2967f48a910ac # v1.4.3
         with:
           version: ${{ steps.plan.outputs.version }}
           tag-prefix: ${{ steps.plan.outputs.prefix }}
