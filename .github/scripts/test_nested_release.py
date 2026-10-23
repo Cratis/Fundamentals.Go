@@ -47,7 +47,7 @@ if args[:2] == ['repo', 'view']:
     print(json.dumps({'nameWithOwner': 'Cratis/Fundamentals.Go', 'defaultBranchRef': {'name': 'main'}}))
 elif args[:2] == ['api', 'user']:
     print('maintainer')
-elif args and args[0] == 'api' and any('verify-release-notes.yml?ref=' in arg for arg in args):
+elif args and args[0] == 'api' and any('verify-pull-request-policy.yml?ref=' in arg for arg in args):
     print(Path(os.environ['TEST_RULES_WORKFLOW']).read_text())
 else:
     sys.exit('Unexpected offline gh request: ' + repr(args))
