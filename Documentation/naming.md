@@ -7,7 +7,7 @@ description: Share acronym-friendly casing and explicit property or read-model n
 <!-- Licensed under the MIT license. See LICENSE file in the project root for full license information. -->
 
 When a serializer and a schema generator spell the same property differently,
-you get a contract mismatch. The experimental `naming` package gives you shared
+you get a contract mismatch. The `naming` package gives you shared
 pure functions and explicit policies. It does not select a product default,
 configure `encoding/json`, interpret tags or rename existing stored data.
 
