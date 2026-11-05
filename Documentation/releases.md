@@ -31,9 +31,8 @@ complex-key implementations, runtime or schema support. The root remains
 standard-library-only; ecosystem recipes remain unpublished. Earlier releases
 include v0.2.0 at `532d218` and v0.1.0 at `e50913e`.
 
-Experimental releases remain v0.x until an approved stable launch. New public
-capabilities use `minor` intent; a minor version may contain breaking changes,
-with migration notes.
+Releases currently use v0.x versions. New public capabilities use `minor`
+intent; minor v0 releases may contain breaking changes, with migration notes.
 
 ## Development and release intent
 
@@ -46,7 +45,7 @@ communicate pins and releases in
 The initial v0.1.0 bootstrap sequencing is complete, not a rule for every release.
 
 Every PR has exactly one of `major`, `minor`, `patch` or `no-release`. While
-v0.x, use minor for additive public APIs or breaking experimental API changes
+v0.x, use minor for additive public APIs or breaking API changes
 and patch for compatible fixes. Describe breaking changes explicitly. Dependabot
 PRs use `no-release`; a dependency change requiring publication needs a deliberate
 release-bound maintainer change.

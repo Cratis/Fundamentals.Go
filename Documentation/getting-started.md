@@ -11,8 +11,8 @@ program. In this tutorial you define an `AuthorID`, encode an author as JSON,
 and decode it without losing either the value or its Go type. No container,
 server or C# knowledge is required.
 
-This tutorial targets Fundamentals.Go **v0.3.2, an experimental v0.x release**.
-Minor releases may change APIs with migration notes. This example uses only the
+This tutorial targets Fundamentals.Go **v0.3.2**.
+Minor v0 releases may contain breaking API changes, with migration notes. This example uses only the
 standard-library-only root module.
 
 ## Create a small Go program

@@ -16,7 +16,7 @@ You need Go 1.26 or later, not a server, DI container or C# background.
 
 ## Packages
 
-This documentation targets the root module **v0.3.2; the API remains experimental**.
+This documentation targets the root module **v0.3.2**.
 It uses only the standard library. Minor v0 releases may change APIs with migration
 notes. Install the lowercase module path
 `github.com/cratis/fundamentals.go@v0.3.2`; see [release status](releases.md).
