@@ -1,6 +1,6 @@
 ---
 title: Keep domain identity in a JSON round trip
-description: Install Fundamentals.Go v0.3.2 and round-trip a UUID-backed author ID using plain Go and encoding/json.
+description: Install Fundamentals.Go v0.3.2, define a UUID-backed author ID and preserve its domain identity through a complete encoding/json round trip in Go.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->

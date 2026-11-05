@@ -1,6 +1,6 @@
 ---
 title: Fundamentals Go parity map
-description: Pinned C# authority, shared scalar contracts and remaining domain-value surfaces for the Go Fundamentals library.
+description: Compare Fundamentals.Go with pinned C# contracts across scalars, concepts, dependency injection and serialization, noting deviations and remaining gaps.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
