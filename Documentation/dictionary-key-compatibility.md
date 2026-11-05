@@ -1,6 +1,6 @@
 ---
 title: Dictionary-key JSON compatibility
-description: Captured embedded JSON property names, typed ValueMap interoperability and the boundaries of complex-key evidence.
+description: Review captured .NET and JavaScript dictionary-key JSON behavior and typed ValueMap evidence, with explicit limits on unimplemented Go complex-key support.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->

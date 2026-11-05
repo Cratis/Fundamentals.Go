@@ -1,6 +1,6 @@
 ---
 title: Go releases
-description: Release intent, module publication, sequencing and recovery for Fundamentals.Go.
+description: Review Fundamentals.Go release history and publication rules, including nested module versioning, release sequencing, consumption and recovery steps.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->

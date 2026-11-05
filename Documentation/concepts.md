@@ -1,6 +1,6 @@
 ---
 title: Typed scalar concepts
-description: Author domain values with explicit scalar codecs and recognize their declarations without executing application code.
+description: Define typed Go domain values with explicit scalar codecs, UUID or calendar backing, validation and declaration discovery without running application code.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->

@@ -1,6 +1,6 @@
 ---
 title: Compose dependencies and own their scopes
-description: Wire Go constructors directly or use exact typed bindings, explicit scopes and deterministic resource cleanup.
+description: Compose Go dependencies with plain constructors or the optional container, using exact typed bindings, explicit scopes and deterministic resource cleanup.
 ---
 
 <!-- Copyright (c) Cratis. All rights reserved. -->
