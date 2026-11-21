@@ -143,8 +143,13 @@ constructors register that interface directly; pointer and value keys stay disti
 
 `KeepExisting` produces `RetainExisting` actions and `BT013` information for
 overlapping keys, using their attested lifetimes. It does not excuse multiple
-generated candidates. Preflight the manifest through runtime `Catalog` when
-available; otherwise composition must attest it. One product should own shared
+generated candidates. Preflight the manifest through runtime `Catalog.Contains`
+when available: it checks registration of an exact runtime `di.Key`, not its
+lifetime. Your product's wiring must associate each planner `types.Type` with
+that key, not match printed names, and supply the actual nonzero lifetime from
+composition code or its manifest. For example, `BindValue` registers a borrowed
+`Singleton`, so that registration contract supplies the lifetime, not `Contains`.
+Without `Catalog`, composition must attest the manifest. One product should own shared
 registrations and the other list them in `Existing`. Reapplying unchanged emitted
 wiring is not idempotent: refresh the manifest and replan. Never swallow duplicate
 registration errors.
