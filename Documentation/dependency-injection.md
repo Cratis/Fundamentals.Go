@@ -202,8 +202,12 @@ exercise caching, forwarding, close-once behavior and failed-result cleanup.
 Duplicates remain strict. `KeepExisting` skips only keys explicitly listed in
 `Config.Existing`, with their actual lifetimes: those bindings have action
 `RetainExisting` and diagnostic `BT013`, and emit no registration. Multiple
-generated candidates still fail. Preflight existing keys through `Catalog` when
-available; otherwise your composition code must attest the supplied manifest.
+generated candidates still fail. Preflight exact runtime-key presence through
+`Catalog.Contains` when available; otherwise your composition code must attest
+the supplied manifest. Presence does not attest lifetime: supply actual lifetimes
+from composition code or its manifest. See the
+[planner-to-runtime handoff](constructor-bindings.md#configure-the-analysis)
+for the source-type/runtime-key association and the limits of this check.
 Propagate every registration error—never catch `ErrDuplicate` and report success.
 Applying unchanged generated wiring twice is not idempotent; refresh `Existing`
 and replan to skip registered keys. If two product generators run in one app,
