@@ -82,7 +82,7 @@ jobs:
       - name: Prepare the nested release
         id: release
         if: steps.plan.outputs.publish == 'true'
-        uses: Cratis/release-action@63dd1239df24ac5da1a41378a4eee7f92ecc0796 # v1.4.1
+        uses: Cratis/release-action@fefcf36b86e78ff5d4d116da7f472bacf2d3d3c1 # v1.5.2
         with:
           version: ${{ steps.plan.outputs.version }}
           tag-prefix: ${{ steps.plan.outputs.prefix }}
@@ -140,7 +140,7 @@ jobs:
       GOTOOLCHAIN: local
     steps:
       # No checkout: resolution must not use a local module or workspace.
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: '1.27.x'
           cache: false
